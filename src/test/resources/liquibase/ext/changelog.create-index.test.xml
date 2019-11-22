@@ -1,0 +1,26 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="1" author="alex">
+        <ext:createIndex collectionName="createIndexTest">
+            <ext:keys>
+                { clientId: 1, type: 1}
+            </ext:keys>
+            <ext:options>
+                {unique: true, name: "ui_tppClientId"}
+            </ext:options>
+        </ext:createIndex>
+
+        <ext:createIndex collectionName="createIndexNoOptionsTest">
+            <ext:keys>
+                { clientId: 1, type: 1}
+            </ext:keys>
+        </ext:createIndex>
+    </changeSet>
+
+
+</databaseChangeLog>

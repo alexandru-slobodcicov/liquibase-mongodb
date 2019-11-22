@@ -1,0 +1,90 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="1" author="alex">
+
+        <ext:runCommand>
+            <ext:command>
+                {
+                createRole: "readRole",
+                roles: [
+                "read"
+                ],
+                privileges: []
+                }
+            </ext:command>
+        </ext:runCommand>
+
+        <ext:runCommand>
+            <ext:command>
+                {
+                createRole: "readWriteRole",
+                roles: [
+                "readWrite"
+                ],
+                privileges: []
+                }
+            </ext:command>
+        </ext:runCommand>
+
+        <ext:runCommand>
+            <ext:command>
+                {
+                createRole: "appRole",
+                roles: [
+                "readRole"
+                ],
+                privileges: []
+                }
+            </ext:command>
+        </ext:runCommand>
+
+        <ext:runCommand>
+            <ext:command>
+                {
+                createRole: "deployRole",
+                roles: [
+                "readWriteRole"
+                ],
+                privileges: []
+                }
+            </ext:command>
+        </ext:runCommand>
+
+    </changeSet>
+
+    <changeSet id="2" author="alex">
+
+        <ext:runCommand>
+            <ext:command>
+                {
+                createUser: "appUser",
+                pwd: "changeit",
+                roles: [
+                "appRole"
+                ],
+                mechanisms: ["SCRAM-SHA-256"]
+                }
+            </ext:command>
+        </ext:runCommand>
+
+        <ext:runCommand>
+            <ext:command>
+                {
+                createUser: "deployUser",
+                pwd: "changeit",
+                roles: [
+                "deployRole"
+                ],
+                mechanisms: ["SCRAM-SHA-256"]
+                }
+            </ext:command>
+        </ext:runCommand>
+
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,22 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="1" author="alex">
+        <ext:insertMany collectionName="insertManyTest1">
+            <ext:documents>
+                [
+                { id: 2 },
+                { id: 3,
+                  address: { nr: 1, ap: 5}
+                }
+                ]
+            </ext:documents>
+
+        </ext:insertMany>
+    </changeSet>
+
+</databaseChangeLog>

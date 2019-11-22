@@ -1,0 +1,70 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="1" author="alex">
+
+        <ext:insertOne collectionName="insertOneTest1">
+
+            <ext:document>
+                {
+                id: 111
+                }
+            </ext:document>
+
+        </ext:insertOne>
+
+    </changeSet>
+
+    <changeSet id="2" author="alex">
+
+        <ext:insertOne collectionName="insertOneTest2">
+
+            <ext:document>
+                {
+                id: 2
+                }
+            </ext:document>
+
+        </ext:insertOne>
+
+        <ext:insertOne collectionName="insertOneTest3">
+
+            <ext:document>
+                {
+                id: 3
+                }
+            </ext:document>
+
+        </ext:insertOne>
+
+    </changeSet>
+
+    <changeSet id="3" author="alex">
+
+        <ext:insertOne collectionName="insertOneTest2">
+
+            <ext:document>
+                {
+                id: 21323123
+                }
+            </ext:document>
+
+        </ext:insertOne>
+
+        <ext:insertOne collectionName="insertOneTest3">
+
+            <ext:document>
+                {
+                id: 321321313
+                }
+            </ext:document>
+
+        </ext:insertOne>
+
+    </changeSet>
+
+</databaseChangeLog>
