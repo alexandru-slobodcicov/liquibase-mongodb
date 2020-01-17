@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.statement;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -36,7 +36,7 @@ import static java.util.Optional.ofNullable;
 @EqualsAndHashCode(callSuper = true)
 public class CreateCollectionStatement extends AbstractMongoStatement {
 
-    public static final String COMMAND = "createCollection";
+    public static final String COMMAND_NAME = "createCollection";
 
     protected String collectionName;
     protected Document options;
@@ -54,7 +54,7 @@ public class CreateCollectionStatement extends AbstractMongoStatement {
     public String toJs() {
         return
                 "db."
-                        + COMMAND
+                        + COMMAND_NAME
                         + "("
                         + collectionName
                         + ", "

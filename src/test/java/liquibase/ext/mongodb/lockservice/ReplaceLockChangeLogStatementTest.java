@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.lockservice;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -22,7 +22,7 @@ package liquibase.ext.mongodb.lockservice;
 
 import org.junit.jupiter.api.Test;
 
-import static liquibase.ext.mongodb.lockservice.ReplaceLockChangeLogStatement.COMMAND;
+import static liquibase.ext.mongodb.lockservice.ReplaceLockChangeLogStatement.COMMAND_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ReplaceLockChangeLogStatementTest {
@@ -31,7 +31,7 @@ class ReplaceLockChangeLogStatementTest {
     void testToJs() {
         final String collectionName = "testCollection";
         final ReplaceLockChangeLogStatement replaceLockChangeLogStatement = new ReplaceLockChangeLogStatement(collectionName, false);
-        assertThat(replaceLockChangeLogStatement.toJs()).isEqualTo("db.".concat(collectionName).concat(".").concat(COMMAND).concat("();"));
+        assertThat(replaceLockChangeLogStatement.toJs()).isEqualTo("db.".concat(collectionName).concat(".").concat(COMMAND_NAME).concat("();"));
     }
 
 }

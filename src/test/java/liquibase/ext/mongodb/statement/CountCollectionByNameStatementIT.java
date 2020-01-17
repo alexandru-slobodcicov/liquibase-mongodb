@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.statement;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -20,20 +20,23 @@ package liquibase.ext.mongodb.statement;
  * #L%
  */
 
+import liquibase.ext.AbstractMongoIntegrationTest;
 import liquibase.ext.mongodb.TestUtils;
 import org.junit.jupiter.api.Test;
 
+import static liquibase.ext.mongodb.TestUtils.COLLECTION_NAME_1;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CountDocumentsInCollectionTest {
+class CountCollectionByNameStatementIT extends AbstractMongoIntegrationTest {
     private static final String COLLECTION_NAME = TestUtils.COLLECTION_NAME_1;
-    private static final String COLLECTION_CMD = String.format("db.countDocumentsInCollection(%s);", COLLECTION_NAME);
-    private static final CountDocumentsInCollection COUNT_COLLECTION = new CountDocumentsInCollection(COLLECTION_NAME);
+    private static final String COLLECTION_CMD = String.format("db.listCollectionNames(%s);", COLLECTION_NAME);
+    private static final CountCollectionByNameStatement COUNT_COLLECTION = new CountCollectionByNameStatement(COLLECTION_NAME);
 
     @Test
-    void toJs() {
-        assertThat(COUNT_COLLECTION.toJs())
-            .isEqualTo(COLLECTION_CMD);
+    void queryForLong() {
+        mongoExecutor.getDb().createCollection(COLLECTION_NAME_1);
+        assertThat(new CountCollectionByNameStatement(COLLECTION_NAME_1).queryForLong(mongoConnection.getDb()))
+            .isEqualTo(1);
     }
 
     @Test

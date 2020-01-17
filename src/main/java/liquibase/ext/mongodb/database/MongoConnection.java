@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.database;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -36,6 +36,8 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 
+import java.util.Objects;
+
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 
 @Getter
@@ -51,7 +53,7 @@ public class MongoConnection implements DatabaseConnection {
     public MongoConnection(final String connectionString) {
         this.connectionString = new ConnectionString(connectionString);
         this.con = MongoClients.create(this.connectionString);
-        this.db = this.con.getDatabase(this.connectionString.getDatabase())
+        this.db = this.con.getDatabase(Objects.requireNonNull(this.connectionString.getDatabase()))
                 .withCodecRegistry(uuidCodecRegistry());
     }
 
@@ -79,7 +81,7 @@ public class MongoConnection implements DatabaseConnection {
     }
 
     public void commit() throws DatabaseException {
-        // NA
+        //TODO: implementation
     }
 
     public boolean getAutoCommit() throws DatabaseException {
@@ -87,7 +89,7 @@ public class MongoConnection implements DatabaseConnection {
     }
 
     public void setAutoCommit(boolean autoCommit) throws DatabaseException {
-
+        //TODO: implementation
     }
 
     @Override
@@ -100,7 +102,7 @@ public class MongoConnection implements DatabaseConnection {
     }
 
     public void rollback() throws DatabaseException {
-        // NA
+        //TODO: implementation
     }
 
     public String getDatabaseProductName() throws DatabaseException {
@@ -135,7 +137,7 @@ public class MongoConnection implements DatabaseConnection {
     }
 
     public void attached(Database database) {
-
+        //TODO: implementation
     }
 
 }

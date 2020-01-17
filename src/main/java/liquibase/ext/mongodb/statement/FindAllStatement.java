@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.statement;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -35,7 +35,7 @@ import static liquibase.ext.mongodb.statement.BsonUtils.orEmptyDocument;
 @EqualsAndHashCode(callSuper = true)
 public class FindAllStatement extends AbstractMongoStatement {
 
-    public static final String COMMAND = "find";
+    public static final String COMMAND_NAME = "find";
 
     private final String collectionName;
     private final Document filter;
@@ -61,13 +61,14 @@ public class FindAllStatement extends AbstractMongoStatement {
             "db." +
                 collectionName +
                 "." +
-                COMMAND +
+                    COMMAND_NAME +
                 "(" +
                 filter.toJson() +
                 ");";
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List queryForList(final MongoDatabase db, final Class elementType) throws DatabaseException {
         final ArrayList result = new ArrayList();
         db.getCollection(collectionName, elementType)

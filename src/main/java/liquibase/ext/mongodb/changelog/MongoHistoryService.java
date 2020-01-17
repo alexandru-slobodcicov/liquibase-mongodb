@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.changelog;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -116,7 +116,7 @@ public class MongoHistoryService extends AbstractChangeLogHistoryService {
 
         final Executor executor = ExecutorService.getInstance().getExecutor(getDatabase());
 
-        boolean createdTable = hasDatabaseChangeLogTable();
+        final boolean createdTable = hasDatabaseChangeLogTable();
 
         if (createdTable) {
             //TODO: Add MD5SUM check logic and potentially get and check validator structure and update not equal
@@ -147,7 +147,7 @@ public class MongoHistoryService extends AbstractChangeLogHistoryService {
         if (this.ranChangeSetList == null) {
             final Document sort = new Document().append("dateExecuted", 1).append("orderExecuted", 1);
 
-            Collection<Document> ranChangeSets = new ArrayList<>();
+            final Collection<Document> ranChangeSets = new ArrayList<>();
             ((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
                     .find().sort(sort).into(ranChangeSets);
 
@@ -185,22 +185,20 @@ public class MongoHistoryService extends AbstractChangeLogHistoryService {
     }
 
     @Override
-    public void setExecType(ChangeSet changeSet, ChangeSet.ExecType execType) throws DatabaseException {
+    public void setExecType(final ChangeSet changeSet, final ChangeSet.ExecType execType) throws DatabaseException {
 
-
-        //TODO: simillar to commented
-        //ExecutorService.getInstance().getExecutor(database).execute(new MarkChangeSetRanStatement(changeSet, execType));
         final RanChangeSet ranChangeSet = new RanChangeSet(changeSet, execType, null, null);
 
         if (execType.ranBefore) {
-            Document filter = new Document()
+            final Document filter = new Document()
                     .append("fileName", changeSet.getFilePath())
                     .append("id", changeSet.getId())
                     .append("author", changeSet.getAuthor());
 
-            Document update = new Document()
+            final Document update = new Document()
                     .append("execType", execType.value);
 
+            //TODO: implement with MongoExecutor of MarkChangeSetRanStatement
             ((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
                     .updateOne(filter, update);
 
@@ -218,13 +216,12 @@ public class MongoHistoryService extends AbstractChangeLogHistoryService {
     @Override
     public void removeFromHistory(final ChangeSet changeSet) throws DatabaseException {
 
-        //ExecutorService.getInstance().getExecutor(database).execute(new RemoveChangeSetRanStatusStatement(changeSet));
-
-        Document filter = new Document()
+        final Document filter = new Document()
                 .append("fileName", changeSet.getFilePath())
                 .append("id", changeSet.getId())
                 .append("author", changeSet.getAuthor());
 
+        //TODO: implement with MongoExecutor of a statement
         ((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
                 .deleteOne(filter);
 
@@ -239,8 +236,8 @@ public class MongoHistoryService extends AbstractChangeLogHistoryService {
             if (getDatabase().getConnection() == null) {
                 lastChangeSetSequenceValue = 0;
             } else {
-                lastChangeSetSequenceValue = Long.valueOf(((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
-                        .countDocuments()).intValue();
+                lastChangeSetSequenceValue = (int)((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
+                        .countDocuments();
             }
         }
 
@@ -252,18 +249,17 @@ public class MongoHistoryService extends AbstractChangeLogHistoryService {
      */
     @Override
     public void tag(final String tagString) throws DatabaseException {
-        int totalRows =
-                Long.valueOf(((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
-                        .countDocuments()).intValue();
-        if (totalRows == 0) {
-            ChangeSet emptyChangeSet = new ChangeSet(String.valueOf(new Date().getTime()), "liquibase",
+        final long totalRows =
+                ((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
+                        .countDocuments();
+        if (totalRows == 0L) {
+            final ChangeSet emptyChangeSet = new ChangeSet(String.valueOf(new Date().getTime()), "liquibase",
                     false, false, "liquibase-internal", null, null,
                     getDatabase().getObjectQuotingStrategy(), null);
             this.setExecType(emptyChangeSet, ChangeSet.ExecType.EXECUTED);
         }
 
-        //TODO: update the last row tag
-        //executor.execute(new TagDatabaseStatement(tagString));
+        //TODO: update the last row tag with TagDatabaseStatement tagString
 
         if (this.ranChangeSetList != null) {
             ranChangeSetList.get(ranChangeSetList.size() - 1).setTag(tagString);
@@ -272,9 +268,9 @@ public class MongoHistoryService extends AbstractChangeLogHistoryService {
 
     @Override
     public boolean tagExists(final String tag) {
-        int count = Long.valueOf(((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
-                .countDocuments(new Document("tag", tag))).intValue();
-        return count > 0;
+        final long count = ((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
+                .countDocuments(new Document("tag", tag));
+        return count > 0L;
     }
 
     @Override

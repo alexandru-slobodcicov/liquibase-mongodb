@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.statement;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -29,7 +29,7 @@ import org.bson.Document;
 @EqualsAndHashCode(callSuper = true)
 public class RunCommandStatement extends AbstractMongoDocumentStatement<Document> {
 
-    public static final String COMMAND = "runCommand";
+    public static final String COMMAND_NAME = "runCommand";
 
     protected Document command;
 
@@ -45,7 +45,7 @@ public class RunCommandStatement extends AbstractMongoDocumentStatement<Document
     public String toJs() {
         return
                 "db."
-                        + COMMAND
+                        + COMMAND_NAME
                         + "("
                         + command.toJson()
                         + ");";

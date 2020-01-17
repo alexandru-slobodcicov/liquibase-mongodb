@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.database;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -40,6 +40,7 @@ import lombok.Setter;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
 
 public class MongoLiquibaseDatabase extends AbstractJdbcDatabase {
@@ -69,6 +70,7 @@ public class MongoLiquibaseDatabase extends AbstractJdbcDatabase {
         return connection;
     }
 
+    @Override
     public void setConnection(final DatabaseConnection connection) {
         this.connection = (MongoConnection) connection;
     }
@@ -100,21 +102,27 @@ public class MongoLiquibaseDatabase extends AbstractJdbcDatabase {
         return MONGODB_PRODUCT_SHORT_NAME;
     }
 
+    @Override
     public String getDefaultCatalogName() {
         return null;
     }
 
+    @Override
     public void setDefaultCatalogName(String catalogName) {
-
+        //TODO: implementation
     }
 
+    @Override
     public String getDefaultSchemaName() {
         return null;
     }
 
+    @Override
     public void setDefaultSchemaName(String schemaName) {
+        //TODO: implementation
     }
 
+    @Override
     public Integer getDefaultScaleForNativeDataType(String nativeDataType) {
         return null;
     }
@@ -123,10 +131,12 @@ public class MongoLiquibaseDatabase extends AbstractJdbcDatabase {
         return 27017;
     }
 
+    @Override
     public Integer getFetchSize() {
         return null;
     }
 
+    @Override
     public String getLiquibaseCatalogName() {
         if (liquibaseCatalogName != null) {
             return liquibaseCatalogName;
@@ -184,30 +194,37 @@ public class MongoLiquibaseDatabase extends AbstractJdbcDatabase {
         return null;
     }
 
+    @Override
     public String escapeObjectName(String catalogName, String schemaName, String objectName, Class<? extends DatabaseObject> objectType) {
         return null;
     }
 
+    @Override
     public String escapeTableName(String catalogName, String schemaName, String tableName) {
         return null;
     }
 
+    @Override
     public String escapeIndexName(String catalogName, String schemaName, String indexName) {
         return null;
     }
 
+    @Override
     public String escapeObjectName(String objectName, Class<? extends DatabaseObject> objectType) {
         return null;
     }
 
+    @Override
     public String escapeColumnName(String catalogName, String schemaName, String tableName, String columnName) {
         return null;
     }
 
+    @Override
     public String escapeColumnName(String catalogName, String schemaName, String tableName, String columnName, boolean quoteNamesThatMayBeFunctions) {
         return null;
     }
 
+    @Override
     public String escapeColumnNameList(String columnNames) {
         return null;
     }
@@ -216,51 +233,59 @@ public class MongoLiquibaseDatabase extends AbstractJdbcDatabase {
         return false;
     }
 
+    @Override
     public boolean supportsCatalogs() {
         return false;
     }
 
+    @Override
     public CatalogAndSchema.CatalogAndSchemaCase getSchemaAndCatalogCase() {
         return CatalogAndSchema.CatalogAndSchemaCase.ORIGINAL_CASE;
     }
 
+    @Override
     public boolean supportsSchemas() {
         return false;
     }
 
+    @Override
     public boolean supportsCatalogInObjectName(Class<? extends DatabaseObject> type) {
         return false;
     }
 
+    @Override
     public String generatePrimaryKeyName(String tableName) {
         return null;
     }
 
+    @Override
     public String escapeSequenceName(String catalogName, String schemaName, String sequenceName) {
         return null;
     }
 
+    @Override
     public String escapeViewName(String catalogName, String schemaName, String viewName) {
         return null;
     }
 
     @Override
     public void commit() throws DatabaseException {
-
+        //TODO: implementation
     }
 
     @Override
     public void rollback() throws DatabaseException {
-
+        //TODO: implementation
     }
 
+    @Override
     public String escapeStringForDatabase(String string) {
         return null;
     }
 
     @Override
     public void close() throws DatabaseException {
-
+        //TODO: implementation
     }
 
     @Override
@@ -268,6 +293,7 @@ public class MongoLiquibaseDatabase extends AbstractJdbcDatabase {
         return false;
     }
 
+    @Override
     public String escapeConstraintName(String constraintName) {
         return null;
     }
@@ -278,38 +304,45 @@ public class MongoLiquibaseDatabase extends AbstractJdbcDatabase {
         return false;
     }
 
+    @Override
     public void saveStatements(Change change, List<SqlVisitor> sqlVisitors, Writer writer) throws IOException {
-
+        //TODO: implementation
     }
 
+    @Override
     public void executeRollbackStatements(Change change, List<SqlVisitor> sqlVisitors) throws LiquibaseException {
-
+        //TODO: implementation
     }
 
+    @Override
     public void executeRollbackStatements(SqlStatement[] statements, List<SqlVisitor> sqlVisitors) throws LiquibaseException {
-
+        //TODO: implementation
     }
 
+    @Override
     public void saveRollbackStatement(Change change, List<SqlVisitor> sqlVisitors, Writer writer) throws IOException, LiquibaseException {
-
+        //TODO: implementation
     }
 
-
+    @Override
     public List<DatabaseFunction> getDateFunctions() {
-        return null;
+        //TODO: proper implementation
+        return Collections.emptyList();
     }
 
-
+    @Override
     public boolean supportsForeignKeyDisable() {
         return false;
     }
 
+    @Override
     public boolean disableForeignKeyChecks() throws DatabaseException {
         return false;
     }
 
+    @Override
     public void enableForeignKeyChecks() throws DatabaseException {
-
+        //TODO: implementation
     }
 
     @Override
@@ -322,98 +355,122 @@ public class MongoLiquibaseDatabase extends AbstractJdbcDatabase {
         return false;
     }
 
+    @Override
     public String correctObjectName(String name, Class<? extends DatabaseObject> objectType) {
         return null;
     }
 
+    @Override
     public boolean isFunction(String string) {
         return false;
     }
 
+    @Override
     public int getDataTypeMaxParameters(String dataTypeName) {
         return 0;
     }
 
+    @Override
     public CatalogAndSchema getDefaultSchema() {
         return null;
     }
 
+    @Override
     public boolean dataTypeIsNotModifiable(String typeName) {
         return false;
     }
 
+    @Override
     public String generateDatabaseFunctionValue(DatabaseFunction databaseFunction) {
         return null;
     }
 
+    @Override
     public ObjectQuotingStrategy getObjectQuotingStrategy() {
         return null;
     }
 
+    @Override
     public void setObjectQuotingStrategy(ObjectQuotingStrategy quotingStrategy) {
-
+        //TODO: implementation
     }
 
+    @Override
     public boolean createsIndexesForForeignKeys() {
         return false;
     }
 
+    @Override
     public boolean getOutputDefaultSchema() {
         return false;
     }
 
+    @Override
     public void setOutputDefaultSchema(boolean outputDefaultSchema) {
-
+        //TODO: implementation
     }
 
+    @Override
     public boolean isDefaultSchema(String catalog, String schema) {
         return false;
     }
 
+    @Override
     public boolean isDefaultCatalog(String catalog) {
         return false;
     }
 
+    @Override
     public boolean getOutputDefaultCatalog() {
         return false;
     }
 
+    @Override
     public void setOutputDefaultCatalog(boolean outputDefaultCatalog) {
-
+        //TODO: implementation
     }
 
+    @Override
     public boolean supportsPrimaryKeyNames() {
         return false;
     }
 
+    @Override
     public boolean supportsNotNullConstraintNames() {
         return false;
     }
 
+    @Override
     public boolean supportsBatchUpdates() throws DatabaseException {
         return false;
     }
 
+    @Override
     public boolean requiresExplicitNullForColumns() {
         return false;
     }
 
+    @Override
     public String getSystemSchema() {
         return null;
     }
 
+    @Override
     public String escapeDataTypeName(String dataTypeName) {
         return null;
     }
 
+    @Override
     public String unescapeDataTypeName(String dataTypeName) {
         return null;
     }
 
+    @Override
     public String unescapeDataTypeString(String dataTypeString) {
         return null;
     }
 
+    @Override
     public ValidationErrors validate() {
         return null;
     }
@@ -429,38 +486,46 @@ public class MongoLiquibaseDatabase extends AbstractJdbcDatabase {
         return null;
     }
 
+    @Override
     public boolean requiresUsername() {
         return false;
     }
 
+    @Override
     public boolean requiresPassword() {
         return false;
     }
 
+    @Override
     public boolean getAutoCommitMode() {
         return false;
     }
 
+    @Override
     public boolean supportsDDLInTransaction() {
         return false;
     }
 
+    @Override
     public String getDatabaseProductName() {
         return MONGODB_PRODUCT_NAME;
     }
 
     protected String getDefaultDatabaseProductName() {
-        return "MongoDB";
+        return MONGODB_PRODUCT_NAME;
     }
 
+    @Override
     public String getDatabaseProductVersion() throws DatabaseException {
         return null;
     }
 
+    @Override
     public int getDatabaseMajorVersion() throws DatabaseException {
         return 0;
     }
 
+    @Override
     public int getDatabaseMinorVersion() throws DatabaseException {
         return 0;
     }

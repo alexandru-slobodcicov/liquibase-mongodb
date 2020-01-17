@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.lockservice;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -34,29 +34,25 @@ import lombok.Setter;
 public class SelectLockChangeLogStatement extends AbstractMongoStatement {
 
 
-    public static String COMMAND = "findOne";
+    public static final String COMMAND_NAME = "findOne";
 
-    public String collectionName;
+    private String collectionName;
 
     @Override
     public String toJs() {
         //TODO: Adjust and unit test
-        return new StringBuilder()
-                .append("db.")
-                .append(collectionName)
-                .append(".")
-                .append(COMMAND)
-                .append("(")
-                .append(");")
-                .toString();
+        return "db." +
+                collectionName +
+                "." +
+                COMMAND_NAME +
+                "(" +
+                ");";
     }
 
     @Override
-    public <LockEntry> LockEntry queryForObject(final MongoDatabase db, final Class<LockEntry> requiredType) {
+    public <ENTRY> ENTRY queryForObject(final MongoDatabase db, final Class<ENTRY> requiredType) {
 
-        final LockEntry entry =
-                db.getCollection(collectionName, requiredType).withCodecRegistry(MongoConnection.pojoCodecRegistry())
-                        .find(Filters.eq("id", 1)).first();
-    return entry;
+        return db.getCollection(collectionName, requiredType).withCodecRegistry(MongoConnection.pojoCodecRegistry())
+                .find(Filters.eq("id", 1)).first();
     }
 }

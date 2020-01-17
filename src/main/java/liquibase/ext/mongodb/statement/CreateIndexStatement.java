@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.statement;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -32,7 +32,7 @@ import static liquibase.ext.mongodb.statement.BsonUtils.orEmptyDocument;
 @EqualsAndHashCode(callSuper = true)
 public class CreateIndexStatement extends AbstractMongoStatement {
 
-    public static final String COMMAND = "createIndex";
+    public static final String COMMAND_NAME = "createIndex";
 
     private final String collectionName;
     private final Document keys;
@@ -54,7 +54,7 @@ public class CreateIndexStatement extends AbstractMongoStatement {
                 "db."
                         + collectionName
                         + ". "
-                        + COMMAND
+                        + COMMAND_NAME
                         + "("
                         + keys.toJson()
                         + ", "
@@ -64,19 +64,19 @@ public class CreateIndexStatement extends AbstractMongoStatement {
 
     @Override
     public void execute(MongoDatabase db) {
-        db.getCollection(collectionName).createIndex(keys, createIndexOptions(options));
+        db.getCollection(collectionName).createIndex(keys, createIndexOptions());
     }
 
-    private IndexOptions createIndexOptions(final Document indexOptions) {
+    private IndexOptions createIndexOptions() {
         //TODO: add POJO codec
-        final IndexOptions options = new IndexOptions();
-        if (indexOptions.containsKey("unique") && indexOptions.getBoolean("unique")) {
-            options.unique(true);
+        final IndexOptions indexOptions = new IndexOptions();
+        if (options.containsKey("unique") && options.getBoolean("unique")) {
+            indexOptions.unique(true);
         }
-        if (indexOptions.containsKey("name")) {
-            options.name(indexOptions.getString("name"));
+        if (options.containsKey("name")) {
+            indexOptions.name(options.getString("name"));
         }
-        return options;
+        return indexOptions;
     }
 
     @Override

@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.lockservice;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -46,17 +46,17 @@ public class MongoChangeLogLock extends DatabaseChangeLogLock{
 
     //TODO: use  db.getCollection(collectionName, requiredType).withCodecRegistry(MongoConnection.pojoCodecRegistry())
     //not working when converting back to POJO, date field is as object, String is as binary
-    public static MongoChangeLogLock from(final Object document) {
+    public static MongoChangeLogLock from(final Document document) {
 
-        Document doc = (Document) document;
         return new MongoChangeLogLock(
-                doc.get("_id", Integer.class)
-                , doc.get("lockGranted", Date.class)
-                , doc.get("lockedBy", String.class)
-                , doc.get("locked", Boolean.class)
+                document.get("_id", Integer.class)
+                , document.get("lockGranted", Date.class)
+                , document.get("lockedBy", String.class)
+                , document.get("locked", Boolean.class)
         );
     }
 
+    @Override
     public int getId() {
         return id;
     }
@@ -65,6 +65,7 @@ public class MongoChangeLogLock extends DatabaseChangeLogLock{
         this.id = id;
     }
 
+    @Override
     public Date getLockGranted() {
         return lockGranted;
     }
@@ -73,6 +74,7 @@ public class MongoChangeLogLock extends DatabaseChangeLogLock{
         this.lockGranted = lockGranted;
     }
 
+    @Override
     public String getLockedBy() {
         return lockedBy;
     }

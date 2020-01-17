@@ -6,8 +6,8 @@ package liquibase.ext.mongodb;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -84,14 +84,14 @@ public final class TestUtils {
     public static List<Document> getAllRoles(final MongoConnection connection) {
         return (List<Document>) connection.getDb()
             .runCommand(Document.parse("{ rolesInfo: 1, showPrivileges:false, showBuiltinRoles: false }"))
-            .get("roles");
+            .getList("roles", Document.class);
     }
 
     public static void dropAllUsers(final MongoConnection connection) {
         connection.getDb().runCommand(Document.parse(CMD_DROP_ALL_USERS));
     }
 
-    public static void commit(final Liquibase liquibase) throws LiquibaseException {
+    public static void liquibaseUpdate(final Liquibase liquibase) throws LiquibaseException {
         liquibase.update("{}");
     }
 

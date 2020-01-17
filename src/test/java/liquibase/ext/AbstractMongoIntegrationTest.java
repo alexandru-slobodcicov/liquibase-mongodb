@@ -6,8 +6,8 @@ package liquibase.ext;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -20,15 +20,12 @@ package liquibase.ext;
  * #L%
  */
 
-import liquibase.Liquibase;
 import liquibase.database.DatabaseFactory;
 import liquibase.exception.DatabaseException;
-import liquibase.exception.LiquibaseException;
 import liquibase.executor.ExecutorService;
 import liquibase.ext.mongodb.database.MongoConnection;
 import liquibase.ext.mongodb.database.MongoLiquibaseDatabase;
 import liquibase.ext.mongodb.executor.MongoExecutor;
-import liquibase.resource.ClassLoaderResourceAccessor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,11 +35,9 @@ import java.util.function.Consumer;
 import static liquibase.ext.mongodb.TestUtils.getMongoConnection;
 
 @Slf4j
-public class AbstractMongoIntegrationTest {
+public abstract class AbstractMongoIntegrationTest {
 
-
-    protected static final MongoConnection mongoConnection = getMongoConnection("application-test.properties");
-
+    protected static MongoConnection mongoConnection;
     protected static MongoExecutor mongoExecutor;
     protected static MongoLiquibaseDatabase database;
 
@@ -54,6 +49,8 @@ public class AbstractMongoIntegrationTest {
 
     @BeforeEach
     protected void setUp() throws DatabaseException {
+
+        mongoConnection = getMongoConnection("application-test.properties");
 
         //Can be achieved by excluding the package to scan or pass package list via system.parameter
         //ServiceLocator.getInstance().getPackages().remove("liquibase.executor");

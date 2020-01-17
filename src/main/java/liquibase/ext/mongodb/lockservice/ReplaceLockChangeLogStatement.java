@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.lockservice;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -40,42 +40,41 @@ import java.util.Optional;
 @Setter
 public class ReplaceLockChangeLogStatement extends AbstractMongoStatement {
 
-    protected static final String hostName;
-    protected static final String hostAddress;
-    protected static final String hostDescription = (System.getProperty("liquibase.hostDescription") == null) ? "" :
+    public static final String COMMAND_NAME = "update";
+
+    protected static final String HOST_NAME;
+    protected static final String HOST_ADDRESS;
+    protected static final String HOST_DESCRIPTION = (System.getProperty("liquibase.hostDescription") == null) ? "" :
             ("#" + System.getProperty("liquibase.hostDescription"));
-    public static String COMMAND = "update";
 
     static {
         try {
-            hostName = NetUtil.getLocalHostName();
-            hostAddress = NetUtil.getLocalHostAddress();
+            HOST_NAME = NetUtil.getLocalHostName();
+            HOST_ADDRESS = NetUtil.getLocalHostAddress();
         } catch (Exception e) {
             throw new UnexpectedLiquibaseException(e);
         }
     }
 
-    public String collectionName;
-    public boolean locked;
+    private String collectionName;
+    private boolean locked;
 
     @Override
     public String toJs() {
         //TODO: Adjust and unit test
-        return new StringBuilder()
-                .append("db.")
-                .append(collectionName)
-                .append(".")
-                .append(COMMAND)
-                .append("(")
-                .append(");")
-                .toString();
+        return "db." +
+                collectionName +
+                "." +
+                COMMAND_NAME +
+                "(" +
+                ");";
     }
 
     @Override
     public int update(MongoDatabase db) {
 
         final MongoChangeLogLock entry = new MongoChangeLogLock(1, new Date()
-                , hostName + hostDescription + " (" + hostAddress + ")", true);
+                , HOST_NAME + HOST_DESCRIPTION + " (" + HOST_ADDRESS + ")", true);
         final Document inputDocument = entry.toDocument();
         inputDocument.put("locked", locked);
         final Optional<Document> changeLogLock = Optional.ofNullable(

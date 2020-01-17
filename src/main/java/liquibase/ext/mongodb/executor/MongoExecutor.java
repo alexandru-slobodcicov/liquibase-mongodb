@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.executor;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -42,6 +42,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import org.bson.Document;
 
 import java.util.List;
 import java.util.Map;
@@ -59,12 +60,14 @@ public class MongoExecutor extends AbstractExecutor {
     @Setter
     public MongoDatabase db;
 
+    @Override
     public void setDatabase(Database database) {
         super.setDatabase(database);
         db = ((MongoConnection) this.database.getConnection()).getDb();
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T> T queryForObject(final SqlStatement sql, final Class<T> requiredType) {
         if (sql instanceof SelectFromDatabaseChangeLogLockStatement) {
             final SelectFromDatabaseChangeLogLockStatement statement = (SelectFromDatabaseChangeLogLockStatement) sql;
@@ -112,7 +115,8 @@ public class MongoExecutor extends AbstractExecutor {
     }
 
     @Override
-    public List queryForList(final SqlStatement sql, final Class elementType) throws DatabaseException {
+    @SuppressWarnings("unchecked")
+    public List<Object> queryForList(final SqlStatement sql, final Class elementType) throws DatabaseException {
         if (sql instanceof AbstractMongoStatement) {
             return ((AbstractMongoStatement) sql).queryForList(db, elementType);
         }
@@ -120,18 +124,18 @@ public class MongoExecutor extends AbstractExecutor {
     }
 
     @Override
-    public List queryForList(final SqlStatement sql, final Class elementType, final List<SqlVisitor> sqlVisitors) {
-        return null;
+    public List<Object> queryForList(final SqlStatement sql, final Class elementType, final List<SqlVisitor> sqlVisitors) {
+        return emptyList();
     }
 
     @Override
     public List<Map<String, ?>> queryForList(final SqlStatement sql) {
-        return null;
+        return emptyList();
     }
 
     @Override
     public List<Map<String, ?>> queryForList(final SqlStatement sql, final List<SqlVisitor> sqlVisitors) {
-        return null;
+        return emptyList();
     }
 
     @Override
@@ -148,7 +152,7 @@ public class MongoExecutor extends AbstractExecutor {
             try {
                 ChangeLogHistoryServiceFactory.getInstance().getChangeLogService(this.database).clearAllCheckSums();
             } catch (LiquibaseException e) {
-                e.printStackTrace();
+                LogService.getLog(getClass()).severe("Execution exception ", e);
             }
         } else {
             throw new IllegalArgumentException();
@@ -171,7 +175,7 @@ public class MongoExecutor extends AbstractExecutor {
 
     @Override
     public void comment(final String message) {
-        LogService.getLog(getClass()).debug(LogType.LOG, message);
+        LogService.getLog(getClass()).debug(message);
     }
 
     @Override
@@ -179,12 +183,8 @@ public class MongoExecutor extends AbstractExecutor {
         return true;
     }
 
-    public <T> T run(final SqlStatement sql) {
-        if (sql instanceof AbstractMongoDocumentStatement) {
-            return (T) ((AbstractMongoDocumentStatement) sql).run(db);
-        } else {
-            throw new IllegalArgumentException();
-        }
+    public <T extends Document> T run(final AbstractMongoDocumentStatement<T> sql) {
+            return sql.run(db);
     }
 
     private static boolean isClearChecksumStatement(final SqlStatement sqlStatement) {

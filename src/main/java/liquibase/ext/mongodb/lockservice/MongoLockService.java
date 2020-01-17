@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.lockservice;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -29,7 +29,7 @@ import liquibase.exception.UnexpectedLiquibaseException;
 import liquibase.executor.Executor;
 import liquibase.executor.ExecutorService;
 import liquibase.ext.mongodb.database.MongoLiquibaseDatabase;
-import liquibase.ext.mongodb.statement.CountDocumentsInCollection;
+import liquibase.ext.mongodb.statement.CountDocumentsInCollectionStatement;
 import liquibase.ext.mongodb.statement.DropCollectionStatement;
 import liquibase.ext.mongodb.statement.FindAllStatement;
 import liquibase.lockservice.DatabaseChangeLogLock;
@@ -47,7 +47,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static java.util.ResourceBundle.getBundle;
 
@@ -188,6 +187,7 @@ public class MongoLockService implements LockService {
             try {
                 database.rollback();
             } catch (DatabaseException e) {
+                LogService.getLog(getClass()).severe(LogType.LOG, "Error on acquire change log lock Rollback.", e);
             }
         }
     }
@@ -226,6 +226,7 @@ public class MongoLockService implements LockService {
                 LogService.getLog(getClass()).info(LogType.LOG, "Successfully released change log lock");
                 database.rollback();
             } catch (DatabaseException e) {
+                LogService.getLog(getClass()).severe(LogType.LOG, "Error on released change log lock Rollback.", e);
             }
         }
     }
@@ -237,15 +238,15 @@ public class MongoLockService implements LockService {
                 return new DatabaseChangeLogLock[0];
             }
 
-            List<DatabaseChangeLogLock> allLocks = new ArrayList<>();
             SqlStatement stmt = new FindAllStatement(
                     getDatabaseChangeLogLockTableName()
             );
 
             final Executor executor = ExecutorService.getInstance().getExecutor(getDatabase());
-            List rows = (List) StreamSupport.<Document>stream(executor.queryForList(stmt, Document.class).spliterator(), false)
-                    .map(d -> MongoChangeLogLock.from(d)).collect(Collectors.toList());
-            allLocks.addAll(rows);
+            @SuppressWarnings("unchecked")
+            List<MongoChangeLogLock> rows = (List<MongoChangeLogLock>) executor.queryForList(stmt, Document.class).stream()
+                    .map(d -> MongoChangeLogLock.from((Document)d)).collect(Collectors.toList());
+            List<DatabaseChangeLogLock> allLocks = new ArrayList<>(rows);
 
             return allLocks.toArray(new DatabaseChangeLogLock[0]);
         } catch (Exception e) {
@@ -266,7 +267,7 @@ public class MongoLockService implements LockService {
     }
 
     @Override
-    public void destroy() throws DatabaseException {
+    public void destroy() {
         try {
             final Executor executor = ExecutorService.getInstance().getExecutor(getDatabase());
 
@@ -322,7 +323,7 @@ public class MongoLockService implements LockService {
             try {
                 final Executor executor = ExecutorService.getInstance().getExecutor(getDatabase());
                 hasDatabaseChangeLogLockTable =
-                        executor.queryForLong(new CountDocumentsInCollection(getDatabase().getDatabaseChangeLogLockTableName())) == 1L;
+                        executor.queryForLong(new CountDocumentsInCollectionStatement(getDatabase().getDatabaseChangeLogLockTableName())) == 1L;
             } catch (Exception e) {
                 throw new DatabaseException(e);
             }

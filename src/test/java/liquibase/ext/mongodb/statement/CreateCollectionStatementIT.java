@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.statement;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -29,7 +29,7 @@ import static liquibase.ext.mongodb.TestUtils.OPTION_1;
 import static liquibase.ext.mongodb.TestUtils.getCollections;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CreateCollectionStatementTest extends AbstractMongoIntegrationTest {
+class CreateCollectionStatementIT extends AbstractMongoIntegrationTest {
 
     private static final String EXPECTED_COMMAND = "db.createCollection(collectionName, {\"opt1\": \"option 1\"});";
 

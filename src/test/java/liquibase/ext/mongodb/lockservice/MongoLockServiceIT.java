@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.lockservice;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -34,7 +34,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.nullValue;
 
-class MongoLockServiceIntegrationTest extends AbstractMongoIntegrationTest {
+class MongoLockServiceIT extends AbstractMongoIntegrationTest {
 
     public MongoLockService mongoLockService;
 
@@ -53,7 +53,7 @@ class MongoLockServiceIntegrationTest extends AbstractMongoIntegrationTest {
     }
 
     @Test
-    void testInit() throws DatabaseException, LockException {
+    void testInit() throws DatabaseException {
         mongoLockService.reset();
         assertThat(mongoLockService.hasChangeLogLock(), equalTo(false));
         assertThat(mongoLockService.getHasDatabaseChangeLogLockTable(), nullValue());

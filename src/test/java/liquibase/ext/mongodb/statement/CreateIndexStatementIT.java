@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.statement;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -22,7 +22,6 @@ package liquibase.ext.mongodb.statement;
 
 import com.mongodb.client.MongoDatabase;
 import liquibase.ext.AbstractMongoIntegrationTest;
-import org.assertj.core.api.SoftAssertions;
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +30,7 @@ import java.util.stream.StreamSupport;
 import static liquibase.ext.mongodb.TestUtils.COLLECTION_NAME_1;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CreateIndexStatementTest extends AbstractMongoIntegrationTest {
+class CreateIndexStatementIT extends AbstractMongoIntegrationTest {
 
     @Test
     void toStringJs() {
@@ -59,9 +58,7 @@ class CreateIndexStatementTest extends AbstractMongoIntegrationTest {
             .findAny()
             .orElseThrow(() -> new IllegalStateException("Index not found"));
 
-        SoftAssertions.assertSoftly(soflty -> {
-            soflty.assertThat(document.get("unique")).isEqualTo(true);
-            soflty.assertThat(document.get("key")).isEqualTo(Document.parse("{ locale: 1 }"));
-        });
+            assertThat(document.get("unique")).isEqualTo(true);
+            assertThat(document.get("key")).isEqualTo(Document.parse("{ locale: 1 }"));
     }
 }

@@ -6,8 +6,8 @@ package liquibase.ext;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MongoLiquibaseIntegrationCreateUsersTest extends AbstractMongoIntegrationTest {
+class MongoLiquibaseCreateDropUsersIT extends AbstractMongoIntegrationTest {
 
     @BeforeEach
     void advancedCleanUp() {
@@ -48,14 +48,14 @@ class MongoLiquibaseIntegrationCreateUsersTest extends AbstractMongoIntegrationT
     @Test
     void testMongoLiquibaseCreateUsers() throws LiquibaseException {
         final Liquibase liquiBase = new Liquibase("liquibase/ext/changelog.create-users.test.xml", new ClassLoaderResourceAccessor(), database);
-        TestUtils.commit(liquiBase);
+        TestUtils.liquibaseUpdate(liquiBase);
         assertThat(TestUtils.getAllRoles(mongoConnection)).hasSize(4);
     }
 
     @Test
     void testMongoLiquibaseDropAllUsers() throws LiquibaseException {
         final Liquibase liquiBase = new Liquibase("liquibase/ext/changelog.drop-users.test.xml", new ClassLoaderResourceAccessor(), database);
-        TestUtils.commit(liquiBase);
+        TestUtils.liquibaseUpdate(liquiBase);
         assertThat(TestUtils.getAllRoles(mongoConnection)).isEmpty();
     }
 

@@ -6,8 +6,8 @@ package liquibase.ext.mongodb.statement;
  * %%
  * Copyright (C) 2019 Mastercard
  * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
@@ -28,22 +28,20 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class CountDocumentsInCollection extends AbstractMongoStatement {
+public class CountDocumentsInCollectionStatement extends AbstractMongoStatement {
 
-    public static final String COMMAND = "countDocumentsInCollection";
+    public static final String COMMAND_NAME = "countDocumentsInCollection";
 
     private final String collectionName;
 
     @Override
     public String toJs() {
         return
-                new StringBuilder()
-                        .append("db.")
-                        .append(COMMAND)
-                        .append("(")
-                        .append(collectionName)
-                        .append(");")
-                        .toString();
+                "db." +
+                        COMMAND_NAME +
+                        "(" +
+                        collectionName +
+                        ");";
     }
 
     @Override
