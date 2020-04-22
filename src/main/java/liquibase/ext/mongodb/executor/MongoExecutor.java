@@ -22,6 +22,7 @@ package liquibase.ext.mongodb.executor;
 
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Projections;
+import liquibase.Scope;
 import liquibase.change.ColumnConfig;
 import liquibase.changelog.ChangeLogHistoryServiceFactory;
 import liquibase.database.Database;
@@ -31,8 +32,6 @@ import liquibase.executor.AbstractExecutor;
 import liquibase.ext.mongodb.database.MongoConnection;
 import liquibase.ext.mongodb.statement.AbstractMongoDocumentStatement;
 import liquibase.ext.mongodb.statement.AbstractMongoStatement;
-import liquibase.logging.LogService;
-import liquibase.logging.LogType;
 import liquibase.servicelocator.LiquibaseService;
 import liquibase.sql.visitor.SqlVisitor;
 import liquibase.statement.SqlStatement;
@@ -152,7 +151,7 @@ public class MongoExecutor extends AbstractExecutor {
             try {
                 ChangeLogHistoryServiceFactory.getInstance().getChangeLogService(this.database).clearAllCheckSums();
             } catch (LiquibaseException e) {
-                LogService.getLog(getClass()).severe("Execution exception ", e);
+                Scope.getCurrentScope().getLog(getClass()).severe("Execution exception ", e);
             }
         } else {
             throw new IllegalArgumentException();
@@ -175,7 +174,7 @@ public class MongoExecutor extends AbstractExecutor {
 
     @Override
     public void comment(final String message) {
-        LogService.getLog(getClass()).debug(message);
+        Scope.getCurrentScope().getLog(getClass()).fine(message);
     }
 
     @Override

@@ -20,13 +20,14 @@ package liquibase.ext;
  * #L%
  */
 
+import liquibase.Scope;
 import liquibase.database.DatabaseFactory;
 import liquibase.exception.DatabaseException;
 import liquibase.executor.ExecutorService;
+import liquibase.ext.mongodb.TestUtils;
 import liquibase.ext.mongodb.database.MongoConnection;
 import liquibase.ext.mongodb.database.MongoLiquibaseDatabase;
 import liquibase.ext.mongodb.executor.MongoExecutor;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -34,7 +35,6 @@ import java.util.function.Consumer;
 
 import static liquibase.ext.mongodb.TestUtils.getMongoConnection;
 
-@Slf4j
 public abstract class AbstractMongoIntegrationTest {
 
     protected static MongoConnection mongoConnection;
@@ -58,11 +58,11 @@ public abstract class AbstractMongoIntegrationTest {
 
         database = (MongoLiquibaseDatabase) DatabaseFactory.getInstance().findCorrectDatabaseImplementation(mongoConnection);
         database.setConnection(mongoConnection);
-        log.debug("database is initialized...");
+        Scope.getCurrentScope().getLog(TestUtils.class).fine("database is initialized...");
 
         mongoExecutor = new MongoExecutor();
         mongoExecutor.setDatabase(database);
-        log.debug("mongoExecutor is initialized...");
+        Scope.getCurrentScope().getLog(TestUtils.class).fine("mongoExecutor is initialized...");
 
         ExecutorService.getInstance().setExecutor(database, mongoExecutor);
 

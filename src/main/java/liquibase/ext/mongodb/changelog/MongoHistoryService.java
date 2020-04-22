@@ -22,6 +22,7 @@ package liquibase.ext.mongodb.changelog;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import liquibase.Scope;
 import liquibase.changelog.AbstractChangeLogHistoryService;
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.RanChangeSet;
@@ -37,7 +38,6 @@ import liquibase.ext.mongodb.statement.AbstractMongoStatement;
 import liquibase.ext.mongodb.statement.CountCollectionByNameStatement;
 import liquibase.ext.mongodb.statement.DropCollectionStatement;
 import liquibase.logging.LogService;
-import liquibase.logging.LogType;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -127,12 +127,12 @@ public class MongoHistoryService extends AbstractChangeLogHistoryService {
                     new CreateChangeLogCollectionStatement(getDatabase().getDatabaseChangeLogTableName());
 
             // If there is no table in the database for recording change history create one.
-            LogService.getLog(getClass()).info(LogType.LOG, "Creating database history collection with name: " +
+            Scope.getCurrentScope().getLog(getClass()).info("Creating database history collection with name: " +
                     getDatabase().getLiquibaseCatalogName() + "." + getDatabase().getDatabaseChangeLogTableName());
 
             executor.execute(createChangeLogCollectionStatement);
 
-            LogService.getLog(getClass()).info(LogType.LOG, "Created database history collection : " +
+            Scope.getCurrentScope().getLog(getClass()).info("Created database history collection : " +
                     createChangeLogCollectionStatement.toJs());
         }
 

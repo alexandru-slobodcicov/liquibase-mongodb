@@ -21,6 +21,7 @@ package liquibase.ext.mongodb;
  */
 
 import liquibase.Liquibase;
+import liquibase.Scope;
 import liquibase.changelog.ChangeLogParameters;
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.DatabaseChangeLog;
@@ -33,7 +34,6 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 import liquibase.util.file.FilenameUtils;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 
 import java.util.List;
@@ -44,7 +44,6 @@ import java.util.stream.StreamSupport;
 import static lombok.AccessLevel.PRIVATE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Slf4j
 @NoArgsConstructor(access = PRIVATE)
 public final class TestUtils {
     public static final String BUILD_INFO_1 = "{ buildInfo: 1 }";
@@ -66,7 +65,6 @@ public final class TestUtils {
     public static MongoConnection getMongoConnection(final String propertyFile) {
         final Properties properties = new Properties();
         properties.load(TestUtils.class.getClassLoader().getResourceAsStream(propertyFile));
-        log.debug("Actual connection properties:\n{}", properties);
 
         return getMongoConnection(properties);
     }
