@@ -175,7 +175,7 @@ public class MongoLiquibaseDatabase extends AbstractJdbcDatabase {
     }
 
     @Override
-    public String getAutoIncrementClause(BigInteger startWith, BigInteger incrementBy) {
+    public String getAutoIncrementClause(BigInteger startWith, BigInteger incrementBy, String generationType, Boolean defaultOnNull) {
         return null;
     }
 
