@@ -10,3 +10,9 @@ target/
 
 ##other###
 *.log
+
+# VS Code Java
+*.prefs
+.project
+.classpath
+.factorypath
