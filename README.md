@@ -46,11 +46,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-####Tested on: 
-
 ```
-MongoDB 4.0.3
-liquibase-core:3.6.3
 mongo-java-driver:3.10.2
 ```
 
