@@ -52,7 +52,7 @@ public final class TestUtils {
     public static final String EMPTY_STRING = "";
     public static final String EMPTY_OPTION = EMPTY_STRING;
     public static final String OPTION_1 = "{\"opt1\":\"option 1\"}";
-    private static final String DB_CONNECTION_PATH = System.getenv("DB_CONNECTION_URI") != null ? System.getenv("DB_CONNECTION_URI") : "db.connection.uri";
+    private static final String DB_CONNECTION_PATH = "db.connection.uri";
     private static final String CMD_DROP_ALL_ROLES = "{dropAllRolesFromDatabase: 1, writeConcern: { w: \"majority\" }}";
     private static final String CMD_DROP_ALL_USERS = "{dropAllUsersFromDatabase: 1, writeConcern: { w: \"majority\" }}";
     private static final String CMD_GET_ALL_ROLES = "{getAllRolesFromDatabase: 1,  showPrivileges:false, showBuiltinRoles: false }}";
