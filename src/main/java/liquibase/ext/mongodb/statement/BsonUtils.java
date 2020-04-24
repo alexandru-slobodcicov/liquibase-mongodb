@@ -43,7 +43,7 @@ public final class BsonUtils {
 
     public static final DocumentCodec DOCUMENT_CODEC =
         new DocumentCodec(fromProviders(
-            new UuidCodecProvider(UuidRepresentation.STANDARD),
+            new UuidCodecProvider(UuidRepresentation.JAVA_LEGACY),
             new ValueCodecProvider(),
             new BsonValueCodecProvider(),
             new DocumentCodecProvider(),
