@@ -1,5 +1,7 @@
 # Liquibase MongoDB Extension
 
+[![Build Status](https://travis-ci.com/liquibase/liquibase-mongodb.svg?branch=master)](https://travis-ci.com/liquibase/liquibase-mongodb)
+
 ## Table of contents
 
 1. [Introduction](#introduction)
