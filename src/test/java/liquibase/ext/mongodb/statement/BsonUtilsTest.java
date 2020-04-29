@@ -20,36 +20,50 @@ package liquibase.ext.mongodb.statement;
  * #L%
  */
 
+import org.bson.Document;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
+import static java.lang.String.format;
+import static java.util.UUID.fromString;
 import static java.util.stream.Collectors.toList;
+import static liquibase.ext.mongodb.statement.BsonUtils.orEmptyDocument;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class BsonUtilsTest {
+    final String UUID_V4 = "e4408c36-4661-4bb2-8565-3e8187f34849";
 
     @Test
-    void orEmptyDocument() {
-        assertThat(BsonUtils.orEmptyDocument("{code: UUID(\"fe4f70d0-d08d-86d0-6147-8d279a4fde9d\")}").get("code", UUID.class))
-            .isEqualTo(UUID.fromString("fe4f70d0-d08d-86d0-6147-8d279a4fde9d"));
-        assertThat(BsonUtils.orEmptyDocument(null).isEmpty()).isTrue();
-        assertThat(BsonUtils.orEmptyDocument("").isEmpty()).isTrue();
-        assertThat(BsonUtils.orEmptyDocument("{id:1}").isEmpty()).isFalse();
+    void shouldProcessProperlyUUID() {
+        final UUID uuid = fromString(UUID_V4);
+        assertThat(uuid.version()).isEqualTo(4);
+        assertThat(uuid.toString()).isEqualTo(UUID_V4);
+    }
+
+    @Test
+    void shouldParseJsonAsDocument() {
+        final Document uuidDoc = orEmptyDocument(format("{code: UUID(\"%s\")}", UUID_V4));
+        final UUID uuidActual = uuidDoc.get("code", UUID.class);
+        assertThat(uuidActual).hasToString(UUID_V4);
+
+        assertThat(orEmptyDocument(null)).isEmpty();
+        assertThat(orEmptyDocument("")).isEmpty();
+        assertThat(orEmptyDocument("{id:1}")).isNotEmpty();
     }
 
     @Test
     void orEmptyDocumentSpecialChars() {
-        assertThat(BsonUtils.orEmptyDocument("{name: \"Bank Złoto\"}").getString("name")).isEqualTo("Bank Złoto");
+        assertThat(orEmptyDocument("{name: \"Bank Złoto\"}").getString("name")).isEqualTo("Bank Złoto");
     }
 
     @Test
     void orEmptyArray() {
         assertThat(
-            BsonUtils.orEmptyList("[{code: UUID(\"fe4f70d0-d08d-86d0-6147-8d279a4fde9d\")}]")
-                .stream()
-                .map(d -> d.get("code"))
-                .collect(toList())).contains(UUID.fromString("fe4f70d0-d08d-86d0-6147-8d279a4fde9d"));
+                BsonUtils.orEmptyList(format("[{code: UUID(\"%s\")}]", UUID_V4))
+                        .stream()
+                        .map(d -> d.get("code"))
+                        .collect(toList())).contains(fromString(UUID_V4));
         assertThat(BsonUtils.orEmptyList(null)).isEmpty();
         assertThat(BsonUtils.orEmptyList("")).isEmpty();
         assertThat(BsonUtils.orEmptyList("[{id:1}, {id:2}]")).hasSize(2);
