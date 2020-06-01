@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.liquibase.ext</groupId>
     <artifactId>liquibase-mongodb</artifactId>
-    <version>1.3.0-SNAPSHOT</version>
+    <version>3.9.0</version>
     <name>Liquibase MongoDB Extension</name>
     <description>Liquibase extension for MongoDB</description>
     <url>http://www.liquibase.org</url>
@@ -23,7 +23,7 @@
     <scm>
         <connection>scm:git:http://github.com/liquibase/liquibase-mongodb.git</connection>
         <url>https://github.com/liquibase/liquibase-monbodb</url>
-        <tag>HEAD</tag>
+        <tag>liquibase-mongodb-3.9.0</tag>
     </scm>
     <developers>
         <developer>
