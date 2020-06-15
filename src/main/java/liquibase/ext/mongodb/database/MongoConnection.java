@@ -36,7 +36,9 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 
+import java.sql.Driver;
 import java.util.Objects;
+import java.util.Properties;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 
@@ -139,5 +141,17 @@ public class MongoConnection implements DatabaseConnection {
     public void attached(Database database) {
         //TODO: implementation
     }
+
+	@Override
+	public int getPriority() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void open(String url, Driver driverObject, Properties driverProperties) throws DatabaseException {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
