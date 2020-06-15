@@ -191,4 +191,16 @@ public class MongoExecutor extends AbstractExecutor {
         return sqlStatement instanceof UpdateStatement
             && ((UpdateStatement) sqlStatement).getNewColumnValues().containsKey("MD5SUM");
     }
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getPriority() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }
