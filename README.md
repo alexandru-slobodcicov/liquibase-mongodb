@@ -1,5 +1,7 @@
 # Liquibase MongoDB Extension
 
+[![Build Status](https://travis-ci.com/liquibase/liquibase-mongodb.svg?branch=master)](https://travis-ci.com/liquibase/liquibase-mongodb)
+
 ## Table of contents
 
 1. [Introduction](#introduction)
@@ -46,11 +48,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-####Tested on: 
-
 ```
-MongoDB 4.0.3
-liquibase-core:3.6.3
 mongo-java-driver:3.10.2
 ```
 
