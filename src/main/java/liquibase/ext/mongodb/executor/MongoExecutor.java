@@ -50,6 +50,7 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static liquibase.ext.mongodb.database.MongoLiquibaseDatabase.DATABASE_CHANGE_LOG_LOCK_TABLE_NAME;
+import static liquibase.servicelocator.PrioritizedService.PRIORITY_DATABASE;
 
 @NoArgsConstructor
 @LiquibaseService
@@ -193,13 +194,11 @@ public class MongoExecutor extends AbstractExecutor {
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return "mongodb";
 	}
 
 	@Override
 	public int getPriority() {
-		// TODO Auto-generated method stub
-		return 0;
+		return PRIORITY_DATABASE;
 	}
 }

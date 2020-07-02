@@ -21,6 +21,7 @@ package liquibase.ext.mongodb.changelog;
  */
 
 import liquibase.Liquibase;
+import liquibase.Scope;
 import liquibase.changelog.ChangeLogHistoryServiceFactory;
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.RanChangeSet;
@@ -61,7 +62,7 @@ class MongoHistoryServiceIT extends AbstractMongoIntegrationTest {
         LIQUIBASE = new Liquibase(FILE_PATH, new ClassLoaderResourceAccessor(), database);
         LIQUIBASE.update("");
 
-        ExecutorService.getInstance().setExecutor(database, mongoExecutor);
+        Scope.getCurrentScope().getSingleton(ExecutorService.class).setExecutor(database, mongoExecutor);
     }
 
     @Test
@@ -120,7 +121,7 @@ class MongoHistoryServiceIT extends AbstractMongoIntegrationTest {
 
         final ChangeSet changeSet = LIQUIBASE.getDatabaseChangeLog().getChangeSet(FILE_PATH, "alex", "1");
         assertTrue(mongoHistoryService.isServiceInitialized());
-        ExecutorService.getInstance().setExecutor(database, mongoExecutor);
+        Scope.getCurrentScope().getSingleton(ExecutorService.class).setExecutor(database, mongoExecutor);
 
         mongoHistoryService.replaceChecksum(changeSet);
 

@@ -64,7 +64,7 @@ public abstract class AbstractMongoIntegrationTest {
         mongoExecutor.setDatabase(database);
         Scope.getCurrentScope().getLog(TestUtils.class).fine("mongoExecutor is initialized...");
 
-        ExecutorService.getInstance().setExecutor(database, mongoExecutor);
+        Scope.getCurrentScope().getSingleton(ExecutorService.class).setExecutor(database, mongoExecutor);
 
         database.getConnection().getDb().listCollectionNames()
             .forEach((Consumer<? super String>) c -> mongoConnection.getDb().getCollection(c).drop());
