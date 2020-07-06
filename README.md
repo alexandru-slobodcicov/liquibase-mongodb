@@ -78,7 +78,7 @@ mvn clean install -Prun-its
 
 ```
 <dependency>
-    <groupId>com.mastercard.liquibase</groupId>
+    <groupId>org.liquibase.ext</groupId>
     <artifactId>liquibase-mongodb</artifactId>
     <version>${liquibase-mongodb.version}</version>
 </dependency>
