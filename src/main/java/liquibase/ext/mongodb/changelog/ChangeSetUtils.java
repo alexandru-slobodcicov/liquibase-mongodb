@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 import org.bson.Document;
 
 import static java.util.Objects.nonNull;
-import static liquibase.util.StringUtils.isNotEmpty;
+import static liquibase.util.StringUtil.isNotEmpty;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ChangeSetUtils {

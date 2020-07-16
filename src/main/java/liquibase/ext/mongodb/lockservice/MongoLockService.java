@@ -20,6 +20,7 @@ package liquibase.ext.mongodb.lockservice;
  * #L%
  */
 
+import liquibase.Scope;
 import liquibase.configuration.GlobalConfiguration;
 import liquibase.configuration.LiquibaseConfiguration;
 import liquibase.database.Database;
@@ -34,8 +35,6 @@ import liquibase.ext.mongodb.statement.DropCollectionStatement;
 import liquibase.ext.mongodb.statement.FindAllStatement;
 import liquibase.lockservice.DatabaseChangeLogLock;
 import liquibase.lockservice.LockService;
-import liquibase.logging.LogService;
-import liquibase.logging.LogType;
 import liquibase.statement.SqlStatement;
 import lombok.Getter;
 import org.bson.Document;
@@ -84,7 +83,7 @@ public class MongoLockService implements LockService {
 
         if (!hasDatabaseChangeLogLockTable()) {
             try {
-                final Executor executor = ExecutorService.getInstance().getExecutor(getDatabase());
+                final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", Scope.getCurrentScope().getDatabase());
                 executor.comment("Create Database Lock Collection");
 
                 final CreateChangelogLockCollectionStatement createChangeLogLockCollectionStatement =
@@ -94,11 +93,11 @@ public class MongoLockService implements LockService {
 
                 database.commit();
 
-                LogService.getLog(getClass()).debug(LogType.LOG, "Created database lock collection: " + createChangeLogLockCollectionStatement.toJs());
+                Scope.getCurrentScope().getLog(getClass()).fine("Created database lock collection: " + createChangeLogLockCollectionStatement.toJs());
             } catch (DatabaseException e) {
                 if ((e.getMessage() != null) && e.getMessage().contains("exists")) {
                     //hit a race condition where the table got created by another node.
-                    LogService.getLog(getClass()).debug(LogType.LOG, "Database lock collection already appears to exist " +
+                    Scope.getCurrentScope().getLog(getClass()).fine("Database lock collection already appears to exist " +
                             "due to exception: " + e.getMessage() + ". Continuing on");
                 } else {
                     throw e;
@@ -121,7 +120,7 @@ public class MongoLockService implements LockService {
         while (!locked && (new Date().getTime() < timeToGiveUp)) {
             locked = acquireLock();
             if (!locked) {
-                LogService.getLog(getClass()).info(LogType.LOG, "Waiting for changelog lock....");
+                Scope.getCurrentScope().getLog(getClass()).info("Waiting for changelog lock....");
                 try {
                     Thread.sleep(getChangeLogLockRecheckTime() * 1000);
                 } catch (InterruptedException e) {
@@ -150,7 +149,7 @@ public class MongoLockService implements LockService {
     public boolean acquireLock() throws LockException {
 
         try {
-            final Executor executor = ExecutorService.getInstance().getExecutor(getDatabase());
+            final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", Scope.getCurrentScope().getDatabase());
             database.rollback();
             this.init();
 
@@ -174,7 +173,7 @@ public class MongoLockService implements LockService {
                 }
 
                 database.commit();
-                LogService.getLog(getClass()).info(LogType.LOG, coreBundle.getString("successfully.acquired.change.log.lock"));
+                Scope.getCurrentScope().getLog(getClass()).info(coreBundle.getString("successfully.acquired.change.log.lock"));
 
                 this.hasChangeLogLock = true;
                 this.database.setCanCacheLiquibaseTableInfo(true);
@@ -187,7 +186,7 @@ public class MongoLockService implements LockService {
             try {
                 database.rollback();
             } catch (DatabaseException e) {
-                LogService.getLog(getClass()).severe(LogType.LOG, "Error on acquire change log lock Rollback.", e);
+                Scope.getCurrentScope().getLog(getClass()).severe("Error on acquire change log lock Rollback.", e);
             }
         }
     }
@@ -198,7 +197,7 @@ public class MongoLockService implements LockService {
         try {
             if (this.hasDatabaseChangeLogLockTable()) {
 
-                final Executor executor = ExecutorService.getInstance().getExecutor(getDatabase());
+                final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", getDatabase());
                 executor.comment("Release Database Lock");
 
                 database.rollback();
@@ -223,10 +222,10 @@ public class MongoLockService implements LockService {
         } finally {
             try {
                 database.setCanCacheLiquibaseTableInfo(false);
-                LogService.getLog(getClass()).info(LogType.LOG, "Successfully released change log lock");
+                Scope.getCurrentScope().getLog(getClass()).info("Successfully released change log lock");
                 database.rollback();
             } catch (DatabaseException e) {
-                LogService.getLog(getClass()).severe(LogType.LOG, "Error on released change log lock Rollback.", e);
+                Scope.getCurrentScope().getLog(getClass()).severe("Error on released change log lock Rollback.", e);
             }
         }
     }
@@ -242,7 +241,7 @@ public class MongoLockService implements LockService {
                     getDatabaseChangeLogLockTableName()
             );
 
-            final Executor executor = ExecutorService.getInstance().getExecutor(getDatabase());
+            final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", getDatabase());
             @SuppressWarnings("unchecked")
             List<MongoChangeLogLock> rows = (List<MongoChangeLogLock>) executor.queryForList(stmt, Document.class).stream()
                     .map(d -> MongoChangeLogLock.from((Document)d)).collect(Collectors.toList());
@@ -269,7 +268,7 @@ public class MongoLockService implements LockService {
     @Override
     public void destroy() {
         try {
-            final Executor executor = ExecutorService.getInstance().getExecutor(getDatabase());
+            final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", getDatabase());
 
             executor.comment("Dropping Collection Database Change Log Lock: " + getDatabaseChangeLogLockTableName());
             {
@@ -321,7 +320,7 @@ public class MongoLockService implements LockService {
     private boolean hasDatabaseChangeLogLockTable() throws DatabaseException {
         if (hasDatabaseChangeLogLockTable == null) {
             try {
-                final Executor executor = ExecutorService.getInstance().getExecutor(getDatabase());
+                final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", getDatabase());
                 hasDatabaseChangeLogLockTable =
                         executor.queryForLong(new CountDocumentsInCollectionStatement(getDatabase().getDatabaseChangeLogLockTableName())) == 1L;
             } catch (Exception e) {

@@ -22,6 +22,7 @@ package liquibase.ext.mongodb.changelog;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import liquibase.Scope;
 import liquibase.changelog.AbstractChangeLogHistoryService;
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.RanChangeSet;
@@ -37,7 +38,6 @@ import liquibase.ext.mongodb.statement.AbstractMongoStatement;
 import liquibase.ext.mongodb.statement.CountCollectionByNameStatement;
 import liquibase.ext.mongodb.statement.DropCollectionStatement;
 import liquibase.logging.LogService;
-import liquibase.logging.LogType;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -99,7 +99,7 @@ public class MongoHistoryService extends AbstractChangeLogHistoryService {
     public boolean hasDatabaseChangeLogTable() {
         if (hasDatabaseChangeLogTable == null) {
             try {
-                final Executor executor = ExecutorService.getInstance().getExecutor(getDatabase());
+                final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", getDatabase());
                 hasDatabaseChangeLogTable =
                         executor.queryForLong(new CountCollectionByNameStatement(getDatabase().getDatabaseChangeLogTableName())) == 1L;
             } catch (LiquibaseException e) {
@@ -114,7 +114,7 @@ public class MongoHistoryService extends AbstractChangeLogHistoryService {
             return;
         }
 
-        final Executor executor = ExecutorService.getInstance().getExecutor(getDatabase());
+        final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", getDatabase());
 
         final boolean createdTable = hasDatabaseChangeLogTable();
 
@@ -127,12 +127,12 @@ public class MongoHistoryService extends AbstractChangeLogHistoryService {
                     new CreateChangeLogCollectionStatement(getDatabase().getDatabaseChangeLogTableName());
 
             // If there is no table in the database for recording change history create one.
-            LogService.getLog(getClass()).info(LogType.LOG, "Creating database history collection with name: " +
+            Scope.getCurrentScope().getLog(getClass()).info("Creating database history collection with name: " +
                     getDatabase().getLiquibaseCatalogName() + "." + getDatabase().getDatabaseChangeLogTableName());
 
             executor.execute(createChangeLogCollectionStatement);
 
-            LogService.getLog(getClass()).info(LogType.LOG, "Created database history collection : " +
+            Scope.getCurrentScope().getLog(getClass()).info("Created database history collection : " +
                     createChangeLogCollectionStatement.toJs());
         }
 
@@ -168,7 +168,7 @@ public class MongoHistoryService extends AbstractChangeLogHistoryService {
         ((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
                 .updateOne(filter, update);
 
-        ExecutorService.getInstance().getExecutor(getDatabase())
+        Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", getDatabase())
             .comment(String.format("Replace checksum executed. Changeset: [filename: %s, id: %s, author: %s]",
                 changeSet.getFilePath(), changeSet.getId(), changeSet.getAuthor()));
 
@@ -278,14 +278,14 @@ public class MongoHistoryService extends AbstractChangeLogHistoryService {
         ((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
                 .updateMany(CLEAR_CHECKSUM_FILTER, CLEAR_CHECKSUM_UPDATE);
 
-        ExecutorService.getInstance().getExecutor(getDatabase()).comment("Clear all checksums executed");
+        Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", getDatabase()).comment("Clear all checksums executed");
     }
 
     @Override
     public void destroy() {
 
         try {
-            final Executor executor = ExecutorService.getInstance().getExecutor(getDatabase());
+            final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", getDatabase());
 
             executor.comment("Dropping Collection Database Change Log: " + getDatabaseChangeLogTableName());
             {

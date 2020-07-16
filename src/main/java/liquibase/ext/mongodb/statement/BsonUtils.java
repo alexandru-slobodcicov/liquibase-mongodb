@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Optional.ofNullable;
-import static liquibase.util.StringUtils.trimToNull;
+import static liquibase.util.StringUtil.trimToNull;
 import static lombok.AccessLevel.PRIVATE;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 

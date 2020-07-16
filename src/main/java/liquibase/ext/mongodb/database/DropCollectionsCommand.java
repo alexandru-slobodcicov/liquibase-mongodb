@@ -20,6 +20,7 @@ package liquibase.ext.mongodb.database;
  * #L%
  */
 
+import liquibase.Scope;
 import liquibase.command.CommandResult;
 import liquibase.command.core.DropAllCommand;
 import liquibase.database.Database;
@@ -49,7 +50,7 @@ public class DropCollectionsCommand extends DropAllCommand {
         LockService lockService = LockServiceFactory.getInstance().getLockService(database);
         try {
             lockService.waitForLock();
-            final Executor executor = ExecutorService.getInstance().getExecutor(database);
+            final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", database);
             executor.execute(new DropAllCollectionsStatement());
 
         } catch (DatabaseException e) {

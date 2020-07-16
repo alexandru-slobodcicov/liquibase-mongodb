@@ -20,6 +20,7 @@ package liquibase.ext.mongodb.executor;
  * #L%
  */
 
+import liquibase.Scope;
 import liquibase.executor.Executor;
 import liquibase.executor.ExecutorService;
 import liquibase.ext.AbstractMongoIntegrationTest;
@@ -33,7 +34,7 @@ class MongoExecutorIT extends AbstractMongoIntegrationTest {
 
     @Test
     void testGetInstance() {
-        final Executor executor = ExecutorService.getInstance().getExecutor(database);
+        final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor(database);
         assertThat(executor, notNullValue());
         assertThat(executor, instanceOf(MongoExecutor.class));
     }

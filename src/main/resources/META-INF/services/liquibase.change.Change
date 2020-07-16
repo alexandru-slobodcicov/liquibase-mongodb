@@ -1,0 +1,6 @@
+liquibase.ext.mongodb.change.AdminCommandChange
+liquibase.ext.mongodb.change.CreateCollectionChange
+liquibase.ext.mongodb.change.CreateIndexChange
+liquibase.ext.mongodb.change.InsertManyChange
+liquibase.ext.mongodb.change.InsertOneChange
+liquibase.ext.mongodb.change.RunCommandChange
