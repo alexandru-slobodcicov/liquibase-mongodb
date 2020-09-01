@@ -83,7 +83,7 @@ public class MongoLockService implements LockService {
 
         if (!hasDatabaseChangeLogLockTable()) {
             try {
-                final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", Scope.getCurrentScope().getDatabase());
+                final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", getDatabase());
                 executor.comment("Create Database Lock Collection");
 
                 final CreateChangelogLockCollectionStatement createChangeLogLockCollectionStatement =
@@ -149,7 +149,7 @@ public class MongoLockService implements LockService {
     public boolean acquireLock() throws LockException {
 
         try {
-            final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", Scope.getCurrentScope().getDatabase());
+            final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", getDatabase());
             database.rollback();
             this.init();
 
