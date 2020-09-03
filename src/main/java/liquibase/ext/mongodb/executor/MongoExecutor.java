@@ -194,7 +194,7 @@ public class MongoExecutor extends AbstractExecutor {
 
 	@Override
 	public String getName() {
-		return "mongodb";
+		return "jdbc";
 	}
 
 	@Override
