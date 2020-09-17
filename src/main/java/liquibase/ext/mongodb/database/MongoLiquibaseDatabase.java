@@ -175,7 +175,7 @@ public class MongoLiquibaseDatabase extends AbstractJdbcDatabase {
     }
 
     @Override
-    public String getAutoIncrementClause(BigInteger startWith, BigInteger incrementBy) {
+    public String getAutoIncrementClause(BigInteger startWith, BigInteger incrementBy, String generationType, Boolean defaultOnNull) {
         return null;
     }
 
@@ -481,7 +481,7 @@ public class MongoLiquibaseDatabase extends AbstractJdbcDatabase {
 
     public String getDefaultDriver(String url) {
         if (url.startsWith("mongodb://")) {
-            return "MongoClientDriver";
+            return MongoClientDriver.class.getName();
         }
         return null;
     }

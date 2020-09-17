@@ -36,7 +36,9 @@ import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 
+import java.sql.Driver;
 import java.util.Objects;
+import java.util.Properties;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 
@@ -46,9 +48,11 @@ public class MongoConnection implements DatabaseConnection {
 
     public final String MONGO_CONNECTION_STRING_PATTERN = "%s/%s";
 
-    private final MongoClient con;
-    private final com.mongodb.client.MongoDatabase db;
-    private final ConnectionString connectionString;
+    private MongoClient con;
+    private com.mongodb.client.MongoDatabase db;
+    private ConnectionString connectionString;
+
+    public MongoConnection() { }
 
     public MongoConnection(final String connectionString) {
         this.connectionString = new ConnectionString(connectionString);
@@ -139,5 +143,19 @@ public class MongoConnection implements DatabaseConnection {
     public void attached(Database database) {
         //TODO: implementation
     }
+
+	@Override
+	public int getPriority() {
+		// TODO Auto-generated method stub
+		return PRIORITY_DEFAULT + 500;
+	}
+
+	@Override
+	public void open(String url, Driver driverObject, Properties driverProperties) throws DatabaseException {
+        this.connectionString = new ConnectionString(url);
+        this.con = MongoClients.create(this.connectionString);
+        this.db = this.con.getDatabase(Objects.requireNonNull(this.connectionString.getDatabase()))
+                .withCodecRegistry(uuidCodecRegistry());
+	}
 
 }
