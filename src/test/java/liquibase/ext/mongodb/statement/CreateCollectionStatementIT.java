@@ -37,8 +37,8 @@ class CreateCollectionStatementIT extends AbstractMongoIntegrationTest {
     void execute() {
         final String collection = COLLECTION_NAME_1 + System.nanoTime();
         final CreateCollectionStatement statement = new CreateCollectionStatement(collection, EMPTY_OPTION);
-        statement.execute(mongoConnection.getDb());
-        assertThat(getCollections(mongoConnection))
+        statement.execute(connection);
+        assertThat(getCollections(connection))
             .contains(collection);
     }
 

@@ -24,9 +24,8 @@ import liquibase.ext.mongodb.statement.CreateCollectionStatement;
 
 public class CreateChangeLogCollectionStatement extends CreateCollectionStatement {
 
-    private static final String VALIDATOR =
-        "{"
-            + "validator: " +
+    public static final String VALIDATOR = "\n" +
+            "validator: " +
             "{ " +
             "   $jsonSchema: {\n" +
             "    bsonType: \"object\",\n" +
@@ -78,6 +77,18 @@ public class CreateChangeLogCollectionStatement extends CreateCollectionStatemen
             "            bsonType: \"string\",\n" +
             "            description: \"Tracks which changeSets correspond to tag operations.\"\n" +
             "        },\n" +
+            "        contexts: {\n" +
+            "            bsonType: \"string\",\n" +
+            "            description: \"Context expression of the run.\"\n" +
+            "        },\n" +
+            "        labels: {\n" +
+            "            bsonType: \"string\",\n" +
+            "            description: \"Labels assigned.\"\n" +
+            "        },\n" +
+            "        deploymentId: {\n" +
+            "            bsonType: \"string\",\n" +
+            "            description: \"Unique identifier generate for a run.\"\n" +
+            "        },\n" +
             "        liquibase: {\n" +
             "            bsonType: \"string\",\n" +
             "            description: \"Version of Liquibase used to execute the changeSet.\"\n" +
@@ -85,11 +96,22 @@ public class CreateChangeLogCollectionStatement extends CreateCollectionStatemen
             "    }\n" +
             "   }" +
             "}" +
-            "validationAction: \"error\"" +
-            "validationLevel: \"strict\"" +
-            "}";
+            "validationAction: \"error\",\n" +
+            "validationLevel: \"strict\"\n";
 
+    public static final String OPTIONS = "{" + VALIDATOR + "}";
+    public static final String COMMAND_NAME = "createChangeLogCollection";
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
+
+    /**
+     * Creates the Statement. Options are passed as null by intention so the Validator is created in {@link AdjustChangeLogCollectionStatement}
+     * @param collectionName The name of the ChangeLog Liquibase table. Is passed from {@link liquibase.configuration.GlobalConfiguration}
+     */
     public CreateChangeLogCollectionStatement(final String collectionName) {
-        super(collectionName, VALIDATOR);
+        super(collectionName, (String) null);
     }
 }

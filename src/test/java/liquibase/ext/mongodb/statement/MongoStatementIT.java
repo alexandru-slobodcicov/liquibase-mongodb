@@ -24,14 +24,16 @@ import liquibase.change.CheckSum;
 import liquibase.changelog.ChangeLogParameters;
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.DatabaseChangeLog;
-import liquibase.changelog.RanChangeSet;
+import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
 import liquibase.ext.AbstractMongoIntegrationTest;
-import liquibase.ext.mongodb.changelog.ChangeSetUtils;
 import liquibase.ext.mongodb.changelog.CreateChangeLogCollectionStatement;
+import liquibase.ext.mongodb.changelog.MongoRanChangeSet;
+import liquibase.ext.mongodb.changelog.MongoRanChangeSetToDocumentConverter;
 import liquibase.parser.ChangeLogParser;
 import liquibase.parser.ChangeLogParserFactory;
 import liquibase.resource.ClassLoaderResourceAccessor;
+import lombok.SneakyThrows;
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
 
@@ -41,19 +43,16 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-//TODO: Add Unit Test with mocks
-
 class MongoStatementIT extends AbstractMongoIntegrationTest {
 
     @Test
-    void testInsertOneStatement() throws LiquibaseException {
+    void testInsertOneStatement() {
 
         final String collectionName = "logCollection";
-        new CreateChangeLogCollectionStatement(collectionName).execute(database.getConnection().getDb());
+        new CreateChangeLogCollectionStatement(collectionName).execute(connection);
 
         Date expectedDateExecuted = new Date();
-
-        RanChangeSet ranChangeSet = new RanChangeSet(
+        MongoRanChangeSet ranChangeSet = new MongoRanChangeSet(
                 "fileName"
                 , "1"
                 , "author"
@@ -65,34 +64,39 @@ class MongoStatementIT extends AbstractMongoIntegrationTest {
                 , "comments"
                 , null
                 , null
+                , null
+                , "deploymentId"
+                , 5
                 , "liquibase"
         );
         ranChangeSet.setOrderExecuted(2);
-        Document document = ChangeSetUtils.toDocument(ranChangeSet);
+        MongoRanChangeSetToDocumentConverter converter = new MongoRanChangeSetToDocumentConverter();
+        Document document = converter.toDocument(ranChangeSet);
 
-        new InsertOneStatement(collectionName,document , null).execute(database.getConnection().getDb());
-        assertThat(database.getConnection().getDb().getCollection(collectionName).countDocuments()).isEqualTo(1L);
+        new InsertOneStatement(collectionName,document , null).execute(connection);
+        assertThat(connection.getDatabase().getCollection(collectionName).countDocuments()).isEqualTo(1L);
 
         document.put("id", "2");
 
-        ranChangeSet = ChangeSetUtils.fromDocument(document);
+        ranChangeSet = converter.fromDocument(document);
 
         ranChangeSet.setOrderExecuted(1);
-        document = ChangeSetUtils.toDocument(ranChangeSet);
+        document = converter.toDocument(ranChangeSet);
 
-        new InsertOneStatement(collectionName,document , null).execute(database.getConnection().getDb());
-        assertThat(database.getConnection().getDb().getCollection(collectionName).countDocuments()).isEqualTo(2L);
+        new InsertOneStatement(collectionName,document , null).execute(connection);
+        assertThat(connection.getDatabase().getCollection(collectionName).countDocuments()).isEqualTo(2L);
 
         final FindAllStatement findAllStatement = new FindAllStatement(collectionName);
 
-        final List ranChangeSetList = findAllStatement.queryForList(database.getConnection().getDb(), Document.class);
+        final List<Document> ranChangeSetList = findAllStatement.queryForList(connection);
 
         assertThat(ranChangeSetList.size()).isEqualTo(2);
 
     }
 
     @Test
-    void testInsertOneChange() throws LiquibaseException {
+    @SneakyThrows
+    void testInsertOneChange() {
         final ClassLoaderResourceAccessor resourceAccessor = new ClassLoaderResourceAccessor();
         final ChangeLogParser parser =
                 ChangeLogParserFactory.getInstance().getParser("xml", resourceAccessor);
@@ -103,17 +107,23 @@ class MongoStatementIT extends AbstractMongoIntegrationTest {
                 .stream()
                 .flatMap(cs -> cs.getChanges().stream())
                 .flatMap(c -> Stream.of(c.generateStatements(database)))
-                .forEach(mongoExecutor::execute);
+                .forEach(sql -> {
+                    try {
+                        executor.execute(sql);
+                    } catch (DatabaseException e) {
+                        e.printStackTrace();
+                    }
+                });
 
         assertThat(
-                mongoConnection
-                        .getDb()
+                connection
+                        .getDatabase()
                         .getCollection("insertOneTest1")
                     .countDocuments()).isEqualTo(1L);
 
         assertThat(
-                mongoConnection
-                        .getDb()
+                connection
+                        .getDatabase()
                         .getCollection("insertOneTest2")
                     .countDocuments()).isEqualTo(2L);
 
@@ -131,11 +141,17 @@ class MongoStatementIT extends AbstractMongoIntegrationTest {
                 .stream()
                 .flatMap(cs -> cs.getChanges().stream())
                 .flatMap(c -> Stream.of(c.generateStatements(database)))
-                .forEach(mongoExecutor::execute);
+                .forEach(sql -> {
+                    try {
+                        executor.execute(sql);
+                    } catch (DatabaseException e) {
+                        e.printStackTrace();
+                    }
+                });
 
         assertThat(
-                mongoConnection
-                        .getDb()
+                connection
+                        .getDatabase()
                         .getCollection("insertManyTest1")
                     .countDocuments()).isEqualTo(2L);
     }
@@ -154,11 +170,17 @@ class MongoStatementIT extends AbstractMongoIntegrationTest {
                 .stream()
                 .flatMap(cs -> cs.getChanges().stream())
                 .flatMap(c -> Stream.of(c.generateStatements(database)))
-                .forEach(mongoExecutor::execute);
+                .forEach(sql -> {
+                    try {
+                        executor.execute(sql);
+                    } catch (DatabaseException e) {
+                        e.printStackTrace();
+                    }
+                });
 
         assertThat(
-                mongoConnection
-                        .getDb()
+                connection
+                        .getDatabase()
                     .getCollection("createCollectionTest")).isNotNull();
     }
 
@@ -175,7 +197,13 @@ class MongoStatementIT extends AbstractMongoIntegrationTest {
                 .stream()
                 .flatMap(cs -> cs.getChanges().stream())
                 .flatMap(c -> Stream.of(c.generateStatements(database)))
-                .forEach(mongoExecutor::execute);
+                .forEach(sql -> {
+                    try {
+                        executor.execute(sql);
+                    } catch (DatabaseException e) {
+                        e.printStackTrace();
+                    }
+                });
     }
 
 }

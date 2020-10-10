@@ -24,7 +24,6 @@ import liquibase.Liquibase;
 import liquibase.Scope;
 import liquibase.changelog.ChangeLogHistoryServiceFactory;
 import liquibase.changelog.ChangeSet;
-import liquibase.changelog.RanChangeSet;
 import liquibase.database.core.H2Database;
 import liquibase.exception.DatabaseException;
 import liquibase.executor.ExecutorService;
@@ -33,68 +32,65 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static liquibase.servicelocator.PrioritizedService.PRIORITY_DATABASE;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MongoHistoryServiceIT extends AbstractMongoIntegrationTest {
 
     private static final String FILE_PATH = "liquibase/ext/changelog.create-collection.test.xml";
-    private static Liquibase LIQUIBASE;
+    private Liquibase liquibase;
 
-    public static MongoHistoryService mongoHistoryService;
+    public MongoHistoryService mongoHistoryService;
 
     @BeforeEach
-    protected void setUp() throws DatabaseException {
-        super.setUp();
+    protected void setUpEach() {
+        super.setUpEach();
         mongoHistoryService = (MongoHistoryService) ChangeLogHistoryServiceFactory.getInstance().getChangeLogService(database);
         mongoHistoryService.reset();
         mongoHistoryService.resetDeploymentId();
     }
 
-    private static void initLiquibase() throws Exception {
-        LIQUIBASE = new Liquibase(FILE_PATH, new ClassLoaderResourceAccessor(), database);
-        LIQUIBASE.update("");
+    private void initLiquibase() throws Exception {
+        liquibase = new Liquibase(FILE_PATH, new ClassLoaderResourceAccessor(), database);
+        liquibase.update("");
 
-        Scope.getCurrentScope().getSingleton(ExecutorService.class).setExecutor(database, mongoExecutor);
+        Scope.getCurrentScope().getSingleton(ExecutorService.class).setExecutor(database, executor);
     }
 
     @Test
     void testGetPriority() {
-        assertThat(mongoHistoryService.getPriority(), equalTo(PRIORITY_DATABASE));
+        assertThat(mongoHistoryService.getPriority()).isEqualTo(PRIORITY_DATABASE);
     }
 
     @Test
     void testSupports() {
-        assertThat(mongoHistoryService.supports(database), equalTo(true));
-        assertThat(mongoHistoryService.supports(new H2Database()), equalTo(false));
+        assertThat(mongoHistoryService.supports(database)).isTrue();
+        assertThat(mongoHistoryService.supports(new H2Database())).isFalse();
     }
 
     @Test
     void testGetDatabaseChangeLogTableName() {
-        assertThat(mongoHistoryService.getDatabaseChangeLogTableName(), equalTo(database.getDatabaseChangeLogTableName()));
+        assertThat(mongoHistoryService.getDatabaseChangeLogTableName()).isEqualTo("DATABASECHANGELOG");
+        assertThat(mongoHistoryService.getDatabaseChangeLogTableName()).isEqualTo(database.getDatabaseChangeLogTableName());
     }
 
     @Test
     void testCanCreateChangeLogTable() {
-        assertThat(mongoHistoryService.canCreateChangeLogTable(), equalTo(true));
+        assertThat(mongoHistoryService.canCreateChangeLogTable()).isTrue();
     }
 
     @Test
     void testInit() throws DatabaseException {
-        assertThat(mongoHistoryService.getRanChangeSetList(), nullValue());
-        assertThat(mongoHistoryService.isServiceInitialized(), equalTo(false));
-        assertThat(mongoHistoryService.getHasDatabaseChangeLogTable(), nullValue());
+        assertThat(mongoHistoryService.existsRepository()).isFalse();
+        assertThat(mongoHistoryService.countRanChangeSets()).isEqualTo(0L);
+        assertThat(mongoHistoryService.isServiceInitialized()).isFalse();
+
         mongoHistoryService.init();
-        assertThat(mongoHistoryService.getRanChangeSetList(), nullValue());
-        assertThat(mongoHistoryService.isServiceInitialized(), equalTo(true));
-        assertThat(mongoHistoryService.getHasDatabaseChangeLogTable(), equalTo(false));
+        assertThat(mongoHistoryService.existsRepository()).isTrue();
+        assertThat(mongoHistoryService.countRanChangeSets()).isEqualTo(0L);
+        assertThat(mongoHistoryService.isServiceInitialized()).isTrue();
     }
 
     @Test
@@ -104,10 +100,9 @@ class MongoHistoryServiceIT extends AbstractMongoIntegrationTest {
     @Test
     void testGetRanChangeSets() throws DatabaseException {
         mongoHistoryService.init();
-        assertThat(mongoHistoryService.getRanChangeSetList(), nullValue());
-
-        final List<RanChangeSet> ranChangeSetList = mongoHistoryService.getRanChangeSetList();
-        assertThat(ranChangeSetList, nullValue());
+        assertThat(mongoHistoryService.existsRepository()).isTrue();
+        assertThat(mongoHistoryService.countRanChangeSets()).isEqualTo(0L);
+        assertThat(mongoHistoryService.isServiceInitialized()).isTrue();
     }
 
     @Test
@@ -119,9 +114,9 @@ class MongoHistoryServiceIT extends AbstractMongoIntegrationTest {
     void testReplaceChecksum() throws Exception {
         initLiquibase();
 
-        final ChangeSet changeSet = LIQUIBASE.getDatabaseChangeLog().getChangeSet(FILE_PATH, "alex", "1");
+        final ChangeSet changeSet = liquibase.getDatabaseChangeLog().getChangeSet(FILE_PATH, "alex", "1");
         assertTrue(mongoHistoryService.isServiceInitialized());
-        Scope.getCurrentScope().getSingleton(ExecutorService.class).setExecutor(database, mongoExecutor);
+        Scope.getCurrentScope().getSingleton(ExecutorService.class).setExecutor(database, executor);
 
         mongoHistoryService.replaceChecksum(changeSet);
 
@@ -141,9 +136,9 @@ class MongoHistoryServiceIT extends AbstractMongoIntegrationTest {
     void testRemoveFromHistory() throws Exception {
         initLiquibase();
 
-        final ChangeSet changeSet = LIQUIBASE.getDatabaseChangeLog().getChangeSet(FILE_PATH, "alex", "1");
+        final ChangeSet changeSet = liquibase.getDatabaseChangeLog().getChangeSet(FILE_PATH, "alex", "1");
 
-        assertThat(mongoHistoryService.getRanChangeSets().size(), is(1));
+        assertThat(mongoHistoryService.getRanChangeSets()).hasSize(1);
 
         mongoHistoryService.removeFromHistory(changeSet);
 
@@ -169,17 +164,19 @@ class MongoHistoryServiceIT extends AbstractMongoIntegrationTest {
 
     @Test
     void testDestroy() throws DatabaseException {
-        assertThat(mongoHistoryService.getRanChangeSetList(), nullValue());
-        assertThat(mongoHistoryService.isServiceInitialized(), equalTo(false));
-        assertThat(mongoHistoryService.getHasDatabaseChangeLogTable(), nullValue());
+        assertThat(mongoHistoryService.existsRepository()).isFalse();
+        assertThat(mongoHistoryService.countRanChangeSets()).isEqualTo(0L);
+        assertThat(mongoHistoryService.isServiceInitialized()).isFalse();
+
         mongoHistoryService.init();
-        assertThat(mongoHistoryService.getRanChangeSetList(), nullValue());
-        assertThat(mongoHistoryService.isServiceInitialized(), equalTo(true));
-        assertThat(mongoHistoryService.getHasDatabaseChangeLogTable(), equalTo(false));
+        assertThat(mongoHistoryService.existsRepository()).isTrue();
+        assertThat(mongoHistoryService.countRanChangeSets()).isEqualTo(0L);
+        assertThat(mongoHistoryService.isServiceInitialized()).isTrue();
+
         mongoHistoryService.destroy();
-        assertThat(mongoHistoryService.getRanChangeSetList(), nullValue());
-        assertThat(mongoHistoryService.isServiceInitialized(), equalTo(false));
-        assertThat(mongoHistoryService.getHasDatabaseChangeLogTable(), nullValue());
-        assertThat(mongoHistoryService.hasDatabaseChangeLogTable(), equalTo(false));
+        assertThat(mongoHistoryService.existsRepository()).isFalse();
+        assertThat(mongoHistoryService.countRanChangeSets()).isEqualTo(0L);
+        assertThat(mongoHistoryService.isServiceInitialized()).isFalse();
+        assertThat(mongoHistoryService.hasDatabaseChangeLogTable()).isFalse();
     }
 }

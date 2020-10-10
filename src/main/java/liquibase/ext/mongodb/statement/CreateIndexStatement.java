@@ -20,26 +20,27 @@ package liquibase.ext.mongodb.statement;
  * #L%
  */
 
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.IndexOptions;
+import liquibase.ext.mongodb.database.MongoConnection;
+import liquibase.nosql.statement.NoSqlExecuteStatement;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.bson.Document;
 
+import static java.util.Optional.ofNullable;
 import static liquibase.ext.mongodb.statement.BsonUtils.orEmptyDocument;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class CreateIndexStatement extends AbstractMongoStatement {
+public class CreateIndexStatement extends AbstractCollectionStatement
+        implements NoSqlExecuteStatement<MongoConnection> {
 
     public static final String COMMAND_NAME = "createIndex";
 
-    private final String collectionName;
     private final Document keys;
     private final Document options;
 
     public CreateIndexStatement(final String collectionName, final Document keys, final Document options) {
-        this.collectionName = collectionName;
+        super(collectionName);
         this.keys = keys;
         this.options = options;
     }
@@ -49,38 +50,27 @@ public class CreateIndexStatement extends AbstractMongoStatement {
     }
 
     @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
+
+    @Override
     public String toJs() {
         return
                 "db."
-                        + collectionName
+                        + getCollectionName()
                         + ". "
-                        + COMMAND_NAME
+                        + getCommandName()
                         + "("
-                        + keys.toJson()
+                        + ofNullable(keys).map(Document::toJson).orElse(null)
                         + ", "
-                        + options.toJson()
+                        + ofNullable(options).map(Document::toJson).orElse(null)
                         + ");";
     }
 
     @Override
-    public void execute(MongoDatabase db) {
-        db.getCollection(collectionName).createIndex(keys, createIndexOptions());
+    public void execute(final MongoConnection connection) {
+        connection.getDatabase().getCollection(collectionName).createIndex(keys, BsonUtils.orEmptyIndexOptions(options));
     }
 
-    private IndexOptions createIndexOptions() {
-        //TODO: add POJO codec
-        final IndexOptions indexOptions = new IndexOptions();
-        if (options.containsKey("unique") && options.getBoolean("unique")) {
-            indexOptions.unique(true);
-        }
-        if (options.containsKey("name")) {
-            indexOptions.name(options.getString("name"));
-        }
-        return indexOptions;
-    }
-
-    @Override
-    public String toString() {
-        return toJs();
-    }
 }

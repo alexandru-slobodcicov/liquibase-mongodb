@@ -20,16 +20,19 @@ package liquibase.ext.mongodb.statement;
  * #L%
  */
 
-import com.mongodb.client.MongoDatabase;
+import liquibase.ext.mongodb.database.MongoConnection;
+import liquibase.nosql.statement.AbstractNoSqlStatement;
+import liquibase.nosql.statement.NoSqlExecuteStatement;
 import org.bson.Document;
 
-public abstract class AbstractMongoDocumentStatement<T extends Document> extends AbstractMongoStatement {
+public abstract class AbstractMongoDocumentStatement<T extends Document> extends AbstractNoSqlStatement
+        implements NoSqlExecuteStatement<MongoConnection> {
 
-    public abstract T run(final MongoDatabase db);
+    public abstract T run(MongoConnection connection);
 
     @Override
-    public void execute(MongoDatabase db) {
-        run(db);
+    public void execute(final MongoConnection connection) {
+        run(connection);
     }
 
 }

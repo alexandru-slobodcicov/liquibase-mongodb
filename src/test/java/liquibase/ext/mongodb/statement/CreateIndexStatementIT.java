@@ -44,14 +44,14 @@ class CreateIndexStatementIT extends AbstractMongoIntegrationTest {
 
     @Test
     void execute() {
-        final MongoDatabase database = mongoConnection.getDb();
+        final MongoDatabase database = connection.getDatabase();
         final Document initialDocument = Document.parse("{name: \"test name\", surname: \"test surname\", locale: \"EN\"}");
         final String indexName = "locale_indx";
         database.createCollection(COLLECTION_NAME_1);
         database.getCollection(COLLECTION_NAME_1).insertOne(initialDocument);
         final CreateIndexStatement createIndexStatement = new CreateIndexStatement(COLLECTION_NAME_1, "{ locale: 1 }",
             "{ name: \"" + indexName + "\", unique: true}");
-        createIndexStatement.execute(database);
+        createIndexStatement.execute(connection);
 
         final Document document = StreamSupport.stream(database.getCollection(COLLECTION_NAME_1).listIndexes().spliterator(), false)
             .filter(doc -> doc.get("name").equals(indexName))

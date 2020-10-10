@@ -1,10 +1,10 @@
-package liquibase.ext.mongodb.lockservice;
+package liquibase.ext.mongodb.statement;
 
 /*-
  * #%L
- * Liquibase MongoDB Extension
+ * Liquibase NoSql Extension
  * %%
- * Copyright (C) 2019 Mastercard
+ * Copyright (C) 2020 Mastercard
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,17 +20,22 @@ package liquibase.ext.mongodb.lockservice;
  * #L%
  */
 
-import org.junit.jupiter.api.Test;
+import liquibase.nosql.statement.AbstractNoSqlStatement;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-import static liquibase.ext.mongodb.lockservice.SelectLockChangeLogStatement.COMMAND_NAME;
-import static org.assertj.core.api.Assertions.assertThat;
+@RequiredArgsConstructor
+public abstract class AbstractCollectionStatement extends AbstractNoSqlStatement {
 
-class SelectLockChangeLogStatementTest {
+    @Getter
+    protected final String collectionName;
 
-    @Test
-    void testToJs() {
-        final String collectionName = "testCollection";
-        assertThat(new SelectLockChangeLogStatement(collectionName).toJs())
-            .isEqualTo("db.".concat(collectionName).concat(".").concat(COMMAND_NAME).concat("();"));
+    @Override
+    public String toJs() {
+        return "db." +
+                getCommandName() +
+                "(" +
+                getCollectionName() +
+                ");";
     }
 }

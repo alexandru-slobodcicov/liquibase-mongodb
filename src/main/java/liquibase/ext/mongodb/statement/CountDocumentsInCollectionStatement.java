@@ -20,37 +20,54 @@ package liquibase.ext.mongodb.statement;
  * #L%
  */
 
-import com.mongodb.client.MongoDatabase;
-import lombok.AllArgsConstructor;
+import liquibase.ext.mongodb.database.MongoConnection;
+import liquibase.nosql.statement.NoSqlQueryForLongStatement;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.bson.conversions.Bson;
 
-@AllArgsConstructor
+import java.util.Objects;
+
+import static java.util.Optional.ofNullable;
+
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class CountDocumentsInCollectionStatement extends AbstractMongoStatement {
+public class CountDocumentsInCollectionStatement extends AbstractCollectionStatement
+        implements NoSqlQueryForLongStatement<MongoConnection> {
 
-    public static final String COMMAND_NAME = "countDocumentsInCollection";
+    public static final String COMMAND_NAME = "countDocuments";
 
-    private final String collectionName;
+    private final Bson filter;
+
+    public CountDocumentsInCollectionStatement(final String collectionName) {
+        this(collectionName, null);
+    }
+
+    public CountDocumentsInCollectionStatement(final String collectionName, final Bson filter) {
+        super(collectionName);
+        this.filter = filter;
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
 
     @Override
     public String toJs() {
         return
                 "db." +
-                        COMMAND_NAME +
+                        getCollectionName() +
+                        "." +
+                        getCommandName() +
                         "(" +
-                        collectionName +
+                        ofNullable(filter).map(Objects::toString).orElse(null) +
                         ");";
     }
 
     @Override
-    public long queryForLong(MongoDatabase db) {
-        return db.getCollection(collectionName).countDocuments();
+    public long queryForLong(final MongoConnection connection) {
+        return connection.getDatabase().getCollection(getCommandName()).countDocuments(filter);
     }
 
-    @Override
-    public String toString() {
-        return this.toJs();
-    }
 }

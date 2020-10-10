@@ -42,8 +42,8 @@ class RunCommandStatementIT extends AbstractMongoIntegrationTest {
 
     @Test
     void runFromString() {
-        final MongoDatabase database = mongoConnection.getDb();
-        new RunCommandStatement(INSERT_CMD).execute(database);
+        final MongoDatabase database = connection.getDatabase();
+        new RunCommandStatement(INSERT_CMD).execute(connection);
         final FindIterable<Document> docs = database.getCollection(COLLECTION_NAME_1).find();
         assertThat(docs).hasSize(2);
         assertThat(docs.iterator().next())
@@ -53,8 +53,8 @@ class RunCommandStatementIT extends AbstractMongoIntegrationTest {
 
     @Test
     void runFromDocument() {
-        final MongoDatabase database = mongoConnection.getDb();
-        new RunCommandStatement(Document.parse(INSERT_CMD)).execute(database);
+        final MongoDatabase database = connection.getDatabase();
+        new RunCommandStatement(Document.parse(INSERT_CMD)).execute(connection);
         final FindIterable<Document> docs = database.getCollection(COLLECTION_NAME_1).find();
         assertThat(docs).hasSize(2);
         assertThat(docs.iterator().next())

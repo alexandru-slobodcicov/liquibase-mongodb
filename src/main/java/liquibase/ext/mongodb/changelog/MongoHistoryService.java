@@ -23,41 +23,34 @@ package liquibase.ext.mongodb.changelog;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import liquibase.Scope;
-import liquibase.changelog.AbstractChangeLogHistoryService;
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.RanChangeSet;
 import liquibase.database.Database;
 import liquibase.exception.DatabaseException;
-import liquibase.exception.DatabaseHistoryException;
-import liquibase.exception.LiquibaseException;
-import liquibase.exception.UnexpectedLiquibaseException;
-import liquibase.executor.Executor;
-import liquibase.executor.ExecutorService;
 import liquibase.ext.mongodb.database.MongoLiquibaseDatabase;
-import liquibase.ext.mongodb.statement.AbstractMongoStatement;
-import liquibase.ext.mongodb.statement.CountCollectionByNameStatement;
-import liquibase.ext.mongodb.statement.DropCollectionStatement;
-import liquibase.logging.LogService;
+import liquibase.ext.mongodb.lockservice.CreateChangeLogLockCollectionStatement;
+import liquibase.ext.mongodb.statement.*;
+import liquibase.logging.Logger;
+import liquibase.nosql.changelog.AbstractNoSqlHistoryService;
+import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MongoHistoryService extends AbstractChangeLogHistoryService {
+public class MongoHistoryService extends AbstractNoSqlHistoryService {
 
-    private static final String CHECKSUM_FIELD_NAME = "md5sum";
-    private static final Bson CLEAR_CHECKSUM_FILTER = Filters.exists(CHECKSUM_FIELD_NAME);
-    private static final Bson CLEAR_CHECKSUM_UPDATE = Updates.unset(CHECKSUM_FIELD_NAME);
+    private final Logger log = Scope.getCurrentScope().getLog(getClass());
 
-    private List<RanChangeSet> ranChangeSetList;
-    private boolean serviceInitialized;
-    private Boolean hasDatabaseChangeLogTable;
-    private Integer lastChangeSetSequenceValue;
+    @Getter
+    private final MongoRanChangeSetToDocumentConverter converter;
+
+    public MongoHistoryService() {
+        super();
+        this.converter = new MongoRanChangeSetToDocumentConverter();
+    }
 
     @Override
     public int getPriority() {
@@ -65,236 +58,126 @@ public class MongoHistoryService extends AbstractChangeLogHistoryService {
     }
 
     @Override
-    public boolean supports(Database database) {
+    protected Logger getLogger() {
+        return log;
+    }
+
+    @Override
+    public boolean supports(final Database database) {
         return MongoLiquibaseDatabase.MONGODB_PRODUCT_NAME.equals(database.getDatabaseProductName());
     }
 
-    public String getDatabaseChangeLogTableName() {
-        return getDatabase().getDatabaseChangeLogTableName();
-    }
-
-    public boolean canCreateChangeLogTable() {
-        return true;
-    }
-
-    public Boolean getHasDatabaseChangeLogTable() {
-        return hasDatabaseChangeLogTable;
-    }
-
-    public List<RanChangeSet> getRanChangeSetList() {
-        return ranChangeSetList;
-    }
-
-    public boolean isServiceInitialized() {
-        return serviceInitialized;
+    @Override
+    protected Boolean existsRepository() throws DatabaseException {
+        return getExecutor().queryForLong(
+                new CountCollectionByNameStatement(getDatabaseChangeLogTableName())) == 1L;
     }
 
     @Override
-    public void reset() {
-        this.ranChangeSetList = null;
-        this.serviceInitialized = false;
-        this.hasDatabaseChangeLogTable = null;
+    protected void createRepository() throws DatabaseException {
+        final CreateChangeLogLockCollectionStatement createChangeLogLockCollectionStatement =
+                new CreateChangeLogLockCollectionStatement(getDatabaseChangeLogTableName());
+        getExecutor().execute(createChangeLogLockCollectionStatement);
     }
 
-    public boolean hasDatabaseChangeLogTable() {
-        if (hasDatabaseChangeLogTable == null) {
-            try {
-                final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", getDatabase());
-                hasDatabaseChangeLogTable =
-                        executor.queryForLong(new CountCollectionByNameStatement(getDatabase().getDatabaseChangeLogTableName())) == 1L;
-            } catch (LiquibaseException e) {
-                throw new UnexpectedLiquibaseException(e);
-            }
-        }
-        return hasDatabaseChangeLogTable;
-    }
+    @Override
+    protected void adjustRepository() throws DatabaseException {
+        if (((MongoLiquibaseDatabase)getDatabase()).getAdjustTrackingTablesOnStartup()) {
+            this.getLogger().info("Adjusting database history Collection with name: "
+                    + getDatabase().getConnection().getCatalog() + "." + getDatabaseChangeLogTableName());
 
-    public void init() throws DatabaseException {
-        if (serviceInitialized) {
-            return;
-        }
+            this.getLogger().info("Adjusted database history Collection with name: "
+                    + getDatabase().getConnection().getCatalog() + "." + getDatabaseChangeLogTableName());
 
-        final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", getDatabase());
+            getExecutor().execute(new AdjustChangeLogCollectionStatement(getDatabaseChangeLogTableName(),
+                    ((MongoLiquibaseDatabase)getDatabase()).getSupportsValidator()));
 
-        final boolean createdTable = hasDatabaseChangeLogTable();
-
-        if (createdTable) {
-            //TODO: Add MD5SUM check logic and potentially get and check validator structure and update not equal
         } else {
-            executor.comment("Create Database Change Log Collection");
-
-            AbstractMongoStatement createChangeLogCollectionStatement =
-                    new CreateChangeLogCollectionStatement(getDatabase().getDatabaseChangeLogTableName());
-
-            // If there is no table in the database for recording change history create one.
-            Scope.getCurrentScope().getLog(getClass()).info("Creating database history collection with name: " +
-                    getDatabase().getLiquibaseCatalogName() + "." + getDatabase().getDatabaseChangeLogTableName());
-
-            executor.execute(createChangeLogCollectionStatement);
-
-            Scope.getCurrentScope().getLog(getClass()).info("Created database history collection : " +
-                    createChangeLogCollectionStatement.toJs());
+            this.getLogger().info("Skipped Adjusting database history Collection with name: "
+                    + getDatabase().getConnection().getCatalog() + "." + getDatabaseChangeLogTableName());
         }
-
-        this.serviceInitialized = true;
-    }
-
-    /**
-     * Returns the ChangeSets that have been run against the current getDatabase().
-     */
-    public List<RanChangeSet> getRanChangeSets() {
-
-        if (this.ranChangeSetList == null) {
-            final Document sort = new Document().append("dateExecuted", 1).append("orderExecuted", 1);
-
-            final Collection<Document> ranChangeSets = new ArrayList<>();
-            ((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
-                    .find().sort(sort).into(ranChangeSets);
-
-            this.ranChangeSetList = ranChangeSets.stream().map(ChangeSetUtils::fromDocument).collect(Collectors.toList());
-        }
-        return Collections.unmodifiableList(ranChangeSetList);
     }
 
     @Override
-    protected void replaceChecksum(final ChangeSet changeSet) throws DatabaseException {
-        final Document filter = new Document()
-                .append("fileName", changeSet.getFilePath())
-                .append("id", changeSet.getId())
-                .append("author", changeSet.getAuthor());
-
-        final Bson update = Updates.set(CHECKSUM_FIELD_NAME, changeSet.generateCheckSum().toString());
-
-        ((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
-                .updateOne(filter, update);
-
-        Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", getDatabase())
-            .comment(String.format("Replace checksum executed. Changeset: [filename: %s, id: %s, author: %s]",
-                changeSet.getFilePath(), changeSet.getId(), changeSet.getAuthor()));
-
-        reset();
+    protected void dropRepository() throws DatabaseException {
+        getExecutor().execute(
+                new DropCollectionStatement(getDatabaseChangeLogTableName()));
     }
 
     @Override
-    public RanChangeSet getRanChangeSet(final ChangeSet changeSet) throws DatabaseException, DatabaseHistoryException {
-        if (!hasDatabaseChangeLogTable()) {
-            return null;
-        }
+    protected List<RanChangeSet> queryRanChangeSets() throws DatabaseException {
 
-        return super.getRanChangeSet(changeSet);
+        return getExecutor()
+                .queryForList(new FindAllStatement(getDatabaseChangeLogTableName()), Document.class)
+                .stream().map(Document.class::cast).map(converter::fromDocument).collect(Collectors.toList());
     }
 
     @Override
-    public void setExecType(final ChangeSet changeSet, final ChangeSet.ExecType execType) throws DatabaseException {
+    protected Integer generateNextSequence() throws DatabaseException {
+        return (int) countRanChangeSets();
+    }
 
-        final RanChangeSet ranChangeSet = new RanChangeSet(changeSet, execType, null, null);
-
+    @Override
+    protected void markChangeSetRun(ChangeSet changeSet, ChangeSet.ExecType execType, Integer nextSequenceValue) throws DatabaseException {
         if (execType.ranBefore) {
             final Document filter = new Document()
-                    .append("fileName", changeSet.getFilePath())
-                    .append("id", changeSet.getId())
-                    .append("author", changeSet.getAuthor());
+                    .append(MongoRanChangeSet.Fields.fileName, changeSet.getFilePath())
+                    .append(MongoRanChangeSet.Fields.changeSetId, changeSet.getId())
+                    .append(MongoRanChangeSet.Fields.author, changeSet.getAuthor());
 
             final Document update = new Document()
-                    .append("execType", execType.value);
+                    .append(MongoRanChangeSet.Fields.execType, execType.value);
 
-            //TODO: implement with MongoExecutor of MarkChangeSetRanStatement
-            ((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
-                    .updateOne(filter, update);
+            getExecutor().execute(new UpdateManyStatement(getDatabaseChangeLogTableName(), update, filter));
 
         } else {
+            final MongoRanChangeSet ranChangeSet = new MongoRanChangeSet(changeSet, execType, null, null);
             ranChangeSet.setOrderExecuted(getNextSequenceValue());
-            ((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
-                    .insertOne(ChangeSetUtils.toDocument(ranChangeSet));
-        }
-
-        if (this.ranChangeSetList != null) {
-            this.ranChangeSetList.add(ranChangeSet);
+            getExecutor().execute(new InsertOneStatement(getDatabaseChangeLogTableName(),
+                    converter.toDocument(ranChangeSet), new Document()));
         }
     }
 
     @Override
-    public void removeFromHistory(final ChangeSet changeSet) throws DatabaseException {
-
+    protected void removeRanChangeSet(ChangeSet changeSet) throws DatabaseException {
         final Document filter = new Document()
-                .append("fileName", changeSet.getFilePath())
-                .append("id", changeSet.getId())
-                .append("author", changeSet.getAuthor());
+                .append(MongoRanChangeSet.Fields.fileName, changeSet.getFilePath())
+                .append(MongoRanChangeSet.Fields.changeSetId, changeSet.getId())
+                .append(MongoRanChangeSet.Fields.author, changeSet.getAuthor());
 
-        //TODO: implement with MongoExecutor of a statement
-        ((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
-                .deleteOne(filter);
-
-        if (this.ranChangeSetList != null) {
-            this.ranChangeSetList.remove(new RanChangeSet(changeSet));
-        }
+        getExecutor().execute(new DeleteManyStatement(getDatabaseChangeLogTableName(), filter));
     }
 
     @Override
-    public int getNextSequenceValue() {
-        if (lastChangeSetSequenceValue == null) {
-            if (getDatabase().getConnection() == null) {
-                lastChangeSetSequenceValue = 0;
-            } else {
-                lastChangeSetSequenceValue = (int)((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
-                        .countDocuments();
-            }
-        }
+    protected void clearChekSums() throws DatabaseException {
+        final Document filter = new Document();
+        final Document update = new Document().append(MongoRanChangeSet.Fields.md5sum, StringUtils.EMPTY);
 
-        return ++lastChangeSetSequenceValue;
-    }
-
-    /**
-     * Tags the database changelog with the given string.
-     */
-    @Override
-    public void tag(final String tagString) throws DatabaseException {
-        final long totalRows =
-                ((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
-                        .countDocuments();
-        if (totalRows == 0L) {
-            final ChangeSet emptyChangeSet = new ChangeSet(String.valueOf(new Date().getTime()), "liquibase",
-                    false, false, "liquibase-internal", null, null,
-                    getDatabase().getObjectQuotingStrategy(), null);
-            this.setExecType(emptyChangeSet, ChangeSet.ExecType.EXECUTED);
-        }
-
-        //TODO: update the last row tag with TagDatabaseStatement tagString
-
-        if (this.ranChangeSetList != null) {
-            ranChangeSetList.get(ranChangeSetList.size() - 1).setTag(tagString);
-        }
+        getExecutor().update(new UpdateManyStatement(getDatabaseChangeLogTableName(), update, filter));
     }
 
     @Override
-    public boolean tagExists(final String tag) {
-        final long count = ((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
-                .countDocuments(new Document("tag", tag));
-        return count > 0L;
+    protected long countTags(final String tag) throws DatabaseException {
+        final Bson filter = Filters.eq(MongoRanChangeSet.Fields.tag, tag);
+        return getExecutor().queryForLong(
+                new CountDocumentsInCollectionStatement(getDatabaseChangeLogTableName(), filter));
     }
 
     @Override
-    public void clearAllCheckSums() throws DatabaseException {
-        ((MongoLiquibaseDatabase) getDatabase()).getConnection().getDb().getCollection(getDatabaseChangeLogTableName())
-                .updateMany(CLEAR_CHECKSUM_FILTER, CLEAR_CHECKSUM_UPDATE);
-
-        Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", getDatabase()).comment("Clear all checksums executed");
+    protected long countRanChangeSets() throws DatabaseException {
+        return getExecutor().queryForLong(new CountDocumentsInCollectionStatement(getDatabaseChangeLogTableName()));
     }
 
     @Override
-    public void destroy() {
+    protected void updateCheckSum(final ChangeSet changeSet) throws DatabaseException {
+        final Bson filter = Filters.and(
+                Filters.eq(MongoRanChangeSet.Fields.fileName, changeSet.getFilePath()),
+                Filters.eq(MongoRanChangeSet.Fields.changeSetId, changeSet.getId()),
+                Filters.eq(MongoRanChangeSet.Fields.author, changeSet.getAuthor())
+        );
 
-        try {
-            final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor("jdbc", getDatabase());
+        final Bson update = Updates.set(MongoRanChangeSet.Fields.md5sum, changeSet.generateCheckSum().toString());
 
-            executor.comment("Dropping Collection Database Change Log: " + getDatabaseChangeLogTableName());
-            {
-                executor.execute(
-                        new DropCollectionStatement(getDatabaseChangeLogTableName()));
-            }
-            reset();
-        } catch (DatabaseException e) {
-            throw new UnexpectedLiquibaseException(e);
-        }
+        getExecutor().update(new UpdateManyStatement(getDatabaseChangeLogTableName(), filter, update));
     }
 }

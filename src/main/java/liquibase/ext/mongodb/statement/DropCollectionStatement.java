@@ -21,40 +21,46 @@ package liquibase.ext.mongodb.statement;
  */
 
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import liquibase.ext.mongodb.database.MongoConnection;
+import liquibase.nosql.statement.NoSqlExecuteStatement;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.bson.Document;
 
-@AllArgsConstructor
+import static java.util.Optional.ofNullable;
+
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class DropCollectionStatement extends AbstractMongoStatement {
+public class DropCollectionStatement extends AbstractCollectionStatement
+        implements NoSqlExecuteStatement<MongoConnection> {
 
     public static final String COMMAND_NAME = "drop";
 
-    private final String collectionName;
+    public DropCollectionStatement(final String collectionName) {
+        super(collectionName);
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
 
     @Override
     public String toJs() {
         return
                 "db." +
-                        collectionName +
+                        getCollectionName() +
                         "." +
-                        COMMAND_NAME +
+                        getCommandName() +
                         "(" +
                         ");";
     }
 
     @Override
-    public void execute(MongoDatabase db) {
-        final MongoCollection<Document> collection = db.getCollection(collectionName);
+    public void execute(final MongoConnection connection) {
+        final MongoCollection<Document> collection = connection.getDatabase().getCollection(getCollectionName());
         collection.drop();
     }
 
-    @Override
-    public String toString() {
-        return this.toJs();
-    }
 }

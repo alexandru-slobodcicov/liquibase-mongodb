@@ -20,23 +20,23 @@ package liquibase.ext.mongodb.statement;
  * #L%
  */
 
-import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import liquibase.exception.DatabaseException;
+import liquibase.ext.mongodb.database.MongoConnection;
+import liquibase.nosql.statement.NoSqlExecuteStatement;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.bson.Document;
 
+import static java.util.Optional.ofNullable;
 import static liquibase.ext.mongodb.statement.BsonUtils.orEmptyDocument;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class InsertOneStatement extends AbstractMongoStatement {
+public class InsertOneStatement extends AbstractCollectionStatement
+implements NoSqlExecuteStatement<MongoConnection> {
 
     public static final String COMMAND_NAME = "insertOne";
 
-    private final String collectionName;
     private final Document document;
     private final Document options;
 
@@ -45,38 +45,34 @@ public class InsertOneStatement extends AbstractMongoStatement {
     }
 
     public InsertOneStatement(final String collectionName, final Document document, final Document options) {
-        this.collectionName = collectionName;
+        super(collectionName);
         this.document = document;
         this.options = options;
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 
     @Override
     public String toJs() {
         return
                 "db." +
-                        collectionName +
+                        getCollectionName() +
                         "." +
-                        COMMAND_NAME +
+                        getCommandName() +
                         "(" +
-                        document.toJson() +
+                        ofNullable(document).map(Document::toJson).orElse(null) +
                         ", " +
-                        options.toJson() +
+                        ofNullable(options).map(Document::toJson).orElse(null) +
                         ");";
     }
 
     @Override
-    public void execute(MongoDatabase db) throws DatabaseException {
-        try {
-            final MongoCollection<Document> collection = db.getCollection(collectionName);
+    public void execute(final MongoConnection connection) {
+            final MongoCollection<Document> collection = connection.getDatabase().getCollection(getCollectionName());
             collection.insertOne(document);
-            //TODO: Parse options into POJO InsertOneOptions.class
-        } catch (MongoException e) {
-            throw new DatabaseException(e);
-        }
     }
 
-    @Override
-    public String toString() {
-        return this.toJs();
-    }
 }

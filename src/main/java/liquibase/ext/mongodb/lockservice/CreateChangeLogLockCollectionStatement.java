@@ -22,9 +22,9 @@ package liquibase.ext.mongodb.lockservice;
 
 import liquibase.ext.mongodb.statement.CreateCollectionStatement;
 
-public class CreateChangelogLockCollectionStatement extends CreateCollectionStatement {
+public class CreateChangeLogLockCollectionStatement extends CreateCollectionStatement {
 
-    private static final String VALIDATOR = "{\n"
+    public static final String VALIDATOR = "\n"
         + "validator: {\n"
         + "     $jsonSchema: {\n"
         + "         bsonType: \"object\",\n"
@@ -51,10 +51,22 @@ public class CreateChangelogLockCollectionStatement extends CreateCollectionStat
         + "         }\n"
         + "     },\n"
         + "validationAction: \"error\",\n"
-        + "validationLevel: \"strict\"\n"
-        + "}";
+        + "validationLevel: \"strict\"\n";
 
-    public CreateChangelogLockCollectionStatement(final String collectionName) {
-        super(collectionName, VALIDATOR);
+    public static final String COMMAND_NAME = "createChangeLogLockCollection";
+    public static final String OPTIONS = "{" + VALIDATOR + "}";
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
+
+    /**
+     * Creates the Statement. Options are passed as null by intention so the Validator is created in {@link AdjustChangeLogLockCollectionStatement}
+     * @param collectionName The name of the ChangeLogLock Liquibase table. Is passed from {@link liquibase.configuration.GlobalConfiguration}
+     */
+    public CreateChangeLogLockCollectionStatement(final String collectionName) {
+        // Options passed as null. Validator will be created on AdjustChangeLogLockCollectionStatement
+        super(collectionName, (String)null);
     }
 }

@@ -20,73 +20,107 @@ package liquibase.ext.mongodb.lockservice;
  * #L%
  */
 
-import liquibase.exception.DatabaseException;
 import liquibase.exception.LockException;
 import liquibase.ext.AbstractMongoIntegrationTest;
-import liquibase.ext.mongodb.database.MongoLiquibaseDatabase;
 import liquibase.lockservice.DatabaseChangeLogLock;
 import liquibase.lockservice.LockServiceFactory;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.nullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MongoLockServiceIT extends AbstractMongoIntegrationTest {
 
-    public MongoLockService mongoLockService;
+    public MongoLockService lockService;
 
     @BeforeEach
-    protected void setUp() throws DatabaseException {
-        super.setUp();
-        mongoLockService = (MongoLockService) LockServiceFactory.getInstance().getLockService(database);
-        mongoLockService.reset();
+    protected void setUpEach() {
+        super.setUpEach();
+        lockService = (MongoLockService) LockServiceFactory.getInstance().getLockService(database);
+        lockService.reset();
     }
 
+    @SneakyThrows
     @Test
-    void testGetDatabaseTest() {
-        assertThat(mongoLockService, instanceOf(MongoLockService.class));
-        assertThat(mongoLockService.getDatabase(), instanceOf(MongoLiquibaseDatabase.class));
-        assertThat(mongoLockService.getDatabase(), equalTo(database));
+    void init() {
+        assertThat(lockService.getHasDatabaseChangeLogLockTable()).isNull();
+        assertThat(lockService.hasChangeLogLock()).isFalse();
+        assertThat(lockService.existsRepository()).isFalse();
+        lockService.init();
+        assertThat(lockService.getHasDatabaseChangeLogLockTable()).isTrue();
+        assertThat(lockService.existsRepository()).isTrue();
+        assertThat(lockService.hasChangeLogLock()).isFalse();
+        assertThat(lockService.isLocked()).isFalse();
     }
 
+    @SneakyThrows
     @Test
-    void testInit() throws DatabaseException {
-        mongoLockService.reset();
-        assertThat(mongoLockService.hasChangeLogLock(), equalTo(false));
-        assertThat(mongoLockService.getHasDatabaseChangeLogLockTable(), nullValue());
-        mongoLockService.init();
-        assertThat(mongoLockService.hasChangeLogLock(), equalTo(false));
-        assertThat(mongoLockService.getHasDatabaseChangeLogLockTable(), equalTo(true));
-    }
-
-    @Test
-    void testAcquireLock() throws DatabaseException, LockException {
-        mongoLockService.reset();
-        assertThat(mongoLockService.hasChangeLogLock(), equalTo(false));
-        mongoLockService.init();
-        assertThat(mongoLockService.hasChangeLogLock(), equalTo(false));
-        final boolean acquiredLock = mongoLockService.acquireLock();
-        assertThat(acquiredLock, equalTo(true));
-        assertThat(mongoLockService.hasChangeLogLock(), equalTo(true));
-        final DatabaseChangeLogLock[] locks = mongoLockService.listLocks();
-        assertThat(locks.length, equalTo(1));
+    void acquireLock() {
+        lockService.reset();
+        assertThat(lockService.hasChangeLogLock()).isFalse();
+        assertThat(lockService.existsRepository()).isFalse();
+        lockService.init();
+        assertThat(lockService.hasChangeLogLock()).isFalse();
+        assertThat(lockService.existsRepository()).isTrue();
+        final boolean acquiredLock = lockService.acquireLock();
+        assertThat(acquiredLock).isTrue();
+        assertThat(lockService.hasChangeLogLock()).isTrue();
+        assertThat(lockService.isLocked()).isTrue();
+        final DatabaseChangeLogLock[] locks = lockService.listLocks();
+        assertThat(locks).hasSize(1);
     }
 
     @Test
     void waitForLock() throws LockException {
-        mongoLockService.waitForLock();
+        assertThat(lockService.hasChangeLogLock()).isFalse();
+        lockService.waitForLock();
+        assertThat(lockService.hasChangeLogLock()).isTrue();
+        assertThat(lockService.listLocks()).hasSize(1);
     }
 
+    @SneakyThrows
     @Test
     void releaseLock() {
-        //TODO:
+        assertThat(lockService.hasChangeLogLock()).isFalse();
+        assertThat(lockService.acquireLock()).isTrue();
+        assertThat(lockService.hasChangeLogLock()).isTrue();
+        assertThat(lockService.listLocks()).hasSize(1);
+        lockService.releaseLock();
+        assertThat(lockService.hasChangeLogLock()).isFalse();
+        assertThat(lockService.isLocked()).isFalse();
+        assertThat(lockService.listLocks()).isEmpty();
     }
 
+    @SneakyThrows
     @Test
     void forceReleaseLock() {
-        //TODO:
+        assertThat(lockService.hasChangeLogLock()).isFalse();
+        lockService.forceReleaseLock();
+        assertThat(lockService.getHasDatabaseChangeLogLockTable()).isTrue();
+        assertThat(lockService.hasChangeLogLock()).isFalse();
+        assertThat(lockService.listLocks()).isEmpty();
+
+        // Force release with existing lock
+        lockService.reset();
+        assertThat(lockService.acquireLock()).isTrue();
+        assertThat(lockService.listLocks()).hasSize(1);
+        lockService.reset();
+        lockService.forceReleaseLock();
+        assertThat(lockService.hasChangeLogLock()).isFalse();
+        assertThat(lockService.isLocked()).isFalse();
+        assertThat(lockService.listLocks()).isEmpty();
+    }
+
+    @SneakyThrows
+    @Test
+    void destroy() {
+        lockService.init();
+        assertThat(lockService.getHasDatabaseChangeLogLockTable()).isTrue();
+        assertThat(lockService.existsRepository()).isTrue();
+        lockService.reset();
+        lockService.destroy();
+        assertThat(lockService.getHasDatabaseChangeLogLockTable()).isNull();
+        assertThat(lockService.existsRepository()).isFalse();
     }
 }

@@ -20,23 +20,18 @@ package liquibase.ext.mongodb.executor;
  * #L%
  */
 
-import liquibase.Scope;
-import liquibase.executor.Executor;
-import liquibase.executor.ExecutorService;
 import liquibase.ext.AbstractMongoIntegrationTest;
+import liquibase.nosql.executor.NoSqlExecutor;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 
-class MongoExecutorIT extends AbstractMongoIntegrationTest {
+class NoSqlExecutorIT extends AbstractMongoIntegrationTest {
 
     @Test
     void testGetInstance() {
-        final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor(database);
-        assertThat(executor, notNullValue());
-        assertThat(executor, instanceOf(MongoExecutor.class));
+        assertThat(executor).isNotNull()
+                .isInstanceOfAny(NoSqlExecutor.class);
     }
 
     @Test
