@@ -93,7 +93,10 @@ public final class TestUtils {
     public static List<ChangeSet> getChangesets(final String changeSetPath, final MongoLiquibaseDatabase database) throws LiquibaseException {
         final ClassLoaderResourceAccessor resourceAccessor = new ClassLoaderResourceAccessor();
         final ChangeLogParser parser =
-            ChangeLogParserFactory.getInstance().getParser(FilenameUtils.getExtension(changeSetPath), resourceAccessor);
+            ChangeLogParserFactory.getInstance().getParser(
+                    //FilenameUtils.getExtension(changeSetPath), resourceAccessor
+                    changeSetPath, resourceAccessor
+                    );
 
         final DatabaseChangeLog changeLog =
             parser.parse(changeSetPath, new ChangeLogParameters(database), resourceAccessor);
