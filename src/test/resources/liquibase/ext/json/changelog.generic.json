@@ -20,7 +20,7 @@
             "createCollection": {
               "collectionName": "person1",
               "options": {
-                "$jsonPayload": {
+                "$rawJson": {
                   "validator": {
                     "$jsonSchema": {
                       "bsonType": "object",

@@ -25,33 +25,34 @@ import liquibase.ext.mongodb.statement.CreateCollectionStatement;
 public class CreateChangeLogLockCollectionStatement extends CreateCollectionStatement {
 
     public static final String VALIDATOR = "\n"
-        + "validator: {\n"
-        + "     $jsonSchema: {\n"
-        + "         bsonType: \"object\",\n"
-        + "         description: \"Database Lock Collection\",\n"
-        + "         required: [\"_id\", \"locked\"],\n"
-        + "             properties: {\n"
-        + "                 _id: {\n"
-        + "                     bsonType: \"int\",\n"
-        + "                     description: \"Unique lock identifier\"\n"
-        + "                 },\n"
-        + "                 locked: {\n"
-        + "                     bsonType: \"bool\",\n"
-        + "                     description: \"Lock flag\"\n"
-        + "                 },\n"
-        + "                 lockGranted: {\n"
-        + "                     bsonType: \"date\",\n"
-        + "                     description: \"Timestamp when lock acquired\"\n"
-        + "                 },\n"
-        + "                 lockedBy: {\n"
-        + "                     bsonType: \"string\",\n"
-        + "                     description: \"Owner of the lock\"\n"
-        + "                 }\n"
-        + "             }\n"
-        + "         }\n"
-        + "     },\n"
-        + "validationAction: \"error\",\n"
-        + "validationLevel: \"strict\"\n";
+            + "\"validator\": {\n"
+            + "     \"$jsonSchema\": {\n"
+            + "         \"bsonType\": \"object\",\n"
+            + "         \"description\": \"Database Lock Collection\",\n"
+            + "         \"required\": [\"_id\", \"locked\"],\n"
+            + "             \"properties\": {\n"
+            + "                 \"_id\": {\n"
+            + "                     \"bsonType\": \"int\",\n"
+            + "                     \"description\": \"Unique lock identifier\"\n"
+            + "                 },\n"
+            + "                 \"locked\": {\n"
+            + "                     \"bsonType\": \"bool\",\n"
+            + "                     \"description\": \"Lock flag\"\n"
+            + "                 },\n"
+            + "                 \"lockGranted\": {\n"
+            + "                     \"bsonType\": \"date\",\n"
+            + "                     \"description\": \"Timestamp when lock acquired\"\n"
+            + "                 },\n"
+            + "                 \"lockedBy\": {\n"
+            + "                     \"bsonType\": [\"string\", \"null\"],\n"
+            + "                     \"description\": \"Owner of the lock\"\n"
+            + "                 }\n"
+            + "             }\n"
+            + "         }\n"
+            + "     },\n"
+            + "\"validationLevel\": \"strict\",\n"
+            + "\"validationAction\": \"error\"\n";
+
 
     public static final String COMMAND_NAME = "createChangeLogLockCollection";
     public static final String OPTIONS = "{" + VALIDATOR + "}";
@@ -63,10 +64,11 @@ public class CreateChangeLogLockCollectionStatement extends CreateCollectionStat
 
     /**
      * Creates the Statement. Options are passed as null by intention so the Validator is created in {@link AdjustChangeLogLockCollectionStatement}
+     *
      * @param collectionName The name of the ChangeLogLock Liquibase table. Is passed from {@link liquibase.configuration.GlobalConfiguration}
      */
     public CreateChangeLogLockCollectionStatement(final String collectionName) {
         // Options passed as null. Validator will be created on AdjustChangeLogLockCollectionStatement
-        super(collectionName, (String)null);
+        super(collectionName, (String) null);
     }
 }

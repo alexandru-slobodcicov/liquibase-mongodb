@@ -25,79 +25,79 @@ import liquibase.ext.mongodb.statement.CreateCollectionStatement;
 public class CreateChangeLogCollectionStatement extends CreateCollectionStatement {
 
     public static final String VALIDATOR = "\n" +
-            "validator: " +
+            "\"validator\": " +
             "{ " +
-            "   $jsonSchema: {\n" +
-            "    bsonType: \"object\",\n" +
-            "    description: \"Database Change Log Table.\",\n" +
-            "    required: [\"id\", \"author\", \"fileName\"],\n" +
-            "    properties: \n" +
+            "   \"$jsonSchema\": {\n" +
+            "    \"bsonType\": \"object\",\n" +
+            "    \"description\": \"Database Change Log Table.\",\n" +
+            "    \"required\": [\"id\", \"author\", \"fileName\", \"execType\"],\n" +
+            "    \"properties\": \n" +
             "    {\n" +
-            "        id: {\n" +
-            "            bsonType: \"string\",\n" +
-            "            description: \"Value from the changeSet id attribute.\"\n" +
+            "        \"id\": {\n" +
+            "            \"bsonType\": \"string\",\n" +
+            "            \"description\": \"Value from the changeSet id attribute.\"\n" +
             "        },\n" +
-            "        author: {\n" +
-            "            bsonType: \"string\",\n" +
-            "            description: \"Value from the changeSet author attribute.\"\n" +
+            "        \"author\": {\n" +
+            "            \"bsonType\": \"string\",\n" +
+            "            \"description\": \"Value from the changeSet author attribute.\"\n" +
             "        },\n" +
-            "        fileName: {\n" +
-            "            bsonType: \"string\",\n" +
-            "            description: \"Path to the changelog. This may be an absolute path or a relative path depending on how the changelog was passed to Liquibase. For best results, it should be a relative path.\"\n"
+            "        \"fileName\": {\n" +
+            "            \"bsonType\": \"string\",\n" +
+            "            \"description\": \"Path to the changelog. This may be an absolute path or a relative path depending on how the changelog was passed to Liquibase. " +
+            "For best results, it should be a relative path.\"\n" +
+            "        },\n" +
+            "        \"dateExecuted\": {\n" +
+            "            \"bsonType\": [\"date\", \"null\"],\n" +
+            "            \"description\": \"Date/time of when the changeSet was executed. Used with orderExecuted to determine rollback order.\"\n" +
+            "        },\n" +
+            "        \"orderExecuted\": {\n" +
+            "            \"bsonType\": [\"int\", \"null\"],\n" +
+            "            \"description\": \"Order that the changeSets were executed. " +
+            "Used in addition to dateExecuted to ensure order is correct even when the databases datetime supports poor resolution.\"\n" +
+            "        },\n" +
+            "        \"execType\": {\n" +
+            "            \"bsonType\": \"string\",\n" +
+            "            \"enum\": [\"EXECUTED\", \"FAILED\", \"SKIPPED\", \"RERAN\", \"MARK_RAN\"],\n" +
+            "            \"description\": \"Description of how the changeSet was executed.\"\n" +
+            "        },\n" +
+            "        \"md5sum\": {\n" +
+            "            \"bsonType\": [\"string\", \"null\"],\n" +
+            "            \"description\": \"Checksum of the changeSet when it was executed. Used on each run to ensure there have been no unexpected changes to changSet in the changelog file.\"\n"
             +
             "        },\n" +
-            "        dateExecuted: {\n" +
-            "            bsonType: \"date\",\n" +
-            "            description: \"Date/time of when the changeSet was executed. Used with orderExecuted to determine rollback order.\"\n" +
+            "        \"description\": {\n" +
+            "            \"bsonType\": [\"string\", \"null\"],\n" +
+            "            \"description\": \"Short auto-generated human readable description of changeSet.\"\n" +
             "        },\n" +
-            "        orderExecuted: {\n" +
-            "            bsonType: \"int\",\n" +
-            "            description: \"Order that the changeSets were executed. Used in addition to dateExecuted to ensure order is correct even when the databases datetime supports poor resolution.\"\n"
-            +
+            "        \"comments\": {\n" +
+            "            \"bsonType\": [\"string\", \"null\"],\n" +
+            "            \"description\": \"Value from the changeSet comment attribute.\"\n" +
             "        },\n" +
-            "        execType: {\n" +
-            "            bsonType: \"string\",\n" +
-            "            enum: [\"EXECUTED\", \"FAILED\", \"SKIPPED\", \"RERAN\", \"MARK_RAN\"],\n" +
-            "            description: \"Description of how the changeSet was executed.\"\n" +
+            "        \"tag\": {\n" +
+            "            \"bsonType\": [\"string\", \"null\"],\n" +
+            "            \"description\": \"Tracks which changeSets correspond to tag operations.\"\n" +
             "        },\n" +
-            "        md5sum: {\n" +
-            "            bsonType: \"string\",\n" +
-            "            description: \"Checksum of the changeSet when it was executed. Used on each run to ensure there have been no unexpected changes to changSet in the changelog file.\"\n"
-            +
+            "        \"contexts\": {\n" +
+            "            \"bsonType\": [\"string\", \"null\"],\n" +
+            "            \"description\": \"Context expression of the run.\"\n" +
             "        },\n" +
-            "        description: {\n" +
-            "            bsonType: \"string\",\n" +
-            "            description: \"Short auto-generated human readable description of changeSet.\"\n" +
+            "        \"labels\": {\n" +
+            "            \"bsonType\": [\"string\", \"null\"],\n" +
+            "            \"description\": \"Labels assigned.\"\n" +
             "        },\n" +
-            "        comments: {\n" +
-            "            bsonType: \"string\",\n" +
-            "            description: \"Value from the changeSet comment attribute.\"\n" +
+            "        \"deploymentId\": {\n" +
+            "            \"bsonType\": [\"string\", \"null\"],\n" +
+            "            \"description\": \"Unique identifier generate for a run.\"\n" +
             "        },\n" +
-            "        tag: {\n" +
-            "            bsonType: \"string\",\n" +
-            "            description: \"Tracks which changeSets correspond to tag operations.\"\n" +
-            "        },\n" +
-            "        contexts: {\n" +
-            "            bsonType: \"string\",\n" +
-            "            description: \"Context expression of the run.\"\n" +
-            "        },\n" +
-            "        labels: {\n" +
-            "            bsonType: \"string\",\n" +
-            "            description: \"Labels assigned.\"\n" +
-            "        },\n" +
-            "        deploymentId: {\n" +
-            "            bsonType: \"string\",\n" +
-            "            description: \"Unique identifier generate for a run.\"\n" +
-            "        },\n" +
-            "        liquibase: {\n" +
-            "            bsonType: \"string\",\n" +
-            "            description: \"Version of Liquibase used to execute the changeSet.\"\n" +
+            "        \"liquibase\": {\n" +
+            "            \"bsonType\": [\"string\", \"null\"],\n" +
+            "            \"description\": \"Version of Liquibase used to execute the changeSet.\"\n" +
             "        }\n" +
             "    }\n" +
             "   }" +
-            "}" +
-            "validationAction: \"error\",\n" +
-            "validationLevel: \"strict\"\n";
+            "}," +
+            "\"validationLevel\": \"strict\",\n" +
+            "\"validationAction\": \"error\"\n";
 
     public static final String OPTIONS = "{" + VALIDATOR + "}";
     public static final String COMMAND_NAME = "createChangeLogCollection";

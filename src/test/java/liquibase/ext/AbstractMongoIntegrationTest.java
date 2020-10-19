@@ -37,7 +37,7 @@ import org.junit.jupiter.api.TestInstance;
 import static liquibase.ext.mongodb.TestUtils.*;
 import static liquibase.nosql.executor.NoSqlExecutor.EXECUTOR_NAME;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public abstract class AbstractMongoIntegrationTest {
 
     protected MongoConnection connection;

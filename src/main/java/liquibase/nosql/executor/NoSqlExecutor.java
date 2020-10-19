@@ -21,7 +21,9 @@ package liquibase.nosql.executor;
  */
 
 import liquibase.Scope;
+import liquibase.changelog.ChangeLogHistoryServiceFactory;
 import liquibase.database.Database;
+import liquibase.nosql.changelog.AbstractNoSqlHistoryService;
 import liquibase.nosql.database.AbstractNoSqlConnection;
 import liquibase.nosql.database.AbstractNoSqlDatabase;
 import liquibase.exception.DatabaseException;
@@ -31,6 +33,7 @@ import liquibase.nosql.statement.*;
 import liquibase.servicelocator.LiquibaseService;
 import liquibase.sql.visitor.SqlVisitor;
 import liquibase.statement.SqlStatement;
+import liquibase.statement.core.UpdateStatement;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
@@ -144,6 +147,27 @@ public class NoSqlExecutor extends AbstractExecutor {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * TODO: Raise with Liquibase why is this used instead of
+     * {@link AbstractNoSqlHistoryService#clearAllCheckSums()}
+     * in {@link liquibase.Liquibase#clearCheckSums()}
+     * @param updateStatement the {@link UpdateStatement} statement with MD5SUM=null
+     * @throws DatabaseException in case of a failure
+     */
+    public void execute(final UpdateStatement updateStatement) throws DatabaseException {
+        if(updateStatement.getNewColumnValues().containsKey("MD5SUM")
+                && updateStatement.getNewColumnValues().get("MD5SUM") == null) {
+            try {
+                ChangeLogHistoryServiceFactory.getInstance()
+                        .getChangeLogService(getDatabase()).clearAllCheckSums();
+            } catch (final Exception e) {
+                throw new DatabaseException("Could not execute", e);
+            }
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
     @Override
     public void execute(final SqlStatement sql) throws DatabaseException {
         this.execute(sql, emptyList());
@@ -157,6 +181,8 @@ public class NoSqlExecutor extends AbstractExecutor {
             } catch (final Exception e) {
                 throw new DatabaseException("Could not execute", e);
             }
+        } else if (sql instanceof UpdateStatement) {
+            execute((UpdateStatement) sql);
         } else {
             throw new IllegalArgumentException();
         }

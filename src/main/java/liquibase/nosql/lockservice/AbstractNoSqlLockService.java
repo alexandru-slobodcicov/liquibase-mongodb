@@ -66,7 +66,7 @@ public abstract class AbstractNoSqlLockService implements LockService {
      */
     @Getter
     @Setter
-    private Clock clock = Clock.systemUTC();
+    private Clock clock = Clock.systemDefaultZone();
 
     @Override
     public int getPriority() {

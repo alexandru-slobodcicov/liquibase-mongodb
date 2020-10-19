@@ -1,22 +1,36 @@
 package liquibase.ext.mongodb.lockservice;
 
+import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import liquibase.ext.AbstractMongoIntegrationTest;
+import liquibase.ext.mongodb.statement.FindAllStatement;
+import liquibase.ext.mongodb.statement.InsertOneStatement;
+import liquibase.lockservice.DatabaseChangeLogLock;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.util.Objects.isNull;
+import static java.util.Optional.ofNullable;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class AdjustChangeLogLockCollectionStatementIT extends AbstractMongoIntegrationTest {
 
     public static final String LOCK_COLLECTION_NAME = "lockCollection";
 
+    protected FindAllStatement findAllStatement = new FindAllStatement(LOCK_COLLECTION_NAME);
+    protected SelectChangeLogLockStatement selectChangeLogLockStatement = new SelectChangeLogLockStatement(LOCK_COLLECTION_NAME);
+
+    protected MongoChangeLogLockToDocumentConverter converter = new MongoChangeLogLockToDocumentConverter();
 
     @Test
     void executeToJSTest() {
@@ -26,7 +40,23 @@ class AdjustChangeLogLockCollectionStatementIT extends AbstractMongoIntegrationT
         assertThat(adjustChangeLogLockCollectionStatement.getCommandName()).isEqualTo("adjustChangeLogLockCollection");
         assertThat(adjustChangeLogLockCollectionStatement.getCollectionName()).isEqualTo(LOCK_COLLECTION_NAME);
         assertThat(adjustChangeLogLockCollectionStatement.getSupportsValidator()).isTrue();
-        assertThat(adjustChangeLogLockCollectionStatement.toJs()).isEqualTo("db.adjustChangeLogLockCollection({\"collMod\": \"lockCollection\", \"validator\": {\"$jsonSchema\": {\"bsonType\": \"object\", \"description\": \"Database Lock Collection\", \"required\": [\"_id\", \"locked\"], \"properties\": {\"_id\": {\"bsonType\": \"int\", \"description\": \"Unique lock identifier\"}, \"locked\": {\"bsonType\": \"bool\", \"description\": \"Lock flag\"}, \"lockGranted\": {\"bsonType\": \"date\", \"description\": \"Timestamp when lock acquired\"}, \"lockedBy\": {\"bsonType\": \"string\", \"description\": \"Owner of the lock\"}}}}, \"validationAction\": \"error\", \"validationLevel\": \"strict\"});");
+        assertThat(adjustChangeLogLockCollectionStatement.toJs()).isEqualTo(
+                "db.adjustChangeLogLockCollection({\"collMod\": \"lockCollection\", \"validator\": " +
+                        "{\"$jsonSchema\": {\"bsonType\": \"object\", \"description\": \"Database Lock Collection\", " +
+                        "\"required\": [\"_id\", \"locked\"], \"properties\": {" +
+                        "\"_id\": {\"bsonType\": \"int\", \"description\": \"Unique lock identifier\"}, " +
+                        "\"locked\": {\"bsonType\": \"bool\", \"description\": \"Lock flag\"}, " +
+                        "\"lockGranted\": {\"bsonType\": \"date\", \"description\": \"Timestamp when lock acquired\"}, " +
+                        "\"lockedBy\": {\"bsonType\": [\"string\", \"null\"], \"description\": \"Owner of the lock\"}}}}, " +
+                        "\"validationLevel\": \"strict\", \"validationAction\": \"error\"});");
+
+        new CreateChangeLogLockCollectionStatement(LOCK_COLLECTION_NAME).execute(connection);
+        adjustChangeLogLockCollectionStatement.execute(connection);
+
+        Optional<Document> options = ofNullable(connection.getDatabase().listCollections().first()).map(c -> (Document)c.get("options"));
+        assertThat(StringUtils.deleteWhitespace(options.map(Document::toJson).orElse(null)))
+                .isEqualTo(StringUtils.deleteWhitespace(CreateChangeLogLockCollectionStatement.OPTIONS));
+
     }
 
     @Test
@@ -40,11 +70,11 @@ class AdjustChangeLogLockCollectionStatementIT extends AbstractMongoIntegrationT
 
         collection.listIndexes().into(indexes);
 
-        // has just default index
+        // Has just default index
         assertThat(indexes).hasSize(1);
         assertThat(indexes.get(0).get("name")).isEqualTo("_id_");
 
-        // options not present
+        // Options not present
         final Document collectionInfo =
                 connection.getDatabase().listCollections().filter(Filters.eq("name", LOCK_COLLECTION_NAME)).first();
 
@@ -52,7 +82,7 @@ class AdjustChangeLogLockCollectionStatementIT extends AbstractMongoIntegrationT
                 .isNotNull()
                 .returns(TRUE, c -> ((Document) c.get("options")).isEmpty());
 
-        // with explicit supportsValidator=false should not be changed
+        // With explicit supportsValidator=false should not be changed
         new AdjustChangeLogLockCollectionStatement(LOCK_COLLECTION_NAME, FALSE).execute(connection);
         final Document collectionInfoExplicitNoAdjustment =
                 connection.getDatabase().listCollections().filter(Filters.eq("name", LOCK_COLLECTION_NAME)).first();
@@ -61,7 +91,7 @@ class AdjustChangeLogLockCollectionStatementIT extends AbstractMongoIntegrationT
                 .isNotNull()
                 .returns(TRUE, c -> ((Document) c.get("options")).isEmpty());
 
-        // with explicit supportsValidator=true should be changed
+        // With explicit supportsValidator=true should be changed
         new AdjustChangeLogLockCollectionStatement(LOCK_COLLECTION_NAME, TRUE).execute(connection);
 
         indexes.clear();
@@ -79,4 +109,164 @@ class AdjustChangeLogLockCollectionStatementIT extends AbstractMongoIntegrationT
                 .returns("error", c -> ((Document) c.get("options")).get("validationAction"))
                 .returns("strict", c -> ((Document) c.get("options")).get("validationLevel"));
     }
+
+    @Test
+    void insertDataTest() {
+        // Returns empty even when collection does not exists
+        assertThat(findAllStatement.queryForList(connection)).isEmpty();
+
+        // Create collection
+        new CreateChangeLogLockCollectionStatement(LOCK_COLLECTION_NAME).execute(connection);
+        new AdjustChangeLogLockCollectionStatement(LOCK_COLLECTION_NAME, TRUE).execute(connection);
+        assertThat(findAllStatement.queryForList(connection)).isEmpty();
+
+        final Document options = new Document();
+        final Document minimal = new Document()
+                .append("_id", 1);
+
+        // Minimal not all required fields
+        assertThatExceptionOfType(MongoWriteException.class)
+                .isThrownBy(() -> new InsertOneStatement(LOCK_COLLECTION_NAME, minimal, options).execute(connection))
+                .withMessageStartingWith("Document failed validation");
+
+        // Minimal accepted
+        minimal.append("locked", true);
+        new InsertOneStatement(LOCK_COLLECTION_NAME, minimal, options).execute(connection);
+
+        assertThat(findAllStatement.queryForList(connection))
+                .hasSize(1).first()
+                .hasFieldOrPropertyWithValue("_id", 1)
+                .hasFieldOrPropertyWithValue("locked", true)
+                .returns(null, d -> d.get("lockedBy"))
+                .returns(null, d -> d.get("lockGranted"));
+
+        // Unique constraint failure
+        assertThatExceptionOfType(MongoWriteException.class)
+                .isThrownBy(() -> new InsertOneStatement(LOCK_COLLECTION_NAME, minimal, options).execute(connection))
+                .withMessageStartingWith("E11000 duplicate key error collection");
+
+        // Extra fields are allowed
+        minimal.append("_id", 2).append("extraField", "extraValue");
+        new InsertOneStatement(LOCK_COLLECTION_NAME, minimal, options).execute(connection);
+        assertThat(findAllStatement.queryForList(connection)).hasSize(2)
+                .filteredOn(d -> d.get("_id").equals(2)).hasSize(1).first()
+                .hasFieldOrPropertyWithValue("_id", 2)
+                .hasFieldOrPropertyWithValue("extraField", "extraValue");
+
+        // Nulls fail validation
+        minimal.append("_id", 3).append("lockGranted", null);
+        assertThatExceptionOfType(MongoWriteException.class)
+                .isThrownBy(() -> new InsertOneStatement(LOCK_COLLECTION_NAME, minimal, options).execute(connection))
+                .withMessageStartingWith("Document failed validation");
+
+        // Maximum
+        final Date lockGranted = new Date();
+        final Document maximal = new Document()
+                .append("_id", 3)
+                .append("lockGranted", lockGranted)
+                .append("locked", false)
+                .append("lockedBy", "Alex");
+
+        new InsertOneStatement(LOCK_COLLECTION_NAME, maximal, options).execute(connection);
+        assertThat(findAllStatement.queryForList(connection)).hasSize(3)
+                .filteredOn(d -> d.get("_id").equals(3)).hasSize(1).first()
+                .hasFieldOrPropertyWithValue("_id", 3)
+                .hasFieldOrPropertyWithValue("locked", false)
+                .hasFieldOrPropertyWithValue("lockGranted", lockGranted)
+                .hasFieldOrPropertyWithValue("lockedBy", "Alex")
+                .hasFieldOrPropertyWithValue(MongoChangeLogLock.Fields.id, 3)
+                .hasFieldOrPropertyWithValue(MongoChangeLogLock.Fields.locked, false)
+                .hasFieldOrPropertyWithValue(MongoChangeLogLock.Fields.lockGranted, lockGranted)
+                .hasFieldOrPropertyWithValue(MongoChangeLogLock.Fields.lockedBy, "Alex");
+
+        // Maximum with allowed null
+        maximal.append(MongoChangeLogLock.Fields.id, 4).append(MongoChangeLogLock.Fields.lockedBy, null);
+        new InsertOneStatement(LOCK_COLLECTION_NAME, maximal, options).execute(connection);
+        assertThat(findAllStatement.queryForList(connection)).hasSize(4)
+                .filteredOn(d -> d.get("_id").equals(4)).hasSize(1).first()
+                .hasFieldOrPropertyWithValue(MongoChangeLogLock.Fields.id, 4)
+                .hasFieldOrPropertyWithValue(MongoChangeLogLock.Fields.locked, false)
+                .hasFieldOrPropertyWithValue(MongoChangeLogLock.Fields.lockGranted, lockGranted)
+                .hasFieldOrPropertyWithValue(MongoChangeLogLock.Fields.lockedBy, null)
+                .returns(null, d -> d.get(MongoChangeLogLock.Fields.lockedBy));
+
+    }
+
+    @Test
+    void insertDataNoValidatorTest() {
+        // Returns empty even when collection does not exists
+        assertThat(findAllStatement.queryForList(connection)).isEmpty();
+
+        // Create collection
+        new CreateChangeLogLockCollectionStatement(LOCK_COLLECTION_NAME).execute(connection);
+        new AdjustChangeLogLockCollectionStatement(LOCK_COLLECTION_NAME, FALSE).execute(connection);
+        assertThat(findAllStatement.queryForList(connection)).isEmpty();
+
+        final Document options = new Document();
+        final Document minimal = new Document()
+                .append("_id", 1);
+
+        // Insert a not valid one, check it was persisted
+        new InsertOneStatement(LOCK_COLLECTION_NAME, minimal, options).execute(connection);
+
+        assertThat(findAllStatement.queryForList(connection)).hasSize(1);
+    }
+
+    @Test
+    void insertEntityTest() {
+        final Date lockGranted = new Date();
+
+        // Create collection
+        new CreateChangeLogLockCollectionStatement(LOCK_COLLECTION_NAME).execute(connection);
+        new AdjustChangeLogLockCollectionStatement(LOCK_COLLECTION_NAME, TRUE).execute(connection);
+        assertThat(findAllStatement.queryForList(connection)).isEmpty();
+
+        final Document options = new Document();
+        final MongoChangeLogLock minimal = new MongoChangeLogLock(1, lockGranted, null, null);
+
+        // Fail on nulls
+        assertThatExceptionOfType(MongoWriteException.class)
+                .isThrownBy(() -> new InsertOneStatement(LOCK_COLLECTION_NAME, converter.toDocument(minimal), options).execute(connection))
+                .withMessageStartingWith("Document failed validation");
+
+        // Minimal accepted
+        final MongoChangeLogLock defaultConstructor = new MongoChangeLogLock();
+        new InsertOneStatement(LOCK_COLLECTION_NAME, converter.toDocument(defaultConstructor), options).execute(connection);
+
+        assertThat(findAllStatement.queryForList(connection))
+                .hasSize(1).first()
+                .hasFieldOrPropertyWithValue("_id", 1)
+                .hasFieldOrPropertyWithValue("locked", true)
+                .hasFieldOrPropertyWithValue("lockedBy", "NoArgConstructor")
+                .returns(false, d -> isNull(d.get("lockGranted")));
+
+        // Unique constraint failure
+        assertThatExceptionOfType(MongoWriteException.class)
+                .isThrownBy(() -> new InsertOneStatement(LOCK_COLLECTION_NAME, converter.toDocument(defaultConstructor), options).execute(connection))
+                .withMessageStartingWith("E11000 duplicate key error collection");
+
+        // Maximum
+        final MongoChangeLogLock maximal = new MongoChangeLogLock(2, lockGranted, "Alex", false);
+
+        new InsertOneStatement(LOCK_COLLECTION_NAME, converter.toDocument(maximal), options).execute(connection);
+        assertThat(findAllStatement.queryForList(connection)).hasSize(2)
+                .filteredOn(d -> d.get("_id").equals(2)).hasSize(1).first()
+                .hasFieldOrPropertyWithValue("_id", 2)
+                .hasFieldOrPropertyWithValue("locked", false)
+                .hasFieldOrPropertyWithValue("lockGranted", lockGranted)
+                .hasFieldOrPropertyWithValue("lockedBy", "Alex")
+                .hasFieldOrPropertyWithValue(MongoChangeLogLock.Fields.id, 2)
+                .hasFieldOrPropertyWithValue(MongoChangeLogLock.Fields.locked, false)
+                .hasFieldOrPropertyWithValue(MongoChangeLogLock.Fields.lockGranted, lockGranted)
+                .hasFieldOrPropertyWithValue(MongoChangeLogLock.Fields.lockedBy, "Alex");
+
+        // selectChangeLogLockStatement
+        assertThat(converter.fromDocument(selectChangeLogLockStatement.queryForObject(connection, Document.class)))
+                .isInstanceOf(MongoChangeLogLock.class)
+                .returns(1, DatabaseChangeLogLock::getId)
+                .returns("NoArgConstructor", DatabaseChangeLogLock::getLockedBy)
+                .returns(false, d -> isNull(d.getLockGranted()));
+    }
+
+
 }

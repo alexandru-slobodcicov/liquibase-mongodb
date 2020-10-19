@@ -108,19 +108,29 @@ class MongoLockServiceTest {
     }
 
     @Test
+    void supports() {
+        assertThat(lockService.supports(database)).isTrue();
+        assertThat(lockService.supports(new DB2Database())).isFalse();
+    }
+
+    @Test
     void getConverter() {
-        assertThat(lockService.getLogger()).isNotNull();
+        assertThat(lockService.getConverter()).isNotNull().isInstanceOf(MongoChangeLogLockToDocumentConverter.class);
     }
 
     @SneakyThrows
     @Test
-    void initWhenNoRepository() {
+    void init() {
+
+        final ArgumentCaptor<AdjustChangeLogLockCollectionStatement> adjustChangeLogLockCollectionStatementArgumentCaptor =
+                ArgumentCaptor.forClass(AdjustChangeLogLockCollectionStatement.class);
+
+
         Scope.getCurrentScope().getSingleton(ExecutorService.class).setExecutor(EXECUTOR_NAME, database, executorMock);
         lockService.setDatabase(database);
 
         doReturn(0L).when(executorMock).queryForLong(any(CountCollectionByNameStatement.class));
-        doNothing().when(executorMock).execute(any(CreateChangeLogLockCollectionStatement.class));
-        doNothing().when(executorMock).execute(any(AdjustChangeLogLockCollectionStatement.class));
+        doNothing().when(executorMock).execute(adjustChangeLogLockCollectionStatementArgumentCaptor.capture());
 
         assertThat(lockService.getHasDatabaseChangeLogLockTable()).isNull();
         assertThat(lockService.getAdjustedChangeLogLockTable()).isFalse();
@@ -131,6 +141,7 @@ class MongoLockServiceTest {
         verify(executorMock, times(1)).queryForLong(any());
         verify(executorMock, times(1)).execute(any(CreateChangeLogLockCollectionStatement.class));
         verify(executorMock, times(1)).execute(any(AdjustChangeLogLockCollectionStatement.class));
+        assertThat(adjustChangeLogLockCollectionStatementArgumentCaptor.getValue().getSupportsValidator()).isTrue();
         verifyNoMoreInteractions(executorMock);
 
         assertThat(lockService.getHasDatabaseChangeLogLockTable()).isTrue();
@@ -212,6 +223,7 @@ class MongoLockServiceTest {
         doReturn(1L).when(executorMock).queryForLong(any(CountCollectionByNameStatement.class));
 
         assertThat(lockService.getHasDatabaseChangeLogLockTable()).isNull();
+        assertThat(lockService.getAdjustedChangeLogLockTable()).isFalse();
         assertThat(lockService.hasChangeLogLock()).isFalse();
 
         database.setAdjustTrackingTablesOnStartup(FALSE);
@@ -221,6 +233,7 @@ class MongoLockServiceTest {
         verifyNoMoreInteractions(executorMock);
 
         assertThat(lockService.getHasDatabaseChangeLogLockTable()).isTrue();
+        assertThat(lockService.getAdjustedChangeLogLockTable()).isTrue();
         assertThat(lockService.hasChangeLogLock()).isFalse();
     }
 
@@ -264,11 +277,6 @@ class MongoLockServiceTest {
         verify(executorMock, times(2)).execute(any(CreateChangeLogLockCollectionStatement.class));
         verify(executorMock, times(1)).execute(any(AdjustChangeLogLockCollectionStatement.class));
         verifyNoMoreInteractions(executorMock);
-    }
-
-    @Test
-    void hasChangeLogLock() {
-        assertThat(lockService.hasChangeLogLock()).isFalse();
     }
 
     @SneakyThrows
@@ -670,7 +678,8 @@ class MongoLockServiceTest {
         lockService.setDatabase(database);
         assertThat(lockService.getDatabaseChangeLogLockTableName())
                 .isEqualTo(database.getDatabaseChangeLogLockTableName())
-                .isNotEqualTo("newTableName");
+                .isNotEqualTo("newTableName")
+                .isEqualTo("DATABASECHANGELOGLOCK");
         database.setDatabaseChangeLogLockTableName("newTableName");
         assertThat(lockService.getDatabaseChangeLogLockTableName())
                 .isEqualTo(database.getDatabaseChangeLogLockTableName())
@@ -697,11 +706,5 @@ class MongoLockServiceTest {
         assertThat(lockService.getChangeLogLockWaitTime())
                 .isNotEqualTo(LiquibaseConfiguration.getInstance().getConfiguration(GlobalConfiguration.class).getDatabaseChangeLogLockWaitTime())
                 .isEqualTo(1000L);
-    }
-
-    @Test
-    void supports() {
-        assertThat(lockService.supports(database)).isTrue();
-        assertThat(lockService.supports(new DB2Database())).isFalse();
     }
 }

@@ -12,7 +12,7 @@ class JsonNoSqlChangeLogParserTest {
     void parse() {
         final ClassLoaderResourceAccessor resourceAccessor = new ClassLoaderResourceAccessor();
         JsonNoSqlChangeLogParser parser = new JsonNoSqlChangeLogParser();
-        parser.parse("liquibase/ext/changelog.generic.json", new ChangeLogParameters(), resourceAccessor);
+        parser.parse("liquibase/ext/json/changelog.generic.json", new ChangeLogParameters(), resourceAccessor);
 
 
     }

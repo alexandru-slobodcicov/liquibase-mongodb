@@ -35,7 +35,7 @@ public class MongoRanChangeSetToDocumentConverter extends AbstractNoSqlItemToDoc
         document.append(MongoRanChangeSet.Fields.labels, buildLabels(item.getLabels()));
         document.append(MongoRanChangeSet.Fields.deploymentId, item.getDeploymentId());
         document.append(MongoRanChangeSet.Fields.orderExecuted, item.getOrderExecuted());
-        document.append(MongoRanChangeSet.Fields.liquibase, item.getLiquibase());
+        document.append(MongoRanChangeSet.Fields.liquibase, item.getLiquibaseVersion());
 
         return document;
     }

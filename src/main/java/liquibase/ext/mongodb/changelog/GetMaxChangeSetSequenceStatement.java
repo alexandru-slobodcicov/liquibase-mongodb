@@ -1,10 +1,10 @@
-package liquibase.ext.mongodb.statement;
+package liquibase.ext.mongodb.changelog;
 
 /*-
  * #%L
  * Liquibase MongoDB Extension
  * %%
- * Copyright (C) 2019 Mastercard
+ * Copyright (C) 2020 Mastercard
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -20,10 +20,13 @@ package liquibase.ext.mongodb.statement;
  * #L%
  */
 
+import com.mongodb.client.model.Sorts;
 import liquibase.ext.mongodb.database.MongoConnection;
+import liquibase.ext.mongodb.statement.AbstractCollectionStatement;
 import liquibase.nosql.statement.NoSqlQueryForLongStatement;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.util.Objects;
@@ -32,20 +35,13 @@ import static java.util.Optional.ofNullable;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class CountDocumentsInCollectionStatement extends AbstractCollectionStatement
+public class GetMaxChangeSetSequenceStatement extends AbstractCollectionStatement
         implements NoSqlQueryForLongStatement<MongoConnection> {
 
-    public static final String COMMAND_NAME = "countDocuments";
+    public static final String COMMAND_NAME = "maxSequence";
 
-    private final Bson filter;
-
-    public CountDocumentsInCollectionStatement(final String collectionName) {
-        this(collectionName, null);
-    }
-
-    public CountDocumentsInCollectionStatement(final String collectionName, final Bson filter) {
+    public GetMaxChangeSetSequenceStatement(final String collectionName) {
         super(collectionName);
-        this.filter = filter;
     }
 
     @Override
@@ -61,13 +57,15 @@ public class CountDocumentsInCollectionStatement extends AbstractCollectionState
                         "." +
                         getCommandName() +
                         "(" +
-                        ofNullable(filter).map(Objects::toString).orElse(null) +
                         ");";
     }
 
     @Override
     public long queryForLong(final MongoConnection connection) {
-        return connection.getDatabase().getCollection(getCollectionName()).countDocuments(filter);
+        final Document max = connection.getDatabase().getCollection(getCollectionName())
+                .find().sort(Sorts.descending(MongoRanChangeSet.Fields.orderExecuted)).limit(1).first();
+        return ofNullable(max).map(d->(long)d.getInteger(MongoRanChangeSet.Fields.orderExecuted))
+                .orElse(0L);
     }
 
 }

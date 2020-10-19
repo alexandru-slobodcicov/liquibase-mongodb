@@ -1,0 +1,9 @@
+{
+  "databaseChangeLog": [
+    {
+      "include": {
+        "file": "liquibase/ext/json/generic-1-insert-people.json"
+      }
+    }
+  ]
+}

@@ -34,6 +34,7 @@ import static liquibase.plugin.Plugin.PRIORITY_SPECIALIZED;
 
 public class JsonNoSqlChangeLogParser implements ChangeLogParser {
 
+    public static final String RAW_JSON_FIELD = "$rawJson";
     protected Logger log = Scope.getCurrentScope().getLog(getClass());
 
     protected ObjectMapper objectMapper = new JsonMapper();
@@ -191,8 +192,8 @@ public class JsonNoSqlChangeLogParser implements ChangeLogParser {
                 if (entry.getValue().isValueNode()) {
                     objectNode.put(entry.getKey(),
                             changeLogParameters.expandExpressions(entry.getValue().asText(), changeLog));
-                } else if (entry.getValue().isObject() && entry.getValue().has("$jsonPayload")) {
-                    final JsonNode jsonPayload = entry.getValue().get("$jsonPayload");
+                } else if (entry.getValue().isObject() && entry.getValue().has(RAW_JSON_FIELD)) {
+                    final JsonNode jsonPayload = entry.getValue().get(RAW_JSON_FIELD);
                     objectNode.put(entry.getKey(),
                             changeLogParameters.expandExpressions(jsonPayload.toPrettyString(), changeLog));
                 } else {

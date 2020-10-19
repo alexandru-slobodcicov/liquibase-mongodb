@@ -36,12 +36,6 @@ class MongoLiquibaseDatabaseTest {
     }
 
     @Test
-    @Disabled
-    void dropDatabaseObjects() {
-        //TODO: Test with mocks
-    }
-
-    @Test
     void getDefaultDriver() {
         assertThat(database.getDefaultDriver("mongodb://qwe")).isEqualTo(MongoClientDriver.class.getName());
         assertThat(database.getDefaultDriver("cosmos://qwe")).isNull();

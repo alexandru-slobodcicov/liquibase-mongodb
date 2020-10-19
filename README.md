@@ -5,6 +5,7 @@
 ## Table of contents
 
 1. [Introduction](#introduction)
+1. [Release Notes](#release-notes)
 1. [Implemented Changes](#implemented-changes)
 1. [Getting Started](#getting-started)
 1. [Running tests](#running-tests)
@@ -22,6 +23,39 @@ Majority of them are basically wrappers over [`db.eval`](https://docs.mongodb.co
 
 In order to call specific `mongo-java-driver` specific methods, 
 Liquibase turned to be the most feasible tool to extend as it allows to define change sets to fit driver methods arguments.
+
+<a name="release-notes"></a>
+## Release Notes
+####4.1.2
+* Added NoSql JSON Parser which can pass raw JSON for a property like this:
+```json 
+{
+    "options" : 
+        {
+            "$rawJson" : { ... }
+        }
+}
+```
+* New properties added
+```properties
+# If disabled can be used on API which do not support validators (Azure Cosmos DB with Mongo API, Amazon DocumentDB)
+liquibase.mongodb.supportsValidator=true
+# If enabled will adjust indexes and validators for Liquibase tracking tables LOCK and CHANGELOG. Can be disabled if sure Liquibase not updated.
+liquibase.mongodb.adjustTrackingTablesOnStartup=true
+```
+* Overridden Liquibase table names removed. Now will be used the default ones in Liquibase. If previous releases used then table names should be explicitly passed as parameters.
+Currently, by default as Liquibase default :`DATABASECHANGELOGLOCK, DATABASECHANGELOG`
+Previous releases used by default : `databaseChangeLogLock, databaseChangeLog`
+####4.1.1
+* Support for Liquibase 4.1.1
+####4.1.0
+* Support for Liquibase 4.1.0
+####4.0.0
+* Works with Liquibase v4.0.0
+####3.10.0
+* Support for Liquibase 3.10
+####3.9.0
+* First release
 
 <a name="implemented-changes"></a>
 ## Implemented Changes:

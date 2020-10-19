@@ -20,6 +20,7 @@ package liquibase.nosql.changelog;
  * #L%
  */
 
+import liquibase.Liquibase;
 import liquibase.Scope;
 import liquibase.changelog.AbstractChangeLogHistoryService;
 import liquibase.changelog.ChangeSet;
@@ -30,23 +31,41 @@ import liquibase.exception.UnexpectedLiquibaseException;
 import liquibase.executor.ExecutorService;
 import liquibase.logging.Logger;
 import liquibase.nosql.executor.NoSqlExecutor;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.time.Clock;
 import java.util.Date;
 import java.util.List;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Objects.isNull;
 import static liquibase.plugin.Plugin.PRIORITY_SPECIALIZED;
 
 public abstract class AbstractNoSqlHistoryService extends AbstractChangeLogHistoryService {
 
+    @Getter
     private List<RanChangeSet> ranChangeSetList;
 
     private boolean serviceInitialized;
 
+    @Getter
     private Boolean hasDatabaseChangeLogTable;
 
+    @Getter
     private Integer lastChangeSetSequenceValue;
+
+    @Getter
+    private Boolean adjustedChangeLogTable = FALSE;
+
+    /**
+     * Clock field in order to make it testable
+     */
+    @Getter
+    @Setter
+    private Clock clock = Clock.systemDefaultZone();
 
     public int getPriority() {
         return PRIORITY_SPECIALIZED;
@@ -70,9 +89,11 @@ public abstract class AbstractNoSqlHistoryService extends AbstractChangeLogHisto
 
     @Override
     public void reset() {
+        super.reset();
         this.ranChangeSetList = null;
         this.serviceInitialized = false;
         this.hasDatabaseChangeLogTable = null;
+        this.adjustedChangeLogTable = FALSE;
     }
 
     @Override
@@ -82,11 +103,7 @@ public abstract class AbstractNoSqlHistoryService extends AbstractChangeLogHisto
             return;
         }
 
-        final boolean createdTable = hasDatabaseChangeLogTable();
-
-        if (createdTable) {
-            adjustRepository();
-        } else {
+        if (!hasDatabaseChangeLogTable()) {
             getLogger().info("Create Database Change Log Container");
 
             // If there is no table in the database for recording change history create one.
@@ -95,7 +112,12 @@ public abstract class AbstractNoSqlHistoryService extends AbstractChangeLogHisto
             createRepository();
             getLogger().info("Created database history container : "
                     + getDatabase().getConnection().getCatalog() + "." + this.getDatabaseChangeLogTableName());
-            this.hasDatabaseChangeLogTable = true;
+            this.hasDatabaseChangeLogTable = TRUE;
+        }
+
+        if (!adjustedChangeLogTable) {
+            adjustRepository();
+            adjustedChangeLogTable = TRUE;
         }
 
         this.serviceInitialized = true;
@@ -205,6 +227,11 @@ public abstract class AbstractNoSqlHistoryService extends AbstractChangeLogHisto
         return count > 0L;
     }
 
+    /**
+     * TODO: Raise with Liquibase why is this one not used instead of {@link liquibase.statement.core.UpdateStatement}
+     * in {@link liquibase.Liquibase#clearCheckSums()}
+     * @throws DatabaseException in case of a failure
+     */
     @Override
     public void clearAllCheckSums() throws DatabaseException {
         getLogger().info("Clear all checksums");

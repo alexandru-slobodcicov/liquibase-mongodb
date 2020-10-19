@@ -85,7 +85,7 @@ class CreateCollectionChangeTest extends AbstractMongoChangeTest {
     @Test
     @SneakyThrows
     void generateStatementsFromJson() {
-        final List<ChangeSet> changeSets = getChangesets("liquibase/ext/changelog.generic.json", database);
+        final List<ChangeSet> changeSets = getChangesets("liquibase/ext/json/changelog.generic.json", database);
 
         assertThat(changeSets)
                 .isNotNull()

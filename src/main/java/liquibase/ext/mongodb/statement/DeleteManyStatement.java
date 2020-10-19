@@ -27,6 +27,7 @@ import liquibase.nosql.statement.NoSqlUpdateStatement;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import static java.util.Optional.ofNullable;
 import static liquibase.ext.mongodb.statement.BsonUtils.orEmptyDocument;
@@ -38,13 +39,9 @@ public class DeleteManyStatement extends AbstractCollectionStatement
 
     public static final String COMMAND_NAME = "deleteMany";
 
-    private final Document filter;
+    private final Bson filter;
 
-    public DeleteManyStatement(final String collectionName, final String filter) {
-        this(collectionName, orEmptyDocument(filter));
-    }
-
-    public DeleteManyStatement(final String collectionName, final Document filter) {
+    public DeleteManyStatement(final String collectionName, final Bson filter) {
         super(collectionName);
         this.filter = filter;
     }
@@ -62,7 +59,7 @@ public class DeleteManyStatement extends AbstractCollectionStatement
                         "." +
                         getCommandName() +
                         "(" +
-                        ofNullable(filter).map(Document::toJson).orElse(null) +
+                        ofNullable(filter).map(Bson::toString).orElse(null) +
                         ");";
     }
 

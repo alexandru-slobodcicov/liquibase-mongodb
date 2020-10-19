@@ -26,12 +26,10 @@ import liquibase.nosql.statement.NoSqlExecuteStatement;
 import liquibase.nosql.statement.NoSqlUpdateStatement;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import static java.util.Optional.ofNullable;
-import static liquibase.ext.mongodb.statement.BsonUtils.orEmptyDocument;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
@@ -40,13 +38,13 @@ public class UpdateManyStatement extends AbstractCollectionStatement
 
     public static final String COMMAND_NAME = "updateMany";
 
-    private final Bson document;
     private final Bson filter;
+    private final Bson document;
 
     public UpdateManyStatement(final String collectionName, final Bson filter, final Bson document) {
         super(collectionName);
-        this.document = document;
         this.filter = filter;
+        this.document = document;
     }
 
     @Override

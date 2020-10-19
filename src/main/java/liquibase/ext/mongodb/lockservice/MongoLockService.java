@@ -61,7 +61,7 @@ public class MongoLockService extends AbstractNoSqlLockService {
     protected Boolean isLocked() throws DatabaseException {
         Optional<Document> lock = Optional.ofNullable(getExecutor()
                 .queryForObject(new SelectChangeLogLockStatement(getDatabaseChangeLogLockTableName()), Document.class));
-        return lock.map(converter::fromDocument).map(MongoChangeLogLock::getLocked).orElse(FALSE);
+        return lock.map(getConverter()::fromDocument).map(MongoChangeLogLock::getLocked).orElse(FALSE);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class MongoLockService extends AbstractNoSqlLockService {
         final SqlStatement findAllStatement = new FindAllStatement(getDatabaseChangeLogLockTableName());
 
         return getExecutor().queryForList(findAllStatement, Document.class).stream().map(Document.class::cast)
-                .map(converter::fromDocument).filter(MongoChangeLogLock::getLocked).collect(Collectors.toList());
+                .map(getConverter()::fromDocument).filter(MongoChangeLogLock::getLocked).collect(Collectors.toList());
     }
 
     @Override
