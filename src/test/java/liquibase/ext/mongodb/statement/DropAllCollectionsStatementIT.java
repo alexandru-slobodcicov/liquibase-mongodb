@@ -33,13 +33,13 @@ class DropAllCollectionsStatementIT extends AbstractMongoIntegrationTest {
 
     @Test
     void execute() {
-        final MongoDatabase database = mongoConnection.getDb();
+        final MongoDatabase database = connection.getDatabase();
 
         IntStream.rangeClosed(1, 5)
             .forEach(indx -> database.createCollection(COLLECTION_NAME_1 + indx));
         assertThat(database.listCollectionNames()).hasSize(5);
 
-        new DropAllCollectionsStatement().execute(database);
+        new DropAllCollectionsStatement().execute(connection);
         assertThat(database.listCollectionNames()).isEmpty();
     }
 

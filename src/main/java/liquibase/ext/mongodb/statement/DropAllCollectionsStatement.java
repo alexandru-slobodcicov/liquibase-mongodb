@@ -21,7 +21,9 @@ package liquibase.ext.mongodb.statement;
  */
 
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import liquibase.ext.mongodb.database.MongoConnection;
+import liquibase.nosql.statement.AbstractNoSqlStatement;
+import liquibase.nosql.statement.NoSqlExecuteStatement;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -32,28 +34,20 @@ import java.util.function.Consumer;
 @AllArgsConstructor
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class DropAllCollectionsStatement extends AbstractMongoStatement {
+public class DropAllCollectionsStatement extends AbstractNoSqlStatement implements NoSqlExecuteStatement<MongoConnection> {
 
     public static final String COMMAND_NAME = "dropAll";
 
     @Override
-    public String toJs() {
-        return
-                "db." +
-                        COMMAND_NAME +
-                        "(" +
-                        ");";
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 
     @Override
-    public void execute(MongoDatabase db) {
-        db.listCollectionNames()
-            .map(db::getCollection)
+    public void execute(final MongoConnection connection) {
+        connection.getDatabase().listCollectionNames()
+            .map(connection.getDatabase()::getCollection)
             .forEach((Consumer<? super MongoCollection<Document>>) MongoCollection::drop);
     }
 
-    @Override
-    public String toString() {
-        return this.toJs();
-    }
 }

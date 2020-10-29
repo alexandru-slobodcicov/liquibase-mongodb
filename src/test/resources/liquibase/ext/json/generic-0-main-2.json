@@ -1,0 +1,14 @@
+{
+  "databaseChangeLog": [
+    {
+      "include": {
+        "file": "liquibase/ext/json/generic-1-insert-people.json"
+      }
+    },
+    {
+      "include": {
+        "file": "liquibase/ext/json/generic-2-update-people.json"
+      }
+    }
+  ]
+}

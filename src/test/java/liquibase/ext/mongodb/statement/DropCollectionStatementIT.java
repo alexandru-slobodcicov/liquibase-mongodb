@@ -31,11 +31,11 @@ class DropCollectionStatementIT extends AbstractMongoIntegrationTest {
 
     @Test
     void execute() {
-        final MongoDatabase database = mongoConnection.getDb();
+        final MongoDatabase database = connection.getDatabase();
         database.createCollection(COLLECTION_NAME_1);
         assertThat(database.listCollectionNames()).hasSize(1);
 
-        new DropCollectionStatement(COLLECTION_NAME_1).execute(database);
+        new DropCollectionStatement(COLLECTION_NAME_1).execute(connection);
         assertThat(database.listCollectionNames()).isEmpty();
     }
 

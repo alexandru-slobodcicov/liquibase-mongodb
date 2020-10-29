@@ -40,7 +40,10 @@
         <liquibase.version>4.1.1</liquibase.version>
         <jupiter.version>5.7.0</jupiter.version>
         <jupiter.surefire.version>1.3.2</jupiter.surefire.version>
+        <mockito-core.version>3.3.3</mockito-core.version>
+        <mockito-junit-jupiter.version>3.3.3</mockito-junit-jupiter.version>
         <mongodb-driver.version>3.12.7</mongodb-driver.version>
+        <commons-lang3.version>3.10</commons-lang3.version>
         <lombok.version>1.18.14</lombok.version>
         <hamcrest.version>1.3</hamcrest.version>
         <assertj.version>3.17.2</assertj.version>
@@ -51,6 +54,8 @@
         <license.trimHeaderLine>true</license.trimHeaderLine>
         <license-maven-plugin.version>2.0.0</license-maven-plugin.version>
         <maven-help-plugin.version>3.2.0</maven-help-plugin.version>
+        <jackson-core.version>2.11.2</jackson-core.version>
+        <snakeyaml.version>1.12</snakeyaml.version>
     </properties>
     <dependencies>
         <dependency>
@@ -63,25 +68,42 @@
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver</artifactId>
             <version>${mongodb-driver.version}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-core</artifactId>
             <version>${mongodb-driver.version}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>bson</artifactId>
             <version>${mongodb-driver.version}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
             <version>${mongodb-driver.version}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson-core.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson-core.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -116,6 +138,18 @@
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito-junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -20,41 +20,34 @@ package liquibase.ext.mongodb.statement;
  * #L%
  */
 
-import com.mongodb.client.MongoDatabase;
+import liquibase.ext.mongodb.database.MongoConnection;
+import liquibase.nosql.statement.NoSqlQueryForLongStatement;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.stream.StreamSupport;
 
-@AllArgsConstructor
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class CountCollectionByNameStatement extends AbstractMongoStatement {
+public class CountCollectionByNameStatement extends AbstractCollectionStatement
+        implements NoSqlQueryForLongStatement<MongoConnection> {
 
-    public static final String COMMAND_NAME = "listCollectionNames";
+    public static final String COMMAND_NAME = "countCollectionByNames";
 
-    private final String collectionName;
-
-    @Override
-    public String toJs() {
-        return
-                "db." +
-                        COMMAND_NAME +
-                        "(" +
-                        collectionName +
-                        ");";
+    public CountCollectionByNameStatement(final String collectionName) {
+        super(collectionName);
     }
 
     @Override
-    public long queryForLong(MongoDatabase db) {
-        return StreamSupport.stream(db.listCollectionNames().spliterator(), false)
-                .filter(s -> s.equals(collectionName))
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
+
+    @Override
+    public long queryForLong(final MongoConnection connection) {
+        return StreamSupport.stream(connection.getDatabase().listCollectionNames().spliterator(), false)
+                .filter(s -> s.equals(getCollectionName()))
                 .count();
-    }
-
-    @Override
-    public String toString() {
-        return toJs();
     }
 }

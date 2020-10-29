@@ -20,17 +20,27 @@ package liquibase.ext.mongodb.lockservice;
  * #L%
  */
 
+import liquibase.exception.UnexpectedLiquibaseException;
 import liquibase.lockservice.DatabaseChangeLogLock;
-import org.bson.Document;
+import liquibase.util.NetUtil;
+import lombok.Getter;
 
 import java.util.Date;
 
+import static java.util.Optional.ofNullable;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+
 public class MongoChangeLogLock extends DatabaseChangeLogLock{
 
-    private int id;
-    private Date lockGranted;
-    private String lockedBy;
-    private Boolean locked;
+    public static class Fields {
+        public static final String id = "_id";
+        public static final String lockGranted = "lockGranted";
+        public static final String lockedBy = "lockedBy";
+        public static final String locked = "locked";
+    }
+
+    @Getter
+    private final Boolean locked;
 
     public MongoChangeLogLock() {
         this(1, new Date(), "NoArgConstructor", true);
@@ -38,70 +48,23 @@ public class MongoChangeLogLock extends DatabaseChangeLogLock{
 
     public MongoChangeLogLock(final Integer id, final Date lockGranted, final String lockedBy, final Boolean locked) {
         super(id, lockGranted, lockedBy);
-        this.id = id;
-        this.lockGranted = lockGranted;
-        this.lockedBy = lockedBy;
-        this.locked = locked;
-    }
-
-    //TODO: use  db.getCollection(collectionName, requiredType).withCodecRegistry(MongoConnection.pojoCodecRegistry())
-    //not working when converting back to POJO, date field is as object, String is as binary
-    public static MongoChangeLogLock from(final Document document) {
-
-        return new MongoChangeLogLock(
-                document.get("_id", Integer.class)
-                , document.get("lockGranted", Date.class)
-                , document.get("lockedBy", String.class)
-                , document.get("locked", Boolean.class)
-        );
-    }
-
-    @Override
-    public int getId() {
-        return id;
-    }
-
-    public void setId(final int id) {
-        this.id = id;
-    }
-
-    @Override
-    public Date getLockGranted() {
-        return lockGranted;
-    }
-
-    public void setLockGranted(final Date lockGranted) {
-        this.lockGranted = lockGranted;
-    }
-
-    @Override
-    public String getLockedBy() {
-        return lockedBy;
-    }
-
-    public void setLockedBy(final String lockedBy) {
-        this.lockedBy = lockedBy;
-    }
-
-    public Boolean getLocked() {
-        return locked;
-    }
-
-    public void setLocked(final Boolean locked) {
         this.locked = locked;
     }
 
     @Override
     public String toString() {
-        return toDocument().toJson();
+        return super.toString();
     }
 
-    public Document toDocument() {
-        return new Document()
-                .append("_id", id)
-                .append("lockGranted", lockGranted)
-                .append("lockedBy", lockedBy)
-                .append("locked", locked);
+    public static String formLockedBy() {
+        try {
+            final String HOST_NAME = NetUtil.getLocalHostName();
+            final String HOST_DESCRIPTION = ofNullable(System.getProperty("liquibase.hostDescription")).map(v -> "#" + v).orElse(EMPTY);
+            final String HOST_ADDRESS = NetUtil.getLocalHostAddress();
+            return HOST_NAME + HOST_DESCRIPTION + " (" + HOST_ADDRESS + ")";
+        } catch (Exception e) {
+            throw new UnexpectedLiquibaseException(e);
+        }
     }
 
 }

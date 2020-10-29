@@ -5,6 +5,7 @@
 ## Table of contents
 
 1. [Introduction](#introduction)
+1. [Release Notes](#release-notes)
 1. [Implemented Changes](#implemented-changes)
 1. [Getting Started](#getting-started)
 1. [Running tests](#running-tests)
@@ -22,6 +23,39 @@ Majority of them are basically wrappers over [`db.eval`](https://docs.mongodb.co
 
 In order to call specific `mongo-java-driver` specific methods, 
 Liquibase turned to be the most feasible tool to extend as it allows to define change sets to fit driver methods arguments.
+
+<a name="release-notes"></a>
+## Release Notes
+####4.1.2
+* Added NoSql JSON Parser which can pass raw JSON for a property like this:
+```json 
+{
+    "options" : 
+        {
+            "$rawJson" : { ... }
+        }
+}
+```
+* New properties added
+```properties
+# If disabled can be used on API which do not support validators (Azure Cosmos DB with Mongo API, Amazon DocumentDB)
+liquibase.mongodb.supportsValidator=true
+# If enabled will adjust indexes and validators for Liquibase tracking tables LOCK and CHANGELOG. Can be disabled if sure Liquibase not updated.
+liquibase.mongodb.adjustTrackingTablesOnStartup=true
+```
+* Overridden Liquibase table names removed. Now will be used the default ones in Liquibase. If previous releases used then table names should be explicitly passed as parameters.
+Currently, by default as Liquibase default :`DATABASECHANGELOGLOCK, DATABASECHANGELOG`
+Previous releases used by default : `databaseChangeLogLock, databaseChangeLog`
+####4.1.1
+* Support for Liquibase 4.1.1
+####4.1.0
+* Support for Liquibase 4.1.0
+####4.0.0
+* Works with Liquibase v4.0.0
+####3.10.0
+* Support for Liquibase 3.10
+####3.9.0
+* First release
 
 <a name="implemented-changes"></a>
 ## Implemented Changes:
@@ -49,7 +83,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 ```
-mongo-java-driver:3.10.2
+mongo-java-driver:3.12.7
 ```
 
 ### Installing
@@ -63,11 +97,11 @@ mongo-java-driver:3.10.2
 ### Adjust connection string
  
 Connection url can be adjusted here: [`db.connection.uri`](./src/test/resources/application-test.properties)
-Integration tests are run by enabling `run-its` profile 
+Run Integration tests by enabling `run-its` profile 
 
 ### Run integration tests
 
-```
+```shell script
 mvn clean install -Prun-its
 ```
 
@@ -76,7 +110,7 @@ mvn clean install -Prun-its
 
 ### Add dependency: 
 
-```
+```xml
 <dependency>
     <groupId>org.liquibase.ext</groupId>
     <artifactId>liquibase-mongodb</artifactId>
@@ -84,28 +118,15 @@ mvn clean install -Prun-its
 </dependency>
 ```
 ### Java call:
+```java
+public class Application {
+    public static void main(String[] args) {
+        MongoLiquibaseDatabase database = (MongoLiquibaseDatabase) DatabaseFactory.getInstance().openDatabase(url, null, null, null, null);;
+        iquibase liquibase = new Liquibase("liquibase/ext/changelog.generic.test.xml", new ClassLoaderResourceAccessor(), database);
+        liquibase.update("");
+    }
+}
 ```
-MongoConnection mongoConnection;
-MongoExecutor mongoExecutor;
-MongoLiquibaseDatabase database;
-
-mongoConnection = new MongoConnection("mongodb://localhost:27017/test_db?socketTimeoutMS=100&connectTimeoutMS=100&serverSelectionTimeoutMS=100");
-
-//Can be achieved by excluding the package to scan or pass package list via system.parameter
-//ServiceLocator.getInstance().getPackages().remove("liquibase.executor");
-//Another way is to register the executor against a Db
-
-database = (MongoLiquibaseDatabase) DatabaseFactory.getInstance().findCorrectDatabaseImplementation(mongoConnection);
-database.setConnection(mongoConnection);
-
-mongoExecutor = new MongoExecutor();
-mongoExecutor.setDatabase(database);
-
-ExecutorService.getInstance().setExecutor(database, mongoExecutor);
-
- final Liquibase liquibase = new Liquibase("liquibase/ext/changelog.create-users.test.xml", new ClassLoaderResourceAccessor(), database);
- liquibase.update("{}");
-``` 
 
 <a name="contributing"></a>
 ## Contributing

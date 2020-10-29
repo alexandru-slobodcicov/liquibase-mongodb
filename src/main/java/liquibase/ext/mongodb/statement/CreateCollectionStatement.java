@@ -20,78 +20,54 @@ package liquibase.ext.mongodb.statement;
  * #L%
  */
 
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.CreateCollectionOptions;
-import com.mongodb.client.model.ValidationAction;
-import com.mongodb.client.model.ValidationLevel;
-import com.mongodb.client.model.ValidationOptions;
+import liquibase.ext.mongodb.database.MongoConnection;
+import liquibase.nosql.statement.NoSqlExecuteStatement;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.bson.Document;
 
-import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class CreateCollectionStatement extends AbstractMongoStatement {
+public class CreateCollectionStatement extends AbstractCollectionStatement
+        implements NoSqlExecuteStatement<MongoConnection> {
 
     public static final String COMMAND_NAME = "createCollection";
 
-    protected String collectionName;
     protected Document options;
 
-    public CreateCollectionStatement(String collectionName, String options) {
+    public CreateCollectionStatement(final String collectionName, final String options) {
         this(collectionName, BsonUtils.orEmptyDocument(options));
     }
 
     public CreateCollectionStatement(final String collectionName, final Document options) {
-        this.collectionName = collectionName;
+        super(collectionName);
         this.options = options;
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 
     @Override
     public String toJs() {
         return
                 "db."
-                        + COMMAND_NAME
+                        + getCommandName()
                         + "("
-                        + collectionName
+                        + getCollectionName()
                         + ", "
-                        + options.toJson()
+                        + ofNullable(options).map(Document::toJson).orElse(null)
                         + ");";
     }
 
     @Override
-    public void execute(MongoDatabase db) {
-        final CreateCollectionOptions createCollectionOptions =
-                new CreateCollectionOptions();
-
-        if (nonNull(options)) {
-            final ValidationAction
-                    validationAction =
-                    ofNullable(this.options.getString("validationAction"))
-                            .map(ValidationAction::fromString)
-                            .orElse(null);
-
-            final ValidationLevel
-                    validationLevel =
-                    ofNullable(this.options.getString("validationLevel"))
-                            .map(ValidationLevel::fromString)
-                            .orElse(null);
-
-            createCollectionOptions.validationOptions(
-                    new ValidationOptions()
-                            .validationAction(validationAction)
-                            .validationLevel(validationLevel)
-                            .validator(this.options.get("validator", Document.class)));
-        }
-
-        db.createCollection(collectionName, createCollectionOptions);
+    public void execute(final MongoConnection connection) {
+        final CreateCollectionOptions createCollectionOptions = BsonUtils.orEmptyCreateCollectionOptions(options);
+        connection.getDatabase().createCollection(getCollectionName(), createCollectionOptions);
     }
 
-    @Override
-    public String toString() {
-        return toJs();
-    }
 }

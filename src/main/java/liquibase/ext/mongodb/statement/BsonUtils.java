@@ -21,18 +21,19 @@ package liquibase.ext.mongodb.statement;
  */
 
 import com.mongodb.DBRefCodecProvider;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.model.*;
 import lombok.NoArgsConstructor;
 import org.bson.Document;
 import org.bson.UuidRepresentation;
-import org.bson.codecs.BsonValueCodecProvider;
-import org.bson.codecs.DocumentCodec;
-import org.bson.codecs.DocumentCodecProvider;
-import org.bson.codecs.UuidCodecProvider;
-import org.bson.codecs.ValueCodecProvider;
+import org.bson.codecs.*;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 import static liquibase.util.StringUtil.trimToNull;
 import static lombok.AccessLevel.PRIVATE;
@@ -43,11 +44,18 @@ public final class BsonUtils {
 
     public static final DocumentCodec DOCUMENT_CODEC =
         new DocumentCodec(fromProviders(
-            new UuidCodecProvider(UuidRepresentation.JAVA_LEGACY),
+            new UuidCodecProvider(UuidRepresentation.STANDARD),
             new ValueCodecProvider(),
             new BsonValueCodecProvider(),
             new DocumentCodecProvider(),
             new DBRefCodecProvider()));
+
+    public static CodecRegistry uuidCodecRegistry() {
+        return CodecRegistries.fromRegistries(
+                CodecRegistries.fromCodecs(new UuidCodec(UuidRepresentation.STANDARD)),
+                MongoClientSettings.getDefaultCodecRegistry()
+        );
+    }
 
     public static Document orEmptyDocument(final String json) {
         return (
@@ -66,4 +74,43 @@ public final class BsonUtils {
                 .orElseGet(ArrayList::new)
         );
     }
+
+    public static CreateCollectionOptions orEmptyCreateCollectionOptions(final Document options) {
+        final CreateCollectionOptions createCollectionOptions =
+                new CreateCollectionOptions();
+
+        if (nonNull(options)) {
+            final ValidationAction
+                    validationAction =
+                    ofNullable(options.getString("validationAction"))
+                            .map(ValidationAction::fromString)
+                            .orElse(null);
+
+            final ValidationLevel
+                    validationLevel =
+                    ofNullable(options.getString("validationLevel"))
+                            .map(ValidationLevel::fromString)
+                            .orElse(null);
+
+            createCollectionOptions.validationOptions(
+                    new ValidationOptions()
+                            .validationAction(validationAction)
+                            .validationLevel(validationLevel)
+                            .validator(options.get("validator", Document.class)));
+        }
+        return createCollectionOptions;
+    }
+
+    public static IndexOptions orEmptyIndexOptions(final Document options) {
+        //TODO: add POJO codec
+        final IndexOptions indexOptions = new IndexOptions();
+        if (options.containsKey("unique") && options.getBoolean("unique")) {
+            indexOptions.unique(true);
+        }
+        if (options.containsKey("name")) {
+            indexOptions.name(options.getString("name"));
+        }
+        return indexOptions;
+    }
+
 }

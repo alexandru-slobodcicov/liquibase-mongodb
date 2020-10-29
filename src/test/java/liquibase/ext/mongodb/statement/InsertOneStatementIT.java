@@ -22,7 +22,6 @@ package liquibase.ext.mongodb.statement;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoDatabase;
-import liquibase.exception.DatabaseException;
 import liquibase.ext.AbstractMongoIntegrationTest;
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
@@ -33,33 +32,33 @@ import static org.assertj.core.api.Assertions.assertThat;
 class InsertOneStatementIT extends AbstractMongoIntegrationTest {
 
     @Test
-    void executeForObject() throws DatabaseException {
-        final MongoDatabase database = mongoConnection.getDb();
+    void executeForObject() {
+        final MongoDatabase database = connection.getDatabase();
         final Document document = new Document("key1", "value1");
-        new InsertOneStatement(COLLECTION_NAME_1, document, new Document()).execute(database);
+        new InsertOneStatement(COLLECTION_NAME_1, document, new Document()).execute(connection);
 
         assertThat(database.getCollection(COLLECTION_NAME_1).find())
-            .containsExactly(document);
+                .containsExactly(document);
     }
 
     @Test
-    void executeForString() throws DatabaseException {
-        final MongoDatabase database = mongoConnection.getDb();
+    void executeForString() {
+        final MongoDatabase database = connection.getDatabase();
         final Document document = new Document("key1", "value1");
-        new InsertOneStatement(COLLECTION_NAME_1, document.toJson(), "").execute(database);
+        new InsertOneStatement(COLLECTION_NAME_1, document.toJson(), "").execute(connection);
 
         final FindIterable<Document> docs = database.getCollection(COLLECTION_NAME_1).find();
         assertThat(docs).hasSize(1);
         assertThat(docs.iterator().next())
-            .containsEntry("key1", "value1")
-            .containsKey("_id");
+                .containsEntry("key1", "value1")
+                .containsKey("_id");
     }
 
     @Test
     void toStringJs() {
         final InsertOneStatement statement = new InsertOneStatement(COLLECTION_NAME_1, new Document("key1", "value1"), new Document());
         assertThat(statement.toJs())
-            .isEqualTo(statement.toString())
-            .isEqualTo("db.collectionName.insertOne({\"key1\": \"value1\"}, {});");
+                .isEqualTo(statement.toString())
+                .isEqualTo("db.collectionName.insertOne({\"key1\": \"value1\"}, {});");
     }
 }
