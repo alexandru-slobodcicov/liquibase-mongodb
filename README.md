@@ -26,7 +26,10 @@ Liquibase turned to be the most feasible tool to extend as it allows to define c
 
 <a name="release-notes"></a>
 ## Release Notes
-####4.1.2
+
+#### 4.1.2
+* Fixed [Rollback doesn't work with liquibase-mongodb-4.0.0.2 extension](https://github.com/liquibase/liquibase-mongodb/issues/38)
+* Added dropCollection and dropIndex Changes
 * Added NoSql JSON Parser which can pass raw JSON for a property like this:
 ```json 
 {
@@ -46,26 +49,35 @@ liquibase.mongodb.adjustTrackingTablesOnStartup=true
 * Overridden Liquibase table names removed. Now will be used the default ones in Liquibase. If previous releases used then table names should be explicitly passed as parameters.
 Currently, by default as Liquibase default :`DATABASECHANGELOGLOCK, DATABASECHANGELOG`
 Previous releases used by default : `databaseChangeLogLock, databaseChangeLog`
-####4.1.1
+
+#### 4.1.1
 * Support for Liquibase 4.1.1
-####4.1.0
+
+#### 4.1.0
 * Support for Liquibase 4.1.0
-####4.0.0
+
+#### 4.0.0
 * Works with Liquibase v4.0.0
-####3.10.0
+
+#### 3.10.0
 * Support for Liquibase 3.10
-####3.9.0
+
+#### 3.9.0
 * First release
 
 <a name="implemented-changes"></a>
 ## Implemented Changes:
 
-A couple of Changes were implemented until identified that majority of of the operations can be achieved using `db.runCommand()` and `db.adminCommand()`
+A couple of Changes were implemented until identified that majority of the operations can be achieved using `db.runCommand()` and `db.adminCommand()`
 
 * [createCollection](https://docs.mongodb.com/manual/reference/method/db.createCollection/#db.createCollection) - 
 Creates a collection with validator
+* [dropCollection](https://docs.mongodb.com/manual/reference/method/db.collection.drop/#db-collection-drop) - 
+Removes a collection or view from the database
 * [createIndex](https://docs.mongodb.com/manual/reference/method/db.collection.createIndex/#db.collection.createIndex) - 
 Creates an index for a collection
+* [dropIndex](https://docs.mongodb.com/manual/reference/method/db.collection.dropIndex/#db.collection.dropIndex) - 
+Drops index for a collection by keys
 * [insertMany](https://docs.mongodb.com/manual/reference/method/db.collection.insertMany/#db.collection.insertMany) - 
 Inserts multiple documents into a collection
 * [insertOne](https://docs.mongodb.com/manual/tutorial/insert-documents/#insert-a-single-document) - 
@@ -121,8 +133,8 @@ mvn clean install -Prun-its
 ```java
 public class Application {
     public static void main(String[] args) {
-        MongoLiquibaseDatabase database = (MongoLiquibaseDatabase) DatabaseFactory.getInstance().openDatabase(url, null, null, null, null);;
-        iquibase liquibase = new Liquibase("liquibase/ext/changelog.generic.test.xml", new ClassLoaderResourceAccessor(), database);
+        MongoLiquibaseDatabase database = (MongoLiquibaseDatabase) DatabaseFactory.getInstance().openDatabase(url, null, null, null, null);
+        Liquibase liquibase = new Liquibase("liquibase/ext/changelog.generic.test.xml", new ClassLoaderResourceAccessor(), database);
         liquibase.update("");
     }
 }

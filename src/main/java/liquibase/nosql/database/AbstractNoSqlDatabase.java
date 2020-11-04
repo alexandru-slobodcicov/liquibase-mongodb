@@ -218,26 +218,6 @@ public abstract class AbstractNoSqlDatabase extends AbstractJdbcDatabase impleme
     }
 
     @Override
-    public void saveStatements(final Change change, final List<SqlVisitor> sqlVisitors, final Writer writer) throws IOException {
-        //TODO: implementation
-    }
-
-    @Override
-    public void executeRollbackStatements(final Change change, final List<SqlVisitor> sqlVisitors) throws LiquibaseException {
-        //TODO: implementation
-    }
-
-    @Override
-    public void executeRollbackStatements(final SqlStatement[] statements, final List<SqlVisitor> sqlVisitors) throws LiquibaseException {
-        //TODO: implementation
-    }
-
-    @Override
-    public void saveRollbackStatement(final Change change, final List<SqlVisitor> sqlVisitors, final Writer writer) throws IOException, LiquibaseException {
-        //TODO: implementation
-    }
-
-    @Override
     public List<DatabaseFunction> getDateFunctions() {
         //TODO: proper implementation
         return Collections.emptyList();

@@ -33,7 +33,9 @@ class InsertManyChangeTest extends AbstractMongoChangeTest {
 
     @Test
     void getConfirmationMessage() {
-        assertThat(new InsertManyChange().getConfirmationMessage()).isNull();
+        final InsertManyChange insertManyChange = new InsertManyChange();
+        insertManyChange.setCollectionName("collection1");
+        assertThat(insertManyChange.getConfirmationMessage()).isEqualTo("Documents inserted into collection collection1");
     }
 
     @Test
@@ -41,14 +43,18 @@ class InsertManyChangeTest extends AbstractMongoChangeTest {
     void generateStatements() {
         final List<ChangeSet> changeSets = getChangesets("liquibase/ext/changelog.insert-many.test.xml", database);
 
-        assertThat(changeSets).hasSize(1);
+        assertThat(changeSets)
+                .hasSize(1).first()
+                .returns("8:c60b95277dcdd83dd5833268fb76d12b",  s -> s.generateCheckSum().toString());
+
         assertThat(changeSets.get(0).getChanges())
-            .hasSize(1)
-            .hasOnlyElementsOfType(InsertManyChange.class);
+                .hasSize(1)
+                .hasOnlyElementsOfType(InsertManyChange.class);
+
         assertThat(changeSets.get(0).getChanges().get(0))
-            .hasFieldOrPropertyWithValue("collectionName", "insertManyTest1")
-            .hasFieldOrPropertyWithValue("documents", "[\n                { id: 2 },\n                { id: 3,\n                  "
-                + "address: { nr: 1, ap: 5}\n                }\n                ]")
-            .hasFieldOrPropertyWithValue("options", null);
+                .hasFieldOrPropertyWithValue("collectionName", "insertManyTest1")
+                .hasFieldOrPropertyWithValue("documents", "[\n                { id: 2 },\n                { id: 3,\n                  "
+                        + "address: { nr: 1, ap: 5}\n                }\n                ]")
+                .hasFieldOrPropertyWithValue("options", null);
     }
 }

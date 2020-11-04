@@ -22,9 +22,11 @@ package liquibase.ext.mongodb.change;
 
 import liquibase.change.Change;
 import liquibase.changelog.ChangeSet;
+import liquibase.ext.mongodb.statement.DropIndexStatement;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static liquibase.ext.mongodb.TestUtils.getChangesets;
@@ -32,9 +34,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CreateIndexChangeTest extends AbstractMongoChangeTest {
 
+    @SneakyThrows
     @Test
     void getConfirmationMessage() {
-        assertThat(new CreateIndexChange().getConfirmationMessage()).isNull();
+        final CreateIndexChange createIndexChange = new CreateIndexChange();
+        createIndexChange.setCollectionName("collection1");
+        createIndexChange.setKeys("{ clientId: 1, type: 1}");
+        assertThat(createIndexChange.getConfirmationMessage()).isEqualTo("Index created for collection collection1");
+
+        assertThat(Arrays.asList(createIndexChange.generateRollbackStatements(database)))
+                .hasSize(1)
+                .first()
+                .isInstanceOf(DropIndexStatement.class)
+                .returns("collection1", s -> ((DropIndexStatement)s).getCollectionName())
+                .returns("{\"clientId\": 1, \"type\": 1}", s -> ((DropIndexStatement)s).getKeys().toJson());
     }
 
     @Test
@@ -42,7 +55,8 @@ class CreateIndexChangeTest extends AbstractMongoChangeTest {
     void generateStatements() {
         final List<ChangeSet> changeSets = getChangesets("liquibase/ext/changelog.create-index.test.xml", database);
 
-        assertThat(changeSets).hasSize(1);
+        assertThat(changeSets).hasSize(1).first()
+                .returns("8:c2b981901db6061d2e034a4f31501ec5",  s -> s.generateCheckSum().toString());
 
         final List<Change> changes1 = changeSets.get(0).getChanges();
         assertThat(changes1).hasSize(2);

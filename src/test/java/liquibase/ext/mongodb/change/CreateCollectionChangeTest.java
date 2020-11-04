@@ -22,10 +22,12 @@ package liquibase.ext.mongodb.change;
 
 import liquibase.changelog.ChangeSet;
 import liquibase.ext.mongodb.statement.CreateCollectionStatement;
+import liquibase.ext.mongodb.statement.DropCollectionStatement;
 import liquibase.statement.SqlStatement;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static liquibase.ext.mongodb.TestUtils.getChangesets;
@@ -33,10 +35,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CreateCollectionChangeTest extends AbstractMongoChangeTest {
 
+    @SneakyThrows
     @Test
     void getConfirmationMessage() {
-        assertThat(new CreateCollectionChange().getConfirmationMessage())
-                .isNull();
+        final CreateCollectionChange createCollectionChange = new CreateCollectionChange();
+        createCollectionChange.setCollectionName("collection1");
+        assertThat(createCollectionChange.supportsRollback(database)).isTrue();
+        assertThat(createCollectionChange.getConfirmationMessage())
+                .isEqualTo("Collection collection1 created");
+
+        assertThat(Arrays.asList(createCollectionChange.generateRollbackStatements(database)))
+                .hasSize(1)
+                .first()
+                .isInstanceOf(DropCollectionStatement.class)
+                .returns("collection1", s -> ((DropCollectionStatement)s).getCollectionName());
     }
 
     @Test
@@ -46,7 +58,10 @@ class CreateCollectionChangeTest extends AbstractMongoChangeTest {
 
         assertThat(changeSets)
                 .isNotNull()
-                .hasSize(1);
+                .hasSize(1)
+                .first()
+                .returns("8:9613cffe7f07a1310ed2b6a47efb92c8",  s -> s.generateCheckSum().toString());
+
         assertThat(changeSets.get(0).getChanges())
                 .hasSize(3)
                 .hasOnlyElementsOfType(CreateCollectionChange.class);

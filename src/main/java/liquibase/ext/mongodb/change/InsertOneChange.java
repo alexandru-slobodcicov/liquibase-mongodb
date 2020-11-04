@@ -44,7 +44,7 @@ public class InsertOneChange extends AbstractMongoChange {
 
     @Override
     public String getConfirmationMessage() {
-        return null;
+        return "Document inserted into collection " + getCollectionName();
     }
 
     @Override

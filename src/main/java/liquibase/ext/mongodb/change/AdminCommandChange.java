@@ -43,7 +43,7 @@ public class AdminCommandChange extends AbstractMongoChange {
 
     @Override
     public String getConfirmationMessage() {
-        return null;
+        return "Admin Command run";
     }
 
     @Override
