@@ -55,6 +55,46 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
     @SneakyThrows
     @Test
     void testMongoLiquibase() {
+        Liquibase liquiBase = new Liquibase("liquibase/ext/json/generic-1-insert-people.json", new ClassLoaderResourceAccessor(), database);
+        liquiBase.update("");
+
+        final List<MongoRanChangeSet> changeSets = findAll.queryForList(connection).stream().map(converter::fromDocument).collect(Collectors.toList());
+        assertThat(changeSets).hasSize(2)
+                .filteredOn(c -> c.getId().equals("1")).hasSize(1).first()
+                .returns("liquibase/ext/json/generic-1-insert-people.json", RanChangeSet::getChangeLog)
+                .returns("Alex", RanChangeSet::getAuthor)
+                .returns(CheckSum.parse("8:6b06a10d8faf0a516c7f4a77f76041f2"), RanChangeSet::getLastCheckSum)
+                .returns(true, c -> nonNull(c.getDateExecuted()))
+                .returns(null, RanChangeSet::getTag)
+                .returns(ChangeSet.ExecType.EXECUTED, RanChangeSet::getExecType)
+                .returns("createCollection collectionName=person", RanChangeSet::getDescription)
+                .returns("Create person collection", RanChangeSet::getComments)
+                .returns(true, c -> c.getContextExpression().isEmpty())
+                .returns(true, c -> c.getLabels().isEmpty())
+                .returns(true, c -> c.getDeploymentId().matches("^[0-9]{10}$"))
+                .returns(1, RanChangeSet::getOrderExecuted)
+                .returns(LiquibaseUtil.getBuildVersion(), RanChangeSet::getLiquibaseVersion);
+
+        assertThat(changeSets)
+                .filteredOn(c -> c.getId().equals("2")).hasSize(1).first()
+                .returns("liquibase/ext/json/generic-1-insert-people.json", RanChangeSet::getChangeLog)
+                .returns("Nick", RanChangeSet::getAuthor)
+                .returns(CheckSum.parse("8:3da23c9b02c5297da06ca10d41c783aa"), RanChangeSet::getLastCheckSum)
+                .returns(true, c -> nonNull(c.getDateExecuted()))
+                .returns(null, RanChangeSet::getTag)
+                .returns(ChangeSet.ExecType.EXECUTED, RanChangeSet::getExecType)
+                .returns("insertOne collectionName=person; insertMany collectionName=person", RanChangeSet::getDescription)
+                .returns("Populate person table", RanChangeSet::getComments)
+                .returns(true, c -> c.getContextExpression().isEmpty())
+                .returns(true, c -> c.getLabels().isEmpty())
+                .returns(true, c -> c.getDeploymentId().matches("^[0-9]{10}$"))
+                .returns(2, RanChangeSet::getOrderExecuted)
+                .returns(LiquibaseUtil.getBuildVersion(), RanChangeSet::getLiquibaseVersion);
+    }
+
+    @SneakyThrows
+    @Test
+    void testMongoParentFile() {
         Liquibase liquiBase = new Liquibase("liquibase/ext/json/generic-0-main-1.json", new ClassLoaderResourceAccessor(), database);
         liquiBase.update("");
 

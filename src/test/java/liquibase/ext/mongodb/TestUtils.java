@@ -30,7 +30,6 @@ import liquibase.ext.mongodb.database.MongoLiquibaseDatabase;
 import liquibase.parser.ChangeLogParser;
 import liquibase.parser.ChangeLogParserFactory;
 import liquibase.resource.ClassLoaderResourceAccessor;
-import liquibase.util.file.FilenameUtils;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import org.bson.Document;
@@ -53,7 +52,7 @@ public final class TestUtils {
     public static final String PROPERTY_FILE = "application-test.properties";
     private static final String CMD_DROP_ALL_ROLES = "{dropAllRolesFromDatabase: 1, writeConcern: { w: \"majority\" }}";
     private static final String CMD_DROP_ALL_USERS = "{dropAllUsersFromDatabase: 1, writeConcern: { w: \"majority\" }}";
-    private static final String CMD_GET_ALL_ROLES = "{getAllRolesFromDatabase: 1,  showPrivileges:false, showBuiltinRoles: false }}";
+    //private static final String CMD_GET_ALL_ROLES = "{getAllRolesFromDatabase: 1,  showPrivileges:false, showBuiltinRoles: false }}";
 
     public static List<String> getCollections(final MongoConnection connection) {
         return StreamSupport.stream(connection.getDatabase().listCollectionNames().spliterator(), false)
@@ -77,7 +76,7 @@ public final class TestUtils {
     }
 
     public static List<Document> getAllRoles(final MongoConnection connection) {
-        return (List<Document>) connection.getDatabase()
+        return connection.getDatabase()
             .runCommand(Document.parse("{ rolesInfo: 1, showPrivileges:false, showBuiltinRoles: false }"))
             .getList("roles", Document.class);
     }

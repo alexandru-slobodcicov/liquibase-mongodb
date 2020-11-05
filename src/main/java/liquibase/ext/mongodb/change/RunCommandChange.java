@@ -43,7 +43,7 @@ public class RunCommandChange extends AbstractMongoChange {
 
     @Override
     public String getConfirmationMessage() {
-        return null;
+        return "Command run";
     }
 
     @Override

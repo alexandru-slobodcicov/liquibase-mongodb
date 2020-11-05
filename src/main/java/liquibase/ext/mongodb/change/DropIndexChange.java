@@ -4,7 +4,7 @@ package liquibase.ext.mongodb.change;
  * #%L
  * Liquibase MongoDB Extension
  * %%
- * Copyright (C) 2019 Mastercard
+ * Copyright (C) 2020 Mastercard
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -23,35 +23,34 @@ package liquibase.ext.mongodb.change;
 import liquibase.change.ChangeMetaData;
 import liquibase.change.DatabaseChange;
 import liquibase.database.Database;
-import liquibase.ext.mongodb.statement.InsertManyStatement;
+import liquibase.ext.mongodb.statement.DropIndexStatement;
 import liquibase.statement.SqlStatement;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@DatabaseChange(name = "insertMany",
-        description = "Inserts multiple documents into a collection " +
-                "https://docs.mongodb.com/manual/reference/method/db.collection.insertMany/#db.collection.insertMany",
-        priority = ChangeMetaData.PRIORITY_DEFAULT, appliesTo = "collection")
+@DatabaseChange(name = "dropIndex",
+        description = "Drops index for a collection by keys" +
+                "https://docs.mongodb.com/manual/reference/method/db.collection.dropIndex/#db.collection.dropIndex",
+        priority = ChangeMetaData.PRIORITY_DATABASE, appliesTo = "collection")
 @NoArgsConstructor
 @Getter
 @Setter
-public class InsertManyChange extends AbstractMongoChange {
+public class DropIndexChange extends AbstractMongoChange {
 
     private String collectionName;
-    private String documents;
-    private String options;
+    private String keys;
 
     @Override
     public String getConfirmationMessage() {
-        return "Documents inserted into collection " + getCollectionName();
+        return "Index dropped for collection " + getCollectionName();
     }
 
     @Override
-    public SqlStatement[] generateStatements(final Database database) {
-
+    public SqlStatement[] generateStatements(Database database) {
         return new SqlStatement[]{
-                new InsertManyStatement(collectionName, documents, options)
+                new DropIndexStatement(collectionName, keys)
         };
     }
+
 }

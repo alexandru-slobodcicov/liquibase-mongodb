@@ -23,35 +23,33 @@ package liquibase.ext.mongodb.change;
 import liquibase.change.ChangeMetaData;
 import liquibase.change.DatabaseChange;
 import liquibase.database.Database;
-import liquibase.ext.mongodb.statement.InsertManyStatement;
+import liquibase.ext.mongodb.statement.DropCollectionStatement;
 import liquibase.statement.SqlStatement;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@DatabaseChange(name = "insertMany",
-        description = "Inserts multiple documents into a collection " +
-                "https://docs.mongodb.com/manual/reference/method/db.collection.insertMany/#db.collection.insertMany",
-        priority = ChangeMetaData.PRIORITY_DEFAULT, appliesTo = "collection")
+
+@DatabaseChange(name = "dropCollection",
+    description = "Removes a collection or view from the database " +
+        "https://docs.mongodb.com/manual/reference/method/db.collection.drop/#db-collection-drop",
+    priority = ChangeMetaData.PRIORITY_DEFAULT, appliesTo = "collection")
 @NoArgsConstructor
 @Getter
 @Setter
-public class InsertManyChange extends AbstractMongoChange {
+public class DropCollectionChange extends AbstractMongoChange {
 
     private String collectionName;
-    private String documents;
-    private String options;
 
     @Override
     public String getConfirmationMessage() {
-        return "Documents inserted into collection " + getCollectionName();
+        return "Collection " + getCollectionName() + " dropped";
     }
 
     @Override
-    public SqlStatement[] generateStatements(final Database database) {
-
+    public SqlStatement[] generateStatements(Database database) {
         return new SqlStatement[]{
-                new InsertManyStatement(collectionName, documents, options)
+            new DropCollectionStatement(collectionName)
         };
     }
 }

@@ -36,7 +36,7 @@ class AdminCommandChangeTest extends AbstractMongoChangeTest {
 
     @Test
     void getConfirmationMessage() {
-        assertThat(new AdminCommandChange().getConfirmationMessage()).isNull();
+        assertThat(new AdminCommandChange().getConfirmationMessage()).isEqualTo("Admin Command run");
     }
 
     @Test
@@ -44,7 +44,8 @@ class AdminCommandChangeTest extends AbstractMongoChangeTest {
     void generateStatements() {
         final List<ChangeSet> changeSets = getChangesets("liquibase/ext/changelog.admin-command.test.xml", database);
 
-        assertThat(changeSets).hasSize(1);
+        assertThat(changeSets).hasSize(1).first()
+                .returns("8:e17342ecb217a7588eb1d33af4fadff4",  s -> s.generateCheckSum().toString());
 
         assertThat(changeSets.get(0).getChanges())
             .hasSize(1)
