@@ -15,7 +15,6 @@ import liquibase.Scope;
 import liquibase.changelog.ChangeLogParameters;
 import liquibase.changelog.DatabaseChangeLog;
 import liquibase.exception.ChangeLogParseException;
-import liquibase.exception.LiquibaseException;
 import liquibase.logging.Logger;
 import liquibase.parser.ChangeLogParser;
 import liquibase.parser.core.ParsedNode;
@@ -147,7 +146,7 @@ public class JsonNoSqlChangeLogParser implements ChangeLogParser {
         }
     }
 
-    private void loadChangeLogParametersFromFile(ChangeLogParameters changeLogParameters, ResourceAccessor resourceAccessor, DatabaseChangeLog changeLog, JsonNode property, ContextExpression context, Labels labels, Boolean global) throws IOException, LiquibaseException {
+    private void loadChangeLogParametersFromFile(ChangeLogParameters changeLogParameters, ResourceAccessor resourceAccessor, DatabaseChangeLog changeLog, JsonNode property, ContextExpression context, Labels labels, Boolean global) throws IOException {
         Properties props = new Properties();
         try (
                 InputStream propertiesStream = resourceAccessor.openStream(null, property.get("file").asText())) {

@@ -183,7 +183,7 @@ public abstract class AbstractNoSqlLockService implements LockService {
         } finally {
             try {
                 database.rollback();
-            } catch (DatabaseException e) {
+            } catch (final DatabaseException e) {
                 getLogger().severe("Error on acquire change log lock Rollback.", e);
             }
         }

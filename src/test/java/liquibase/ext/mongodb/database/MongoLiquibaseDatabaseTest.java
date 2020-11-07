@@ -1,12 +1,15 @@
 package liquibase.ext.mongodb.database;
 
+import liquibase.CatalogAndSchema;
 import liquibase.configuration.LiquibaseConfiguration;
 import liquibase.database.DatabaseFactory;
+import liquibase.database.ObjectQuotingStrategy;
 import liquibase.ext.mongodb.configuration.MongoConfiguration;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.*;
 
 import static java.lang.Boolean.FALSE;
+import static liquibase.servicelocator.PrioritizedService.PRIORITY_DATABASE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
@@ -19,8 +22,9 @@ class MongoLiquibaseDatabaseTest {
     @BeforeEach
     void setUp() {
         resetServices();
-        database = (MongoLiquibaseDatabase) DatabaseFactory.getInstance()
-                .findCorrectDatabaseImplementation(new MongoConnection());
+
+        database = new MongoLiquibaseDatabase();
+
         configuration = LiquibaseConfiguration.getInstance()
                 .getConfiguration(MongoConfiguration.class);
     }
@@ -35,11 +39,14 @@ class MongoLiquibaseDatabaseTest {
         LiquibaseConfiguration.getInstance().reset();
     }
 
+    @SneakyThrows
     @Test
     void getDefaultDriver() {
+        database = (MongoLiquibaseDatabase) DatabaseFactory.getInstance()
+                .findCorrectDatabaseImplementation(new MongoConnection());
+
         assertThat(database.getDefaultDriver("mongodb://qwe")).isEqualTo(MongoClientDriver.class.getName());
         assertThat(database.getDefaultDriver("cosmos://qwe")).isNull();
-
     }
 
     @Test
@@ -97,4 +104,58 @@ class MongoLiquibaseDatabaseTest {
         assertThat(configuration.getSupportsValidator()).isTrue();
         assertThat(database.getSupportsValidator()).isFalse();
     }
+
+    @Test
+    void getPriority() {
+        assertThat(database.getPriority())
+                .isEqualTo(PRIORITY_DATABASE)
+        .isEqualTo(5);
+    }
+
+    @Test
+    void supportsCatalogs() {
+        assertThat(database.supportsCatalogs()).isTrue();
+    }
+
+    @Test
+    void supportsSchemas() {
+        assertThat(database.supportsSchemas()).isFalse();
+    }
+
+    @Test
+    void getSchemaAndCatalogCase() {
+        assertThat(database.getSchemaAndCatalogCase()).isEqualTo(CatalogAndSchema.CatalogAndSchemaCase.ORIGINAL_CASE);
+    }
+
+    @Test
+    void getObjectQuotingStrategy() {
+        assertThat(database.getObjectQuotingStrategy()).isEqualTo(ObjectQuotingStrategy.LEGACY);
+    }
+
+    @Test
+    void getDefaultCatalogName() {
+        database.setDefaultCatalogName("catalog1");
+        assertThat(database.getDefaultCatalogName()).isEqualTo("catalog1");
+        // when schema present still catalog returned
+        database.setDefaultSchemaName("schema1");
+        assertThat(database.getDefaultCatalogName()).isEqualTo("catalog1");
+    }
+
+    @Test
+    void getDefaultSchemaName() {
+        database.setDefaultSchemaName("schema1");
+        assertThat(database.getDefaultSchemaName()).isEqualTo("schema1");
+        // when catalog is defined catalog is returned
+        database.setDefaultCatalogName("catalog1");
+        assertThat(database.getDefaultSchemaName()).isEqualTo("catalog1");
+    }
+
+    @Test
+    void getDefaultSchema() {
+        database.setDefaultSchemaName("schema1");
+        database.setDefaultCatalogName("catalog1");
+        assertThat(database.getDefaultSchema()).extracting(CatalogAndSchema::getCatalogName, CatalogAndSchema::getSchemaName)
+                .containsExactly("catalog1", "catalog1");
+    }
+
 }
