@@ -48,8 +48,8 @@ public final class TestUtils {
     public static final String EMPTY_STRING = "";
     public static final String EMPTY_OPTION = EMPTY_STRING;
     public static final String OPTION_1 = "{\"opt1\":\"option 1\"}";
-    public static final String DB_CONNECTION_PATH = "db.connection.uri";
-    public static final String PROPERTY_FILE = "application-test.properties";
+    public static final String DB_CONNECTION_PATH = "url";
+    public static final String PROPERTY_FILE = "liquibase.properties";
     private static final String CMD_DROP_ALL_ROLES = "{dropAllRolesFromDatabase: 1, writeConcern: { w: \"majority\" }}";
     private static final String CMD_DROP_ALL_USERS = "{dropAllUsersFromDatabase: 1, writeConcern: { w: \"majority\" }}";
     //private static final String CMD_GET_ALL_ROLES = "{getAllRolesFromDatabase: 1,  showPrivileges:false, showBuiltinRoles: false }}";

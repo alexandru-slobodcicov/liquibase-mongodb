@@ -21,22 +21,16 @@ package liquibase.nosql.database;
  */
 
 import liquibase.CatalogAndSchema;
-import liquibase.change.Change;
 import liquibase.database.AbstractJdbcDatabase;
 import liquibase.database.Database;
 import liquibase.database.DatabaseConnection;
-import liquibase.database.ObjectQuotingStrategy;
 import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
 import liquibase.exception.ValidationErrors;
-import liquibase.sql.visitor.SqlVisitor;
 import liquibase.statement.DatabaseFunction;
-import liquibase.statement.SqlStatement;
 import liquibase.structure.DatabaseObject;
 import lombok.NoArgsConstructor;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
@@ -134,11 +128,6 @@ public abstract class AbstractNoSqlDatabase extends AbstractJdbcDatabase impleme
     }
 
     @Override
-    public String escapeColumnName(final String catalogName, final String schemaName, final String tableName, final String columnName, final boolean quoteNamesThatMayBeFunctions) {
-        return null;
-    }
-
-    @Override
     public String escapeColumnNameList(final String columnNames) {
         return null;
     }
@@ -150,7 +139,7 @@ public abstract class AbstractNoSqlDatabase extends AbstractJdbcDatabase impleme
 
     @Override
     public boolean supportsCatalogs() {
-        return false;
+        return true;
     }
 
     @Override
@@ -212,12 +201,6 @@ public abstract class AbstractNoSqlDatabase extends AbstractJdbcDatabase impleme
     }
 
     @Override
-    public boolean isSafeToRunUpdate() throws DatabaseException {
-        //TODO: Add the check to not be admin, etc.
-        return false;
-    }
-
-    @Override
     public List<DatabaseFunction> getDateFunctions() {
         //TODO: proper implementation
         return Collections.emptyList();
@@ -249,11 +232,6 @@ public abstract class AbstractNoSqlDatabase extends AbstractJdbcDatabase impleme
     }
 
     @Override
-    public String correctObjectName(final String name, final Class<? extends DatabaseObject> objectType) {
-        return null;
-    }
-
-    @Override
     public boolean isFunction(String string) {
         return false;
     }
@@ -261,11 +239,6 @@ public abstract class AbstractNoSqlDatabase extends AbstractJdbcDatabase impleme
     @Override
     public int getDataTypeMaxParameters(String dataTypeName) {
         return 0;
-    }
-
-    @Override
-    public CatalogAndSchema getDefaultSchema() {
-        return null;
     }
 
     @Override
@@ -279,49 +252,9 @@ public abstract class AbstractNoSqlDatabase extends AbstractJdbcDatabase impleme
     }
 
     @Override
-    public ObjectQuotingStrategy getObjectQuotingStrategy() {
-        return null;
-    }
-
-    @Override
-    public void setObjectQuotingStrategy(final ObjectQuotingStrategy quotingStrategy) {
-        //TODO: implementation
-    }
-
-    @Override
     public boolean createsIndexesForForeignKeys() {
         //Not applicable
         return false;
-    }
-
-    @Override
-    public boolean getOutputDefaultSchema() {
-        return false;
-    }
-
-    @Override
-    public void setOutputDefaultSchema(final boolean outputDefaultSchema) {
-        //TODO: implementation
-    }
-
-    @Override
-    public boolean isDefaultSchema(final String catalog, final String schema) {
-        return false;
-    }
-
-    @Override
-    public boolean isDefaultCatalog(final String catalog) {
-        return false;
-    }
-
-    @Override
-    public boolean getOutputDefaultCatalog() {
-        return false;
-    }
-
-    @Override
-    public void setOutputDefaultCatalog(final boolean outputDefaultCatalog) {
-        //TODO: implementation
     }
 
     @Override

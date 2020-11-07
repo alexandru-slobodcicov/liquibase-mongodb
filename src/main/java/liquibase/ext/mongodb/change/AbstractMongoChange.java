@@ -30,4 +30,14 @@ public abstract class AbstractMongoChange extends AbstractChange {
     public boolean supports(Database database) {
         return database instanceof MongoLiquibaseDatabase;
     }
+
+    @Override
+    public boolean generateStatementsVolatile(final Database database) {
+        return false;
+    }
+
+    @Override
+    public boolean generateRollbackStatementsVolatile(final Database database) {
+        return false;
+    }
 }

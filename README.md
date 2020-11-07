@@ -108,7 +108,7 @@ mongo-java-driver:3.12.7
 
 ### Adjust connection string
  
-Connection url can be adjusted here: [`db.connection.uri`](./src/test/resources/application-test.properties)
+Connection url can be adjusted here: [`url`](./src/test/resources/liquibase.properties)
 Run Integration tests by enabling `run-its` profile 
 
 ### Run integration tests

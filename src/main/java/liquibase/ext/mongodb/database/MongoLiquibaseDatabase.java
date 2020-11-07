@@ -88,6 +88,15 @@ public class MongoLiquibaseDatabase extends AbstractNoSqlDatabase {
         return MONGODB_PRODUCT_NAME;
     }
 
+    @Override
+    public String getSystemSchema() {
+        return "admin";
+    }
+
+    /*********************************
+     * Custom Parameters
+     *********************************/
+
     public Boolean getAdjustTrackingTablesOnStartup() {
 
         if (adjustTrackingTablesOnStartup != null) {
@@ -106,4 +115,6 @@ public class MongoLiquibaseDatabase extends AbstractNoSqlDatabase {
         return LiquibaseConfiguration.getInstance().getConfiguration(MongoConfiguration.class)
                 .getSupportsValidator();
     }
+
+
 }
