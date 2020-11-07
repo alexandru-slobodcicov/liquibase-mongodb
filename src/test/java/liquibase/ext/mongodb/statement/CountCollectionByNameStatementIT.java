@@ -29,13 +29,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CountCollectionByNameStatementIT extends AbstractMongoIntegrationTest {
     private static final String COLLECTION_NAME = TestUtils.COLLECTION_NAME_1;
-    private static final String COLLECTION_CMD = String.format("db.listCollectionNames(%s);", COLLECTION_NAME);
+    private static final String COLLECTION_CMD = String.format("db.countCollectionByNames(%s);", COLLECTION_NAME);
     private static final CountCollectionByNameStatement COUNT_COLLECTION = new CountCollectionByNameStatement(COLLECTION_NAME);
 
     @Test
     void queryForLong() {
-        mongoExecutor.getDb().createCollection(COLLECTION_NAME_1);
-        assertThat(new CountCollectionByNameStatement(COLLECTION_NAME_1).queryForLong(mongoConnection.getDb()))
+        connection.getDatabase().createCollection(COLLECTION_NAME_1);
+        assertThat(new CountCollectionByNameStatement(COLLECTION_NAME_1).queryForLong(connection))
             .isEqualTo(1);
     }
 

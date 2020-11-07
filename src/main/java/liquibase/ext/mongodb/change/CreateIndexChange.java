@@ -20,6 +20,7 @@ package liquibase.ext.mongodb.change;
  * #L%
  */
 
+import liquibase.change.Change;
 import liquibase.change.ChangeMetaData;
 import liquibase.change.DatabaseChange;
 import liquibase.database.Database;
@@ -44,13 +45,23 @@ public class CreateIndexChange extends AbstractMongoChange {
 
     @Override
     public String getConfirmationMessage() {
-        return null;
+        return "Index created for collection " + getCollectionName();
     }
 
     @Override
     public SqlStatement[] generateStatements(Database database) {
         return new SqlStatement[]{
                 new CreateIndexStatement(collectionName, keys, options)
+        };
+    }
+
+    @Override
+    protected Change[] createInverses() {
+        final DropIndexChange inverse = new DropIndexChange();
+        inverse.setCollectionName(getCollectionName());
+        inverse.setKeys(getKeys());
+        return new Change[]{
+                inverse
         };
     }
 

@@ -37,7 +37,7 @@ class RunCommandChangeTest extends AbstractMongoChangeTest {
 
     @Test
     void getConfirmationMessage() {
-        assertThat(new RunCommandChange().getConfirmationMessage()).isNull();
+        assertThat(new RunCommandChange().getConfirmationMessage()).isEqualTo("Command run");
     }
 
     @SneakyThrows
@@ -46,6 +46,8 @@ class RunCommandChangeTest extends AbstractMongoChangeTest {
         final List<ChangeSet> changeSets = getChangesets("liquibase/ext/changelog.run-command.test.xml", database);
 
         assertThat(changeSets).hasSize(2);
+
+        assertThat(changeSets.get(0)).returns("8:a9f789a8482003bb149da01cdab92707",  s -> s.generateCheckSum().toString());
 
         assertThat(changeSets.get(0).getChanges()).hasSize(1);
         assertThat(changeSets.get(0).getChanges()).hasOnlyElementsOfTypes(RunCommandChange.class);
@@ -58,6 +60,7 @@ class RunCommandChangeTest extends AbstractMongoChangeTest {
         assertThat(sqlStatements).hasOnlyElementsOfType(RunCommandStatement.class);
         assertThat(((RunCommandStatement) sqlStatements[0]).getCommand()).containsEntry("buildInfo", 1);
 
+        assertThat(changeSets.get(1)).returns("8:e17342ecb217a7588eb1d33af4fadff4",  s -> s.generateCheckSum().toString());
         assertThat(changeSets.get(1).getChanges()).hasSize(1);
         assertThat(changeSets.get(1).getChanges()).hasOnlyElementsOfTypes(AdminCommandChange.class);
 

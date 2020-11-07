@@ -21,52 +21,57 @@ package liquibase.ext;
  */
 
 import liquibase.Scope;
+import liquibase.changelog.ChangeLogHistoryServiceFactory;
 import liquibase.database.DatabaseFactory;
-import liquibase.exception.DatabaseException;
 import liquibase.executor.ExecutorService;
-import liquibase.ext.mongodb.TestUtils;
 import liquibase.ext.mongodb.database.MongoConnection;
 import liquibase.ext.mongodb.database.MongoLiquibaseDatabase;
-import liquibase.ext.mongodb.executor.MongoExecutor;
-import org.junit.jupiter.api.AfterAll;
+import liquibase.ext.mongodb.statement.DropAllCollectionsStatement;
+import liquibase.lockservice.LockServiceFactory;
+import liquibase.nosql.executor.NoSqlExecutor;
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
 
-import java.util.function.Consumer;
+import static liquibase.ext.mongodb.TestUtils.*;
+import static liquibase.nosql.executor.NoSqlExecutor.EXECUTOR_NAME;
 
-import static liquibase.ext.mongodb.TestUtils.getMongoConnection;
-
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public abstract class AbstractMongoIntegrationTest {
 
-    protected static MongoConnection mongoConnection;
-    protected static MongoExecutor mongoExecutor;
-    protected static MongoLiquibaseDatabase database;
+    protected MongoConnection connection;
+    protected NoSqlExecutor executor;
+    protected MongoLiquibaseDatabase database;
 
-    @AfterAll
-    protected static void destroy() {
-        database.getConnection().getDb().listCollectionNames()
-            .forEach((Consumer<? super String>) c -> mongoConnection.getDb().getCollection(c).drop());
+    @SneakyThrows
+    @BeforeEach
+    protected void setUpEach() {
+
+        resetServices();
+        final String url = loadProperty(PROPERTY_FILE, DB_CONNECTION_PATH);
+        database = (MongoLiquibaseDatabase) DatabaseFactory.getInstance().openDatabase(url, null, null, null , null);
+        connection = (MongoConnection) database.getConnection();
+        executor = (NoSqlExecutor) Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor(EXECUTOR_NAME, database);
+        deleteContainers();
     }
 
-    @BeforeEach
-    protected void setUp() throws DatabaseException {
+    @SneakyThrows
+    @AfterEach
+    protected void tearDownEach() {
+        executor.execute(new DropAllCollectionsStatement());
+        connection.close();
+        resetServices();
+    }
 
-        mongoConnection = getMongoConnection("application-test.properties");
+    @SneakyThrows
+    private void deleteContainers() {
+        executor.execute(new DropAllCollectionsStatement());
+    }
 
-        //Can be achieved by excluding the package to scan or pass package list via system.parameter
-        //ServiceLocator.getInstance().getPackages().remove("liquibase.executor");
-        //Another way is to register the executor against a Db
-
-        database = (MongoLiquibaseDatabase) DatabaseFactory.getInstance().findCorrectDatabaseImplementation(mongoConnection);
-        database.setConnection(mongoConnection);
-        Scope.getCurrentScope().getLog(TestUtils.class).fine("database is initialized...");
-
-        mongoExecutor = new MongoExecutor();
-        mongoExecutor.setDatabase(database);
-        Scope.getCurrentScope().getLog(TestUtils.class).fine("mongoExecutor is initialized...");
-
-        Scope.getCurrentScope().getSingleton(ExecutorService.class).setExecutor(database, mongoExecutor);
-
-        database.getConnection().getDb().listCollectionNames()
-            .forEach((Consumer<? super String>) c -> mongoConnection.getDb().getCollection(c).drop());
+    private void resetServices() {
+        LockServiceFactory.getInstance().resetAll();
+        ChangeLogHistoryServiceFactory.getInstance().resetAll();
+        Scope.getCurrentScope().getSingleton(ExecutorService.class).reset();
     }
 }

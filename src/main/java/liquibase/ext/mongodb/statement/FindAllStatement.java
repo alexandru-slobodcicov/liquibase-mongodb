@@ -20,64 +20,62 @@ package liquibase.ext.mongodb.statement;
  * #L%
  */
 
-import com.mongodb.client.MongoDatabase;
-import liquibase.exception.DatabaseException;
+import liquibase.ext.mongodb.database.MongoConnection;
+import liquibase.nosql.statement.NoSqlQueryForListStatement;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static liquibase.ext.mongodb.statement.BsonUtils.orEmptyDocument;
+import static java.util.Optional.ofNullable;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class FindAllStatement extends AbstractMongoStatement {
+public class FindAllStatement extends AbstractCollectionStatement
+        implements NoSqlQueryForListStatement<MongoConnection, Document> {
 
     public static final String COMMAND_NAME = "find";
 
-    private final String collectionName;
-    private final Document filter;
-    private final Document sort;
+    private final Bson filter;
+    private final Bson sort;
 
     public FindAllStatement(final String collectionName) {
         this(collectionName, new Document(), new Document());
     }
 
-    public FindAllStatement(final String collectionName, final String filter, final String sort) {
-        this(collectionName, orEmptyDocument(filter), orEmptyDocument(sort));
-    }
-
-    public FindAllStatement(final String collectionName, final Document filter, final Document sort) {
-        this.collectionName = collectionName;
+    public FindAllStatement(final String collectionName, final Bson filter, final Bson sort) {
+        super(collectionName);
         this.filter = filter;
         this.sort = sort;
     }
 
     @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
+    }
+
+    @Override
     public String toJs() {
         return
-            "db." +
-                collectionName +
-                "." +
-                    COMMAND_NAME +
-                "(" +
-                filter.toJson() +
-                ");";
+                "db." +
+                        getCollectionName() +
+                        "." +
+                        getCommandName() +
+                        "(" +
+                        ofNullable(filter).map(Bson::toString).orElse(null) +
+                        ", " +
+                        ofNullable(sort).map(Bson::toString).orElse(null) +
+                        ");";
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public List queryForList(final MongoDatabase db, final Class elementType) throws DatabaseException {
-        final ArrayList result = new ArrayList();
-        db.getCollection(collectionName, elementType)
-            .find(filter).sort(sort).into(result);
+    public List<Document> queryForList(final MongoConnection connection) {
+        final ArrayList<Document> result = new ArrayList<>();
+        connection.getDatabase().getCollection(collectionName, Document.class)
+                .find(filter).sort(sort).into(result);
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return toJs();
     }
 }

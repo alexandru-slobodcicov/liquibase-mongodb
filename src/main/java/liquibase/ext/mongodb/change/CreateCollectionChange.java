@@ -20,6 +20,7 @@ package liquibase.ext.mongodb.change;
  * #L%
  */
 
+import liquibase.change.Change;
 import liquibase.change.ChangeMetaData;
 import liquibase.change.DatabaseChange;
 import liquibase.database.Database;
@@ -31,9 +32,9 @@ import lombok.Setter;
 
 
 @DatabaseChange(name = "createCollection",
-    description = "Create collection with validation " +
-        "https://docs.mongodb.com/manual/reference/method/db.createCollection/#db.createCollection",
-    priority = ChangeMetaData.PRIORITY_DEFAULT, appliesTo = "collection")
+        description = "Create collection with validation " +
+                "https://docs.mongodb.com/manual/reference/method/db.createCollection/#db.createCollection",
+        priority = ChangeMetaData.PRIORITY_DEFAULT, appliesTo = "collection")
 @NoArgsConstructor
 @Getter
 @Setter
@@ -44,13 +45,22 @@ public class CreateCollectionChange extends AbstractMongoChange {
 
     @Override
     public String getConfirmationMessage() {
-        return null;
+        return "Collection " + getCollectionName() + " created";
     }
 
     @Override
     public SqlStatement[] generateStatements(Database database) {
         return new SqlStatement[]{
-            new CreateCollectionStatement(collectionName, options)
+                new CreateCollectionStatement(collectionName, options)
+        };
+    }
+
+    @Override
+    protected Change[] createInverses() {
+        final DropCollectionChange inverse = new DropCollectionChange();
+        inverse.setCollectionName(getCollectionName());
+        return new Change[]{
+                inverse
         };
     }
 }

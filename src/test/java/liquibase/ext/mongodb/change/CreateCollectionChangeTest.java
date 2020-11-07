@@ -22,10 +22,12 @@ package liquibase.ext.mongodb.change;
 
 import liquibase.changelog.ChangeSet;
 import liquibase.ext.mongodb.statement.CreateCollectionStatement;
+import liquibase.ext.mongodb.statement.DropCollectionStatement;
 import liquibase.statement.SqlStatement;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static liquibase.ext.mongodb.TestUtils.getChangesets;
@@ -33,10 +35,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CreateCollectionChangeTest extends AbstractMongoChangeTest {
 
+    @SneakyThrows
     @Test
     void getConfirmationMessage() {
-        assertThat(new CreateCollectionChange().getConfirmationMessage())
-            .isNull();
+        final CreateCollectionChange createCollectionChange = new CreateCollectionChange();
+        createCollectionChange.setCollectionName("collection1");
+        assertThat(createCollectionChange.supportsRollback(database)).isTrue();
+        assertThat(createCollectionChange.getConfirmationMessage())
+                .isEqualTo("Collection collection1 created");
+
+        assertThat(Arrays.asList(createCollectionChange.generateRollbackStatements(database)))
+                .hasSize(1)
+                .first()
+                .isInstanceOf(DropCollectionStatement.class)
+                .returns("collection1", s -> ((DropCollectionStatement)s).getCollectionName());
     }
 
     @Test
@@ -45,40 +57,76 @@ class CreateCollectionChangeTest extends AbstractMongoChangeTest {
         final List<ChangeSet> changeSets = getChangesets("liquibase/ext/changelog.create-collection.test.xml", database);
 
         assertThat(changeSets)
-            .isNotNull()
-            .hasSize(1);
+                .isNotNull()
+                .hasSize(1)
+                .first()
+                .returns("8:9613cffe7f07a1310ed2b6a47efb92c8",  s -> s.generateCheckSum().toString());
+
         assertThat(changeSets.get(0).getChanges())
-            .hasSize(3)
-            .hasOnlyElementsOfType(CreateCollectionChange.class);
+                .hasSize(3)
+                .hasOnlyElementsOfType(CreateCollectionChange.class);
 
         final CreateCollectionChange ch1 = (CreateCollectionChange) changeSets.get(0).getChanges().get(0);
         assertThat(ch1.getCollectionName()).isEqualTo("createCollectionWithValidatorAndOptionsTest");
         assertThat(ch1.getOptions()).isNotBlank();
         final SqlStatement[] sqlStatement1 = ch1.generateStatements(database);
         assertThat(sqlStatement1)
-            .hasSize(1);
+                .hasSize(1);
         assertThat(((CreateCollectionStatement) sqlStatement1[0]))
-            .hasNoNullFieldsOrProperties()
-            .hasFieldOrPropertyWithValue("collectionName", "createCollectionWithValidatorAndOptionsTest");
+                .hasNoNullFieldsOrProperties()
+                .hasFieldOrPropertyWithValue("collectionName", "createCollectionWithValidatorAndOptionsTest");
 
         final CreateCollectionChange ch2 = (CreateCollectionChange) changeSets.get(0).getChanges().get(1);
         assertThat(ch2.getCollectionName()).isEqualTo("createCollectionWithEmptyValidatorTest");
         assertThat(ch2.getOptions()).isBlank();
         final SqlStatement[] sqlStatement2 = ch2.generateStatements(database);
         assertThat(sqlStatement2)
-            .hasSize(1);
+                .hasSize(1);
         assertThat(((CreateCollectionStatement) sqlStatement2[0]))
-            .hasNoNullFieldsOrPropertiesExcept("options")
-            .hasFieldOrPropertyWithValue("collectionName", "createCollectionWithEmptyValidatorTest");
+                .hasNoNullFieldsOrPropertiesExcept("options")
+                .hasFieldOrPropertyWithValue("collectionName", "createCollectionWithEmptyValidatorTest");
 
         final CreateCollectionChange ch3 = (CreateCollectionChange) changeSets.get(0).getChanges().get(2);
         assertThat(ch3.getCollectionName()).isEqualTo("createCollectionWithNoValidator");
         assertThat(ch3.getOptions()).isBlank();
         final SqlStatement[] sqlStatement3 = ch3.generateStatements(database);
         assertThat(sqlStatement3)
-            .hasSize(1);
+                .hasSize(1);
         assertThat(((CreateCollectionStatement) sqlStatement3[0]))
-            .hasNoNullFieldsOrPropertiesExcept("options")
-            .hasFieldOrPropertyWithValue("collectionName", "createCollectionWithNoValidator");
+                .hasNoNullFieldsOrPropertiesExcept("options")
+                .hasFieldOrPropertyWithValue("collectionName", "createCollectionWithNoValidator");
+    }
+
+    @Test
+    @SneakyThrows
+    void generateStatementsFromJson() {
+        final List<ChangeSet> changeSets = getChangesets("liquibase/ext/json/changelog.generic.json", database);
+
+        assertThat(changeSets)
+                .isNotNull()
+                .hasSize(1);
+        assertThat(changeSets.get(0).getChanges())
+                .hasSize(2)
+                .hasOnlyElementsOfType(CreateCollectionChange.class);
+
+        final CreateCollectionChange ch1 = (CreateCollectionChange) changeSets.get(0).getChanges().get(0);
+        assertThat(ch1.getCollectionName()).isEqualTo("person");
+        assertThat(ch1.getOptions()).isNull();
+        final SqlStatement[] sqlStatement1 = ch1.generateStatements(database);
+        assertThat(sqlStatement1)
+                .hasSize(1);
+        assertThat(((CreateCollectionStatement) sqlStatement1[0]))
+                .hasNoNullFieldsOrProperties()
+                .hasFieldOrPropertyWithValue("collectionName", "person");
+
+        final CreateCollectionChange ch2 = (CreateCollectionChange) changeSets.get(0).getChanges().get(1);
+        assertThat(ch2.getCollectionName()).isEqualTo("person1");
+        assertThat(ch2.getOptions()).isNotBlank();
+        final SqlStatement[] sqlStatement2 = ch2.generateStatements(database);
+        assertThat(sqlStatement2)
+                .hasSize(1);
+        assertThat(((CreateCollectionStatement) sqlStatement2[0]))
+                .hasFieldOrPropertyWithValue("collectionName", "person1")
+                .hasNoNullFieldsOrPropertiesExcept("options");
     }
 }

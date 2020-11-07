@@ -44,7 +44,7 @@ public class InsertManyChange extends AbstractMongoChange {
 
     @Override
     public String getConfirmationMessage() {
-        return null;
+        return "Documents inserted into collection " + getCollectionName();
     }
 
     @Override

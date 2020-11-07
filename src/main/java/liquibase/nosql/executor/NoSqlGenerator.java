@@ -1,10 +1,10 @@
-package liquibase.ext.mongodb.executor;
+package liquibase.nosql.executor;
 
 /*-
  * #%L
- * Liquibase MongoDB Extension
+ * Liquibase NoSql Extension
  * %%
- * Copyright (C) 2019 Mastercard
+ * Copyright (C) 2020 Mastercard
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License").
  * You may not use this file except in compliance with the License.
@@ -22,21 +22,21 @@ package liquibase.ext.mongodb.executor;
 
 import liquibase.database.Database;
 import liquibase.exception.ValidationErrors;
-import liquibase.ext.mongodb.statement.AbstractMongoStatement;
+import liquibase.nosql.statement.AbstractNoSqlStatement;
 import liquibase.sql.Sql;
 import liquibase.sqlgenerator.SqlGeneratorChain;
 import liquibase.sqlgenerator.core.AbstractSqlGenerator;
 
-public class MongoSqlGenerator extends AbstractSqlGenerator<AbstractMongoStatement> {
+public class NoSqlGenerator extends AbstractSqlGenerator<AbstractNoSqlStatement> {
 
     @Override
-    public ValidationErrors validate(AbstractMongoStatement statement, Database database,
-                                     SqlGeneratorChain<AbstractMongoStatement> sqlGeneratorChain) {
+    public ValidationErrors validate(AbstractNoSqlStatement statement, Database database,
+                                     SqlGeneratorChain<AbstractNoSqlStatement> sqlGeneratorChain) {
         return null;
     }
 
     @Override
-    public Sql[] generateSql(AbstractMongoStatement statement, Database database, SqlGeneratorChain<AbstractMongoStatement> sqlGeneratorChain) {
+    public Sql[] generateSql(AbstractNoSqlStatement statement, Database database, SqlGeneratorChain<AbstractNoSqlStatement> sqlGeneratorChain) {
         return new Sql[0];
     }
 

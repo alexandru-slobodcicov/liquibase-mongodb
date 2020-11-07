@@ -49,6 +49,16 @@
 
     </xsd:element>
 
+    <xsd:element name="dropCollection">
+
+        <xsd:complexType>
+
+            <xsd:attribute name="collectionName" type="xsd:string" use="required"/>
+
+        </xsd:complexType>
+
+    </xsd:element>
+
     <xsd:element name="createIndex">
 
         <xsd:complexType>
@@ -56,6 +66,20 @@
             <xsd:sequence>
                 <xsd:element name="keys" type="xsd:string" minOccurs="1" maxOccurs="1"/>
                 <xsd:element name="options" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+            </xsd:sequence>
+
+            <xsd:attribute name="collectionName" type="xsd:string" use="required"/>
+
+        </xsd:complexType>
+
+    </xsd:element>
+
+    <xsd:element name="dropIndex">
+
+        <xsd:complexType>
+
+            <xsd:sequence>
+                <xsd:element name="keys" type="xsd:string" minOccurs="1" maxOccurs="1"/>
             </xsd:sequence>
 
             <xsd:attribute name="collectionName" type="xsd:string" use="required"/>

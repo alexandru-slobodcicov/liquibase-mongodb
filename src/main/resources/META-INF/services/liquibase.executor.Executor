@@ -1,1 +1,1 @@
-liquibase.ext.mongodb.executor.MongoExecutor
+liquibase.nosql.executor.NoSqlExecutor

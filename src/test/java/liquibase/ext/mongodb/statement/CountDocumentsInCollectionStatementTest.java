@@ -27,17 +27,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CountDocumentsInCollectionStatementTest {
     private static final String COLLECTION_NAME = TestUtils.COLLECTION_NAME_1;
-    private static final String COLLECTION_CMD = String.format("db.countDocumentsInCollection(%s);", COLLECTION_NAME);
+    private static final String COLLECTION_CMD = String.format("db.%s.countDocuments(null);", COLLECTION_NAME);
     private static final CountDocumentsInCollectionStatement COUNT_COLLECTION = new CountDocumentsInCollectionStatement(COLLECTION_NAME);
 
     @Test
-    void toJs() {
+    void testToJs() {
         assertThat(COUNT_COLLECTION.toJs())
             .isEqualTo(COLLECTION_CMD);
     }
 
     @Test
-    void shouldReturnToString() {
+    void testToString() {
         assertThat(COUNT_COLLECTION.toJs())
             .isEqualTo(COUNT_COLLECTION.toString())
             .isEqualTo(COLLECTION_CMD, COLLECTION_NAME);

@@ -20,10 +20,9 @@ package liquibase.ext.mongodb.statement;
  * #L%
  */
 
-import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import liquibase.exception.DatabaseException;
+import liquibase.ext.mongodb.database.MongoConnection;
+import liquibase.nosql.statement.NoSqlExecuteStatement;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.bson.Document;
@@ -31,56 +30,53 @@ import org.bson.Document;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Optional.ofNullable;
 import static liquibase.ext.mongodb.statement.BsonUtils.orEmptyDocument;
 import static liquibase.ext.mongodb.statement.BsonUtils.orEmptyList;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class InsertManyStatement extends AbstractMongoStatement {
+public class InsertManyStatement extends AbstractCollectionStatement
+        implements NoSqlExecuteStatement<MongoConnection> {
 
     public static final String COMMAND_NAME = "insertMany";
 
-    private final String collectionName;
     private final List<Document> documents;
-    private Document options;
+    private final Document options;
 
     public InsertManyStatement(final String collectionName, final String documents, final String options) {
         this(collectionName, new ArrayList<>(orEmptyList(documents)), orEmptyDocument(options));
     }
 
     public InsertManyStatement(final String collectionName, final List<Document> documents, final Document options) {
-        this.collectionName = collectionName;
+        super(collectionName);
         this.documents = documents;
         this.options = options;
+    }
+
+    @Override
+    public String getCommandName() {
+        return COMMAND_NAME;
     }
 
     @Override
     public String toJs() {
         return
                 "db." +
-                        collectionName +
+                        getCollectionName() +
                         "." +
-                        COMMAND_NAME +
+                        getCommandName() +
                         "(" +
-                        documents.toString() +
+                        ofNullable(documents).map(List::toString).orElse(null) +
                         ", " +
-                        options.toJson() +
+                        ofNullable(options).map(Document::toJson).orElse(null) +
                         ");";
     }
 
     @Override
-    public void execute(MongoDatabase db) throws DatabaseException {
-        try {
-            final MongoCollection<Document> collection = db.getCollection(collectionName);
-            collection.insertMany(documents);
-            //TODO: Parse options into POJO InsertManyOptions.class
-        } catch (MongoException e) {
-            throw new DatabaseException(e);
-        }
+    public void execute(final MongoConnection connection) {
+        final MongoCollection<Document> collection = connection.getDatabase().getCollection(collectionName);
+        collection.insertMany(documents);
     }
 
-    @Override
-    public String toString() {
-        return this.toJs();
-    }
 }

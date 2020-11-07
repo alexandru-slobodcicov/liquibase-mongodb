@@ -21,7 +21,6 @@ package liquibase.ext.mongodb.statement;
  */
 
 import com.mongodb.client.MongoDatabase;
-import liquibase.exception.DatabaseException;
 import liquibase.ext.AbstractMongoIntegrationTest;
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
@@ -45,27 +44,27 @@ class InsertManyStatementIT extends AbstractMongoIntegrationTest {
     }
 
     @Test
-    void executeForList() throws DatabaseException {
-        final MongoDatabase database = mongoConnection.getDb();
+    void executeForList() {
+        final MongoDatabase database = connection.getDatabase();
         final List<Document> testObjects = IntStream.rangeClosed(1, 5)
             .mapToObj(id -> Collections.singletonMap("id", (Object) id))
             .map(Document::new)
             .collect(Collectors.toList());
-        new InsertManyStatement(COLLECTION_NAME_1, testObjects, new Document()).execute(database);
+        new InsertManyStatement(COLLECTION_NAME_1, testObjects, new Document()).execute(connection);
 
         assertThat(database.getCollection(COLLECTION_NAME_1).find())
             .hasSize(5);
     }
 
     @Test
-    void executeForString() throws DatabaseException {
-        final MongoDatabase database = mongoConnection.getDb();
+    void executeForString() {
+        final MongoDatabase database = connection.getDatabase();
         final String testObjects = IntStream.rangeClosed(1, 5)
             .mapToObj(id -> Collections.singletonMap("id", (Object) id))
             .map(Document::new)
             .map(Document::toJson)
             .collect(Collectors.joining(",", "[", "]"));
-        new InsertManyStatement(COLLECTION_NAME_1, testObjects, "").execute(database);
+        new InsertManyStatement(COLLECTION_NAME_1, testObjects, "").execute(connection);
 
         assertThat(database.getCollection(COLLECTION_NAME_1).find())
             .hasSize(5);

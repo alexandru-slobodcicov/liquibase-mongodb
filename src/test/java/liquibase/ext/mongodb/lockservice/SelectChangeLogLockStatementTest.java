@@ -22,16 +22,15 @@ package liquibase.ext.mongodb.lockservice;
 
 import org.junit.jupiter.api.Test;
 
-import static liquibase.ext.mongodb.lockservice.ReplaceLockChangeLogStatement.COMMAND_NAME;
+import static liquibase.ext.mongodb.lockservice.SelectChangeLogLockStatement.COMMAND_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ReplaceLockChangeLogStatementTest {
+class SelectChangeLogLockStatementTest {
 
     @Test
     void testToJs() {
         final String collectionName = "testCollection";
-        final ReplaceLockChangeLogStatement replaceLockChangeLogStatement = new ReplaceLockChangeLogStatement(collectionName, false);
-        assertThat(replaceLockChangeLogStatement.toJs()).isEqualTo("db.".concat(collectionName).concat(".").concat(COMMAND_NAME).concat("();"));
+        assertThat(new SelectChangeLogLockStatement(collectionName).toJs())
+            .isEqualTo("db.".concat(collectionName).concat(".").concat(COMMAND_NAME).concat("();"));
     }
-
 }
