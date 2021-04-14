@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         java: [8, 11, 16]
-        mongo: [4.0, 4.2, 4.4]
+        mongo: [3.6, 4.0, 4.2, 4.4]
     services:
       mongo:
         image: mongo:${{ matrix.mongo }}
