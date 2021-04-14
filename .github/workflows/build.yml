@@ -17,7 +17,7 @@ jobs:
       mongo:
         image: mongo:${{ matrix.mongo }}
         env:
-          NAME: mongodb
+          name: mongodb
         ports:
           - 27017-27019:27017-27019
     steps:
