@@ -199,15 +199,15 @@
                     </execution>
                     <execution>
                         <id>integration-tests</id>
-                        <properties>
-                            <db.connection.uri>mongodb://localhost:27017/test_db?socketTimeoutMS=100&amp;connectTimeoutMS=100&amp;serverSelectionTimeoutMS=100</db.connection.uri>
-                            <!--db.connection.uri>mongodb://test_user:test_password@localhost:27017/test_db?socketTimeoutMS=100&amp;connectTimeoutMS=100&amp;serverSelectionTimeoutMS=100</db.connection.uri>-->
-                        </properties>
                         <phase>integration-test</phase>
                         <goals>
                             <goal>test</goal>
                         </goals>
                         <configuration>
+                            <properties>
+                                <db.connection.uri>mongodb://localhost:27017/test_db?socketTimeoutMS=100&amp;connectTimeoutMS=100&amp;serverSelectionTimeoutMS=100</db.connection.uri>
+                                <!--db.connection.uri>mongodb://test_user:test_password@localhost:27017/test_db?socketTimeoutMS=100&amp;connectTimeoutMS=100&amp;serverSelectionTimeoutMS=100</db.connection.uri>-->
+                            </properties>
                             <includes>
                                 <include>**/*IT.java</include>
                                 <include>**/*Test.java</include>
