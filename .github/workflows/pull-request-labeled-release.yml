@@ -18,7 +18,7 @@ jobs:
         mongodb: [4]
     services:
       mongodb:
-        image: mongodb:${{ matrix.mongodb }}
+        image: mongo:${{ matrix.mongodb }}
         ports:
           - 27017-27019:27017-27019
 
