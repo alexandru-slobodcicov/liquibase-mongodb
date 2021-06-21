@@ -28,6 +28,14 @@ Liquibase turned to be the most feasible tool to extend as it allows to define c
 <a name="release-notes"></a>
 ## Release Notes
 
+#### 4.4.0
+* Updated code to work with core 4.4.0 [PR #147](https://github.com/liquibase/liquibase-mongodb/pull/147)
+* Bump mockito-core from 3.10.0 to 3.11.0 [PR#151](https://github.com/liquibase/liquibase-mongodb/pull/151)
+* Bump mockito-junit-jupiter from 3.10.0 to 3.11.0 [PR#152](https://github.com/liquibase/liquibase-mongodb/pull/152)
+* Bump snakeyaml from 1.28 to 1.29 [PR#153](https://github.com/liquibase/liquibase-mongodb/pull/153)
+* Bump assertj-core from 3.19.0 to 3.20.0[PR#157](https://github.com/liquibase/liquibase-mongodb/pull/157)
+
+
 #### 4.3.1.1
 * Upgrade Mongo Java Driver from 4.2.1 to 4.2.2
 * Fixed [Issue-111: Is adminCommand really connected to the admin DB?](https://github.com/liquibase/liquibase-mongodb/issues/111)
