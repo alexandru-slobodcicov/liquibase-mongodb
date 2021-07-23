@@ -23,12 +23,13 @@ package liquibase.nosql.executor;
 import liquibase.Scope;
 import liquibase.changelog.ChangeLogHistoryServiceFactory;
 import liquibase.database.Database;
+import liquibase.exception.DatabaseException;
+import liquibase.executor.AbstractExecutor;
+import liquibase.ext.mongodb.database.MongoLiquibaseDatabase;
+import liquibase.logging.Logger;
 import liquibase.nosql.changelog.AbstractNoSqlHistoryService;
 import liquibase.nosql.database.AbstractNoSqlConnection;
 import liquibase.nosql.database.AbstractNoSqlDatabase;
-import liquibase.exception.DatabaseException;
-import liquibase.executor.AbstractExecutor;
-import liquibase.logging.Logger;
 import liquibase.nosql.statement.*;
 import liquibase.servicelocator.LiquibaseService;
 import liquibase.sql.visitor.SqlVisitor;
@@ -67,6 +68,11 @@ public class NoSqlExecutor extends AbstractExecutor {
     @Override
     public int getPriority() {
         return PRIORITY_SPECIALIZED;
+    }
+
+    @Override
+    public boolean supports(Database database) {
+        return database instanceof MongoLiquibaseDatabase;
     }
 
     @SuppressWarnings("unchecked")
