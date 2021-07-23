@@ -72,7 +72,6 @@ class MongoLockServiceTest {
     protected void resetServices() {
         LockServiceFactory.reset();
         Scope.getCurrentScope().getSingleton(ExecutorService.class).reset();
-        LiquibaseConfiguration.getInstance().init();
     }
 
     @AfterEach

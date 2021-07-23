@@ -108,8 +108,7 @@ public class MongoLiquibaseDatabase extends AbstractNoSqlDatabase {
             return adjustTrackingTablesOnStartup;
         }
 
-        return LiquibaseConfiguration.getInstance().getConfiguration(MongoConfiguration.class)
-                .getAdjustTrackingTablesOnStartup();
+        return MongoConfiguration.ADJUST_TRACKING_TABLES_ON_STARTUP.getCurrentValue();
     }
 
     public Boolean getSupportsValidator() {
@@ -117,8 +116,7 @@ public class MongoLiquibaseDatabase extends AbstractNoSqlDatabase {
             return supportsValidator;
         }
 
-        return LiquibaseConfiguration.getInstance().getConfiguration(MongoConfiguration.class)
-                .getSupportsValidator();
+        return MongoConfiguration.SUPPORTS_VALIDATOR.getCurrentValue();
     }
 
 
