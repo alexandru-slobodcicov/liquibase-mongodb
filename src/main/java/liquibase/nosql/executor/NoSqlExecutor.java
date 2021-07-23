@@ -20,6 +20,7 @@ package liquibase.nosql.executor;
  * #L%
  */
 
+import com.mongodb.client.MongoDatabase;
 import liquibase.Scope;
 import liquibase.changelog.ChangeLogHistoryServiceFactory;
 import liquibase.database.Database;
@@ -67,6 +68,11 @@ public class NoSqlExecutor extends AbstractExecutor {
     @Override
     public int getPriority() {
         return PRIORITY_SPECIALIZED;
+    }
+
+    @Override
+    public boolean supports(Database database) {
+        return database instanceof MongoDatabase;
     }
 
     @SuppressWarnings("unchecked")
