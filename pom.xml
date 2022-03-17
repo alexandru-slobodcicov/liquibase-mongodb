@@ -4,7 +4,7 @@
     <groupId>org.liquibase.ext</groupId>
     <artifactId>liquibase-mongodb</artifactId>
     <packaging>jar</packaging>
-    <version>4.8.1-SNAPSHOT</version>
+    <version>4.9.0</version>
     <name>Liquibase MongoDB Extension</name>
     <description>Liquibase Extension for MongoDB</description>
     <url>http://www.liquibase.org</url>
@@ -65,7 +65,7 @@
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
-            <version>4.8.0</version>
+            <version>4.9.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
