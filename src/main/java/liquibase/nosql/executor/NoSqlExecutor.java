@@ -191,7 +191,7 @@ public class NoSqlExecutor extends AbstractExecutor {
         } else if (sql instanceof UpdateStatement) {
             execute((UpdateStatement) sql);
         } else {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Mongodb cannot execute "+sql.getClass().getName()+" statements");
         }
     }
 
