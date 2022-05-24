@@ -38,7 +38,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
-        <liquibase.version>4.3.5</liquibase.version>
         <jupiter.version>5.7.1</jupiter.version>
         <jupiter.surefire.version>1.3.2</jupiter.surefire.version>
         <mockito-core.version>3.9.0</mockito-core.version>
@@ -109,11 +108,6 @@
                     <artifactId>bson</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <version>${liquibase.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -273,12 +267,6 @@
                 </dependency>
 
             </dependencies>
-        </profile>
-        <profile>
-            <id>liquibase-3x</id>
-            <properties>
-                <liquibase.version>3.10.3</liquibase.version>
-            </properties>
         </profile>
         <profile>
             <id>run-its</id>
