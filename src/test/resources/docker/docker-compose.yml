@@ -1,12 +1,29 @@
-version: '3.1'
+version: "3"
 
 services:
-
-  mongo:
-    image: mongo:latest
+  postgres:
+    image: postgres
+    container_name: postgres
     ports:
-      - "27020:27017"
+      - 5432:5432
     environment:
-      MONGO_INITDB_DATABASE: lbcat
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=ferretdb
+
+  ferretdb:
+    image: ghcr.io/ferretdb/ferretdb:latest
+    container_name: ferretdb
+    restart: on-failure
+    ports:
+      - 27017:27017
+    environment:
+      - FERRETDB_POSTGRESQL_URL: postgres://postgres:5432/ferretdb
+      - MONGO_INITDB_DATABASE: lbcat
     volumes: 
       - ./init-mongo.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+
+networks:
+  default:
+    name: ferretdb
