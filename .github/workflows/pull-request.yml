@@ -7,8 +7,6 @@ on:
       - reopened
       - synchronize
   push:
-    branches:
-      - main
 
 jobs:
   unit-test:
