@@ -19,7 +19,7 @@ services:
       - 27017:27017
     environment:
       - FERRETDB_POSTGRESQL_URL=postgres://postgres:5432/ferretdb
-      - MONGO_INITDB_DATABASE: lbcat
+      - MONGO_INITDB_DATABASE=lbcat
     volumes: 
       - ./init-mongo.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
 
