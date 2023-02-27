@@ -18,7 +18,7 @@ services:
     ports:
       - 27017:27017
     environment:
-      - FERRETDB_POSTGRESQL_URL=postgres://lbcat:LiquibasePass1@localhost:5432/lbcat
+      - FERRETDB_POSTGRESQL_URL=postgres://lbcat:LiquibasePass1@postgres:5432/lbcat
 
 networks:
   default:
