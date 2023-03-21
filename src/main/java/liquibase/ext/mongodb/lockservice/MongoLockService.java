@@ -82,7 +82,16 @@ public class MongoLockService extends AbstractNoSqlLockService<MongoLiquibaseDat
 
     @Override
     protected Boolean existsRepository() throws DatabaseException {
-        return getExecutor().queryForLong(new CountCollectionByNameStatement(getDatabase().getDatabaseChangeLogLockTableName())) == 1L;
+        try {
+            return getExecutor().queryForLong(new CountCollectionByNameStatement(getDatabase().getDatabaseChangeLogLockTableName())) == 1L;
+        } catch (DatabaseException e){
+            if("Could not query for long".equalsIgnoreCase(e.getMessage())){
+                //"Could not query for long" is not meaningful let's remove it from trace and rethrow underlying exception
+                throw new DatabaseException("Failed to create or initialize the lock table",e.getCause());
+            } else {
+                throw e;
+            }
+        }
     }
 
     @Override
