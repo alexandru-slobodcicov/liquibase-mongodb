@@ -28,6 +28,9 @@ Liquibase turned to be the most feasible tool to extend as it allows to define c
 <a name="release-notes"></a>
 ## Release Notes
 
+#### 4.21.0
+* Support for Liquibase 4.20.0
+
 #### 4.4.0
 * Updated code to work with core 4.4.0 [PR #147](https://github.com/liquibase/liquibase-mongodb/pull/147)
 * Bump mockito-core from 3.10.0 to 3.11.0 [PR#151](https://github.com/liquibase/liquibase-mongodb/pull/151)

@@ -27,7 +27,9 @@ import liquibase.changelog.RanChangeSet;
 import liquibase.exception.DatabaseException;
 import liquibase.exception.DatabaseHistoryException;
 import liquibase.exception.UnexpectedLiquibaseException;
+import liquibase.executor.Executor;
 import liquibase.executor.ExecutorService;
+import liquibase.executor.LoggingExecutor;
 import liquibase.logging.Logger;
 import liquibase.nosql.database.AbstractNoSqlDatabase;
 import liquibase.nosql.executor.NoSqlExecutor;
@@ -37,6 +39,7 @@ import lombok.Setter;
 import java.time.Clock;
 import java.util.Date;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -50,6 +53,8 @@ public abstract class AbstractNoSqlHistoryService<D extends AbstractNoSqlDatabas
     private List<RanChangeSet> ranChangeSetList;
 
     private boolean serviceInitialized;
+
+    private static final ResourceBundle mongoBundle = ResourceBundle.getBundle("liquibase/i18n/liquibase-mongo");
 
     @Getter
     private Boolean hasDatabaseChangeLogTable;
@@ -88,8 +93,12 @@ public abstract class AbstractNoSqlHistoryService<D extends AbstractNoSqlDatabas
         return (D) getDatabase();
     }
 
-    public NoSqlExecutor getExecutor() {
-        return (NoSqlExecutor) Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor(NoSqlExecutor.EXECUTOR_NAME, getDatabase());
+    public NoSqlExecutor getExecutor() throws DatabaseException {
+        Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor(NoSqlExecutor.EXECUTOR_NAME, getDatabase());
+        if (executor instanceof LoggingExecutor) {
+            throw new DatabaseException(String.format(mongoBundle.getString("command.unsupported"), "*sql"));
+        }
+        return (NoSqlExecutor) executor ;
     }
 
     @Override
