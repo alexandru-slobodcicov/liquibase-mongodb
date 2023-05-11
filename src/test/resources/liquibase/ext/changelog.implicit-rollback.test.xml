@@ -20,33 +20,33 @@
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:ext="http://www.liquibase.org/xml/ns/mongodb"
+        xmlns:mongodb="http://www.liquibase.org/xml/ns/mongodb"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
         http://www.liquibase.org/xml/ns/mongodb http://www.liquibase.org/xml/ns/mongodb/liquibase-mongodb-latest.xsd">
 
     <changeSet id="1" author="alex">
-        <ext:createCollection collectionName="collection1"/>
-        <ext:createCollection collectionName="collection2"/>
+        <mongodb:createCollection collectionName="collection1"/>
+        <mongodb:createCollection collectionName="collection2"/>
     </changeSet>
 
     <changeSet id="2" author="alex">
-        <ext:createIndex collectionName="collection1">
-            <ext:keys>
+        <mongodb:createIndex collectionName="collection1">
+            <mongodb:keys>
                 { id: 1, type: 1}
-            </ext:keys>
-            <ext:options>
+            </mongodb:keys>
+            <mongodb:options>
                 {unique: true, name: "ui_namedIndex1"}
-            </ext:options>
-        </ext:createIndex>
+            </mongodb:options>
+        </mongodb:createIndex>
 
-        <ext:createIndex collectionName="collection2">
-            <ext:keys>
+        <mongodb:createIndex collectionName="collection2">
+            <mongodb:keys>
                 { id: 1, type: 1}
-            </ext:keys>
-            <ext:options>
+            </mongodb:keys>
+            <mongodb:options>
                 {unique: true, name: "ui_namedIndex2"}
-            </ext:options>
-        </ext:createIndex>
+            </mongodb:options>
+        </mongodb:createIndex>
     </changeSet>
 
 </databaseChangeLog>

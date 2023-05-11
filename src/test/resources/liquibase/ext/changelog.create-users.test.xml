@@ -20,14 +20,14 @@
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:ext="http://www.liquibase.org/xml/ns/mongodb"
+        xmlns:mongodb="http://www.liquibase.org/xml/ns/mongodb"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
         http://www.liquibase.org/xml/ns/mongodb http://www.liquibase.org/xml/ns/mongodb/liquibase-mongodb-latest.xsd">
 
     <changeSet id="1" author="alex">
 
-        <ext:runCommand>
-            <ext:command>
+        <mongodb:runCommand>
+            <mongodb:command>
                 {
                 createRole: "readRole",
                 roles: [
@@ -35,11 +35,11 @@
                 ],
                 privileges: []
                 }
-            </ext:command>
-        </ext:runCommand>
+            </mongodb:command>
+        </mongodb:runCommand>
 
-        <ext:runCommand>
-            <ext:command>
+        <mongodb:runCommand>
+            <mongodb:command>
                 {
                 createRole: "readWriteRole",
                 roles: [
@@ -47,11 +47,11 @@
                 ],
                 privileges: []
                 }
-            </ext:command>
-        </ext:runCommand>
+            </mongodb:command>
+        </mongodb:runCommand>
 
-        <ext:runCommand>
-            <ext:command>
+        <mongodb:runCommand>
+            <mongodb:command>
                 {
                 createRole: "appRole",
                 roles: [
@@ -59,11 +59,11 @@
                 ],
                 privileges: []
                 }
-            </ext:command>
-        </ext:runCommand>
+            </mongodb:command>
+        </mongodb:runCommand>
 
-        <ext:runCommand>
-            <ext:command>
+        <mongodb:runCommand>
+            <mongodb:command>
                 {
                 createRole: "deployRole",
                 roles: [
@@ -71,15 +71,15 @@
                 ],
                 privileges: []
                 }
-            </ext:command>
-        </ext:runCommand>
+            </mongodb:command>
+        </mongodb:runCommand>
 
     </changeSet>
 
     <changeSet id="2" author="alex">
 
-        <ext:runCommand>
-            <ext:command>
+        <mongodb:runCommand>
+            <mongodb:command>
                 {
                 createUser: "appUser",
                 pwd: "changeit",
@@ -88,11 +88,11 @@
                 ],
                 mechanisms: ["SCRAM-SHA-256"]
                 }
-            </ext:command>
-        </ext:runCommand>
+            </mongodb:command>
+        </mongodb:runCommand>
 
-        <ext:runCommand>
-            <ext:command>
+        <mongodb:runCommand>
+            <mongodb:command>
                 {
                 createUser: "deployUser",
                 pwd: "changeit",
@@ -101,8 +101,8 @@
                 ],
                 mechanisms: ["SCRAM-SHA-256"]
                 }
-            </ext:command>
-        </ext:runCommand>
+            </mongodb:command>
+        </mongodb:runCommand>
 
     </changeSet>
 

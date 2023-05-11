@@ -20,69 +20,69 @@
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:ext="http://www.liquibase.org/xml/ns/mongodb"
+        xmlns:mongodb="http://www.liquibase.org/xml/ns/mongodb"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
         http://www.liquibase.org/xml/ns/mongodb http://www.liquibase.org/xml/ns/mongodb/liquibase-mongodb-latest.xsd">
 
     <changeSet id="1" author="alex">
 
-        <ext:insertOne collectionName="insertOneTest1">
+        <mongodb:insertOne collectionName="insertOneTest1">
 
-            <ext:document>
+            <mongodb:document>
                 {
                 id: 111
                 }
-            </ext:document>
+            </mongodb:document>
 
-        </ext:insertOne>
+        </mongodb:insertOne>
 
     </changeSet>
 
     <changeSet id="2" author="alex">
 
-        <ext:insertOne collectionName="insertOneTest2">
+        <mongodb:insertOne collectionName="insertOneTest2">
 
-            <ext:document>
+            <mongodb:document>
                 {
                 id: 2
                 }
-            </ext:document>
+            </mongodb:document>
 
-        </ext:insertOne>
+        </mongodb:insertOne>
 
-        <ext:insertOne collectionName="insertOneTest3">
+        <mongodb:insertOne collectionName="insertOneTest3">
 
-            <ext:document>
+            <mongodb:document>
                 {
                 id: 3
                 }
-            </ext:document>
+            </mongodb:document>
 
-        </ext:insertOne>
+        </mongodb:insertOne>
 
     </changeSet>
 
     <changeSet id="3" author="alex">
 
-        <ext:insertOne collectionName="insertOneTest2">
+        <mongodb:insertOne collectionName="insertOneTest2">
 
-            <ext:document>
+            <mongodb:document>
                 {
                 id: 21323123
                 }
-            </ext:document>
+            </mongodb:document>
 
-        </ext:insertOne>
+        </mongodb:insertOne>
 
-        <ext:insertOne collectionName="insertOneTest3">
+        <mongodb:insertOne collectionName="insertOneTest3">
 
-            <ext:document>
+            <mongodb:document>
                 {
                 id: 321321313
                 }
-            </ext:document>
+            </mongodb:document>
 
-        </ext:insertOne>
+        </mongodb:insertOne>
 
     </changeSet>
 

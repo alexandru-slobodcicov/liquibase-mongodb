@@ -20,25 +20,25 @@
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:ext="http://www.liquibase.org/xml/ns/mongodb"
+        xmlns:mongodb="http://www.liquibase.org/xml/ns/mongodb"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
         http://www.liquibase.org/xml/ns/mongodb http://www.liquibase.org/xml/ns/mongodb/liquibase-mongodb-latest.xsd">
 
     <changeSet id="1" author="alex">
-        <ext:createIndex collectionName="createIndexTest">
-            <ext:keys>
+        <mongodb:createIndex collectionName="createIndexTest">
+            <mongodb:keys>
                 { clientId: 1, type: 1}
-            </ext:keys>
-            <ext:options>
+            </mongodb:keys>
+            <mongodb:options>
                 {unique: true, name: "ui_tppClientId"}
-            </ext:options>
-        </ext:createIndex>
+            </mongodb:options>
+        </mongodb:createIndex>
 
-        <ext:createIndex collectionName="createIndexNoOptionsTest">
-            <ext:keys>
+        <mongodb:createIndex collectionName="createIndexNoOptionsTest">
+            <mongodb:keys>
                 { clientId: 1, type: 1}
-            </ext:keys>
-        </ext:createIndex>
+            </mongodb:keys>
+        </mongodb:createIndex>
     </changeSet>
 
 

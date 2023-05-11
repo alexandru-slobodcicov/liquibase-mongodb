@@ -20,13 +20,13 @@
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:ext="http://www.liquibase.org/xml/ns/mongodb"
+        xmlns:mongodb="http://www.liquibase.org/xml/ns/mongodb"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
         http://www.liquibase.org/xml/ns/mongodb http://www.liquibase.org/xml/ns/mongodb/liquibase-mongodb-latest.xsd">
 
     <changeSet id="1" author="alex">
-            <ext:createCollection collectionName="createCollectionWithValidatorAndOptionsTest">
-                <ext:options>
+            <mongodb:createCollection collectionName="createCollectionWithValidatorAndOptionsTest">
+                <mongodb:options>
                     {
                     validator: {
                         $jsonSchema: {
@@ -47,17 +47,17 @@
                     validationAction: "warn",
                     validationLevel: "strict"
                     }
-                </ext:options>
-            </ext:createCollection>
+                </mongodb:options>
+            </mongodb:createCollection>
 
-        <ext:createCollection collectionName="createCollectionWithEmptyValidatorTest">
-            <ext:options>
+        <mongodb:createCollection collectionName="createCollectionWithEmptyValidatorTest">
+            <mongodb:options>
 
-            </ext:options>
+            </mongodb:options>
 
-        </ext:createCollection>
+        </mongodb:createCollection>
 
-        <ext:createCollection collectionName="createCollectionWithNoValidator"/>
+        <mongodb:createCollection collectionName="createCollectionWithNoValidator"/>
 
     </changeSet>
 
