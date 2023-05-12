@@ -20,14 +20,14 @@
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:ext="http://www.liquibase.org/xml/ns/mongodb"
+        xmlns:mongodb="http://www.liquibase.org/xml/ns/mongodb"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
         http://www.liquibase.org/xml/ns/mongodb http://www.liquibase.org/xml/ns/mongodb/liquibase-mongodb-latest.xsd">
 
     <changeSet id="1" author="alex">
 
-        <ext:insertMany collectionName="insertManyRollback1">
-            <ext:documents>
+        <mongodb:insertMany collectionName="insertManyRollback1">
+            <mongodb:documents>
                 <!--@formatter:off-->
                 [
                     { id: 1 },
@@ -35,28 +35,28 @@
                     { id: 3 }
                 ]
                 <!--@formatter:on-->
-            </ext:documents>
-        </ext:insertMany>
+            </mongodb:documents>
+        </mongodb:insertMany>
 
         <rollback>
-            <ext:runCommand>
-                <ext:command>
+            <mongodb:runCommand>
+                <mongodb:command>
                     <!--@formatter:off-->
                     {
                         delete: "insertManyRollback1",
                         deletes: [{q: {id : {$lt: 4}}, limit: 0}]
                     }
                     <!--@formatter:on-->
-                </ext:command>
-            </ext:runCommand>
+                </mongodb:command>
+            </mongodb:runCommand>
         </rollback>
 
     </changeSet>
 
     <changeSet id="2" author="alex">
 
-        <ext:insertMany collectionName="insertManyRollback1">
-            <ext:documents>
+        <mongodb:insertMany collectionName="insertManyRollback1">
+            <mongodb:documents>
                 <!--@formatter:off-->
                 [
                     { id: 4 },
@@ -64,20 +64,20 @@
                     { id: 6 }
                 ]
                 <!--@formatter:on-->
-            </ext:documents>
-        </ext:insertMany>
+            </mongodb:documents>
+        </mongodb:insertMany>
 
         <rollback>
-            <ext:runCommand>
-                <ext:command>
+            <mongodb:runCommand>
+                <mongodb:command>
                     <!--@formatter:off-->
                     {
                         delete: "insertManyRollback1",
                         deletes: [{q: {id : {$gt: 3}}, limit: 0}]
                     }
                     <!--@formatter:on-->
-                </ext:command>
-            </ext:runCommand>
+                </mongodb:command>
+            </mongodb:runCommand>
         </rollback>
 
     </changeSet>

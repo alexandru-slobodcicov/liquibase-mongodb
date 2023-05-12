@@ -20,7 +20,7 @@
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:ext="http://www.liquibase.org/xml/ns/mongodb"
+        xmlns:mongodb="http://www.liquibase.org/xml/ns/mongodb"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
         http://www.liquibase.org/xml/ns/mongodb http://www.liquibase.org/xml/ns/mongodb/liquibase-mongodb-latest.xsd">
 
@@ -28,25 +28,25 @@
 
     <changeSet id="1" author="alex">
 
-        <ext:adminCommand>
+        <mongodb:adminCommand>
 
-            <ext:command>
+            <mongodb:command>
                 { buildInfo: 1 }
-            </ext:command>
+            </mongodb:command>
 
-        </ext:adminCommand>
+        </mongodb:adminCommand>
 
     </changeSet>
 
     <changeSet id="2" author="alex">
 
-        <ext:adminCommand>
+        <mongodb:adminCommand>
 
-            <ext:command>
+            <mongodb:command>
                 { shardCollection: "${database.name}.player_info_static", key: {location: 1, _id: 1}, unique: true}
-            </ext:command>
+            </mongodb:command>
 
-        </ext:adminCommand>
+        </mongodb:adminCommand>
 
     </changeSet>
 

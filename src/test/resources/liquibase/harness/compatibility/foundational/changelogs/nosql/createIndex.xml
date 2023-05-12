@@ -2,7 +2,7 @@
 <databaseChangeLog
   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:ext="http://www.liquibase.org/xml/ns/mongodb"
+  xmlns:mongodb="http://www.liquibase.org/xml/ns/mongodb"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
          http://www.liquibase.org/xml/ns/mongodb
@@ -10,13 +10,13 @@
 
 
   <changeSet id="1" author="as">
-    <ext:createCollection collectionName="countries"/>
+    <mongodb:createCollection collectionName="countries"/>
   </changeSet>
 
 
   <changeSet id="2" author="as">
-    <ext:insertMany collectionName="countries">
-      <ext:documents>
+    <mongodb:insertMany collectionName="countries">
+      <mongodb:documents>
         [
         {
         _id : "us",
@@ -48,29 +48,29 @@
         }
         }
         ]
-      </ext:documents>
-    </ext:insertMany>
+      </mongodb:documents>
+    </mongodb:insertMany>
 
     <rollback>
-      <ext:runCommand>
-        <ext:command>
+      <mongodb:runCommand>
+        <mongodb:command>
           {
           delete: "countries",
           deletes: [ { q: { }, limit: 0 } ]
           }
-        </ext:command>
-      </ext:runCommand>
+        </mongodb:command>
+      </mongodb:runCommand>
     </rollback>
   </changeSet>
 
   <changeSet id="3" author="as">
-    <ext:createIndex collectionName="countries">
-      <ext:keys>
+    <mongodb:createIndex collectionName="countries">
+      <mongodb:keys>
         { name: 1, type: 1}
-      </ext:keys>
-      <ext:options>
+      </mongodb:keys>
+      <mongodb:options>
         {unique: true, name: "ui_countries"}
-      </ext:options>
-    </ext:createIndex>
+      </mongodb:options>
+    </mongodb:createIndex>
   </changeSet>
 </databaseChangeLog>

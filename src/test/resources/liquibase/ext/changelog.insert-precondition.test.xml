@@ -20,71 +20,71 @@
 <databaseChangeLog
         xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:ext="http://www.liquibase.org/xml/ns/mongodb"
+        xmlns:mongodb="http://www.liquibase.org/xml/ns/mongodb"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.2.xsd
         http://www.liquibase.org/xml/ns/mongodb http://www.liquibase.org/xml/ns/mongodb/liquibase-mongodb-latest.xsd">
 
     <changeSet id="1" author="alex">
 
         <preConditions onFail="CONTINUE" onError="HALT">
-            <ext:documentExists collectionName="collection1"/>
+            <mongodb:documentExists collectionName="collection1"/>
         </preConditions>
         <comment>Will be SKIPPED due to precondition</comment>
 
-        <ext:insertOne collectionName="results">
+        <mongodb:insertOne collectionName="results">
 
-            <ext:document>
+            <mongodb:document>
                 <!--@formatter:off-->
                 {
                     info: "notExistsAnyDocumentInCollection1"
                 }
                 <!--@formatter:on-->
-            </ext:document>
+            </mongodb:document>
 
-        </ext:insertOne>
+        </mongodb:insertOne>
 
     </changeSet>
 
     <changeSet id="2" author="alex">
 
-        <ext:insertOne collectionName="collection1">
+        <mongodb:insertOne collectionName="collection1">
 
-            <ext:document>
+            <mongodb:document>
                 <!--@formatter:off-->
                 {
                     id: 1
                 }
                 <!--@formatter:on-->
-            </ext:document>
+            </mongodb:document>
 
-        </ext:insertOne>
+        </mongodb:insertOne>
 
     </changeSet>
 
     <changeSet id="3" author="alex">
         <preConditions onFail="CONTINUE" onError="HALT">
-            <ext:documentExists collectionName="collection1"/>
+            <mongodb:documentExists collectionName="collection1"/>
         </preConditions>
         <comment>Will be inserted due to existing documents</comment>
 
-        <ext:insertOne collectionName="results">
+        <mongodb:insertOne collectionName="results">
 
-            <ext:document>
+            <mongodb:document>
                 <!--@formatter:off-->
                 {
                     info: "existsAnyDocumentInCollection1"
                 }
                 <!--@formatter:on-->
-            </ext:document>
+            </mongodb:document>
 
-        </ext:insertOne>
+        </mongodb:insertOne>
 
     </changeSet>
 
     <changeSet id="4" author="alex">
         <preConditions onFail="CONTINUE" onError="HALT">
-            <ext:documentExists collectionName="collection1">
-                <ext:filter>
+            <mongodb:documentExists collectionName="collection1">
+                <mongodb:filter>
                     <!--@formatter:off-->
                     {
                         "$or" :
@@ -93,29 +93,29 @@
                             ]
                     }
                     <!--@formatter:on-->
-                </ext:filter>
-            </ext:documentExists>
+                </mongodb:filter>
+            </mongodb:documentExists>
         </preConditions>
         <comment>Will be SKIPPED due to not matching filter</comment>
 
-        <ext:insertOne collectionName="results">
+        <mongodb:insertOne collectionName="results">
 
-            <ext:document>
+            <mongodb:document>
                 <!--@formatter:off-->
                 {
                 info: "notMatchingFilterInCollection1"
                 }
                 <!--@formatter:on-->
-            </ext:document>
+            </mongodb:document>
 
-        </ext:insertOne>
+        </mongodb:insertOne>
 
     </changeSet>
 
     <changeSet id="5" author="alex">
         <preConditions onFail="CONTINUE" onError="HALT">
-            <ext:documentExists collectionName="collection1">
-                <ext:filter>
+            <mongodb:documentExists collectionName="collection1">
+                <mongodb:filter>
                     <!--@formatter:off-->
                     {
                         "$or" :
@@ -124,22 +124,22 @@
                             ]
                     }
                     <!--@formatter:on-->
-                </ext:filter>
-            </ext:documentExists>
+                </mongodb:filter>
+            </mongodb:documentExists>
         </preConditions>
         <comment>Will be inserted as filter matches</comment>
 
-        <ext:insertOne collectionName="results">
+        <mongodb:insertOne collectionName="results">
 
-            <ext:document>
+            <mongodb:document>
                 <!--@formatter:off-->
                 {
                     info: "filterMatchedInCollection1"
                 }
                 <!--@formatter:on-->
-            </ext:document>
+            </mongodb:document>
 
-        </ext:insertOne>
+        </mongodb:insertOne>
 
     </changeSet>
 
@@ -149,24 +149,24 @@
         </preConditions>
         <comment>Will be inserted as out of the box precondition met</comment>
 
-        <ext:insertOne collectionName="results">
+        <mongodb:insertOne collectionName="results">
 
-            <ext:document>
+            <mongodb:document>
                 <!--@formatter:off-->
                 {
                     info: "changeSetExecutedMatch"
                 }
                 <!--@formatter:on-->
-            </ext:document>
+            </mongodb:document>
 
-        </ext:insertOne>
+        </mongodb:insertOne>
 
     </changeSet>
     
     <changeSet id="7" author="alex">
         <preConditions onFail="CONTINUE" onError="HALT">
-            <ext:expectedDocumentCount collectionName="collection1" expectedCount="0">
-                <ext:filter>
+            <mongodb:expectedDocumentCount collectionName="collection1" expectedCount="0">
+                <mongodb:filter>
                     <!--@formatter:off-->
                     {
                         "$or" :
@@ -175,29 +175,29 @@
                             ]
                     }
                     <!--@formatter:on-->
-                </ext:filter>
-            </ext:expectedDocumentCount>
+                </mongodb:filter>
+            </mongodb:expectedDocumentCount>
         </preConditions>
         <comment>Will not be inserted as filter not matches</comment>
 
-        <ext:insertOne collectionName="results">
+        <mongodb:insertOne collectionName="results">
 
-            <ext:document>
+            <mongodb:document>
                 <!--@formatter:off-->
                 {
                     info: "expectedDocumentCountFilterNotMatchedInCollection1"
                 }
                 <!--@formatter:on-->
-            </ext:document>
+            </mongodb:document>
 
-        </ext:insertOne>
+        </mongodb:insertOne>
 
     </changeSet>
 
 	<changeSet id="8" author="alex">
         <preConditions onFail="CONTINUE" onError="HALT">
-            <ext:expectedDocumentCount collectionName="collection1" expectedCount="1">
-                <ext:filter>
+            <mongodb:expectedDocumentCount collectionName="collection1" expectedCount="1">
+                <mongodb:filter>
                     <!--@formatter:off-->
                     {
                         "$or" :
@@ -206,62 +206,62 @@
                             ]
                     }
                     <!--@formatter:on-->
-                </ext:filter>
-            </ext:expectedDocumentCount>
+                </mongodb:filter>
+            </mongodb:expectedDocumentCount>
         </preConditions>
         <comment>Will be inserted as filter matches</comment>
 
-        <ext:insertOne collectionName="results">
+        <mongodb:insertOne collectionName="results">
 
-            <ext:document>
+            <mongodb:document>
                 <!--@formatter:off-->
                 {
                     info: "expectedDocumentCountFilterMatchedInCollection1"
                 }
                 <!--@formatter:on-->
-            </ext:document>
+            </mongodb:document>
 
-        </ext:insertOne>
+        </mongodb:insertOne>
 
     </changeSet>
 
     <changeSet id="9" author="alex">
         <preConditions onFail="CONTINUE" onError="HALT">
-            <ext:collectionExists collectionName="results"/>
+            <mongodb:collectionExists collectionName="results"/>
         </preConditions>
         <comment>Will be inserted as collection exists</comment>
 
-        <ext:insertOne collectionName="results">
+        <mongodb:insertOne collectionName="results">
 
-            <ext:document>
+            <mongodb:document>
                 <!--@formatter:off-->
                 {
                     info: "expectedCollectionResultsExists"
                 }
                 <!--@formatter:on-->
-            </ext:document>
+            </mongodb:document>
 
-        </ext:insertOne>
+        </mongodb:insertOne>
 
     </changeSet>
 
     <changeSet id="10" author="alex">
         <preConditions onFail="CONTINUE" onError="HALT">
-            <ext:collectionExists collectionName="results1"/>
+            <mongodb:collectionExists collectionName="results1"/>
         </preConditions>
         <comment>Will be inserted as collection exists</comment>
 
-        <ext:insertOne collectionName="results">
+        <mongodb:insertOne collectionName="results">
 
-            <ext:document>
+            <mongodb:document>
                 <!--@formatter:off-->
                 {
                     info: "expectedCollectionResults1NotExists"
                 }
                 <!--@formatter:on-->
-            </ext:document>
+            </mongodb:document>
 
-        </ext:insertOne>
+        </mongodb:insertOne>
 
     </changeSet>
 
