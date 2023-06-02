@@ -24,8 +24,12 @@ import com.mongodb.ConnectionString;
 import com.mongodb.MongoCredential;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
+import liquibase.GlobalConfiguration;
+import liquibase.Scope;
 import liquibase.exception.DatabaseException;
+import liquibase.ext.mongodb.configuration.MongoConfiguration;
 import liquibase.ext.mongodb.statement.BsonUtils;
+import liquibase.logging.Logger;
 import liquibase.nosql.database.AbstractNoSqlConnection;
 import liquibase.util.StringUtil;
 import lombok.Getter;
@@ -49,7 +53,6 @@ import static liquibase.ext.mongodb.database.MongoLiquibaseDatabase.MONGODB_PROD
 @Setter
 @NoArgsConstructor
 public class MongoConnection extends AbstractNoSqlConnection {
-
     public static final int DEFAULT_PORT = 27017;
     public static final String MONGO_PREFIX = MONGODB_PRODUCT_SHORT_NAME + "://";
     public static final String MONGO_DNS_PREFIX = MONGODB_PRODUCT_SHORT_NAME + "+srv://";
@@ -103,7 +106,7 @@ public class MongoConnection extends AbstractNoSqlConnection {
         try {
             final String urlWithCredentials = injectCredentials(StringUtil.trimToEmpty(url), driverProperties);
 
-            this.connectionString = new ConnectionString(urlWithCredentials);
+            this.connectionString = new ConnectionString(resolveRetryWrites(urlWithCredentials));
 
             this.mongoClient = ((MongoClientDriver) driverObject).connect(connectionString);
 
@@ -117,6 +120,28 @@ public class MongoConnection extends AbstractNoSqlConnection {
             throw new DatabaseException("Could not open connection to database: "
                     + ofNullable(connectionString).map(ConnectionString::getDatabase).orElse(url), e);
         }
+    }
+
+    private String resolveRetryWrites(String url) {
+        final Logger log = Scope.getCurrentScope().getLog(getClass());
+        if (MongoConfiguration.RETRY_WRITES.getCurrentConfiguredValue().wasDefaultValueUsed()) {
+        //user didn't set retryWrites property, so no need to explicitly add default value to url as it already works like that
+            return url;
+        }
+        String retryWritesConfigValue = String.valueOf(MongoConfiguration.RETRY_WRITES.getCurrentValue());
+        if(url.contains("retryWrites")){
+            if(url.contains("retryWrites="+retryWritesConfigValue)){
+                log.info("retryWrites query param is already set to" + retryWritesConfigValue + ", no need to override it");
+            } else {
+                log.warning(String.format("overriding retryWrites query param value to '%s'", retryWritesConfigValue));
+                url = url.replaceFirst("\\bretryWrites=.*?(&|$)", "retryWrites=" + retryWritesConfigValue + "$1");
+            }
+        } else {
+            log.info("Adding retryWrites=" + retryWritesConfigValue + " to URL");
+            url+=(url.contains("?")?"&":"?") + "retryWrites="+retryWritesConfigValue;
+        }
+        return url;
+
     }
 
     private String injectCredentials(final String url, final Properties driverProperties) {
@@ -140,7 +165,7 @@ public class MongoConnection extends AbstractNoSqlConnection {
 
     private static String encode(String s) {
         try {
-            return URLEncoder.encode(s, "UTF-8");
+            return URLEncoder.encode(s, GlobalConfiguration.FILE_ENCODING.getCurrentValue().name());
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
