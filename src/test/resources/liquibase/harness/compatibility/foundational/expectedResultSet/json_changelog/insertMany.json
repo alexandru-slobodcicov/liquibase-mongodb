@@ -1,0 +1,18 @@
+{
+    "insertMany": [
+        {
+            "fileName":"liquibase\/harness\/compatibility\/foundational\/changelogs\/nosql\/insertMany.json",
+            "author":"as",
+            "description":"createCollection collectionName=countries_json",
+            "id":"1",
+            "execType":"EXECUTED"
+        },
+        {
+            "fileName":"liquibase\/harness\/compatibility\/foundational\/changelogs\/nosql\/insertMany.json",
+            "author":"as",
+            "description":"insertMany collectionName=countries_json",
+            "id":"2",
+            "execType":"EXECUTED"
+        }
+    ]
+}

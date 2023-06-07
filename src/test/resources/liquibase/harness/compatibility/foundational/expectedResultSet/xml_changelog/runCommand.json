@@ -1,0 +1,11 @@
+{
+    "runCommand": [
+        {
+            "fileName":"liquibase\/harness\/compatibility\/foundational\/changelogs\/nosql\/runCommand.xml",
+            "author":"as",
+            "description":"runCommand",
+            "id":"1",
+            "execType":"EXECUTED"
+        }
+    ]
+}

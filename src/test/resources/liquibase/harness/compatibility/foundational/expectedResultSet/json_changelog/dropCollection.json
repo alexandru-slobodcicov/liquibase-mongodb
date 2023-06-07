@@ -1,0 +1,11 @@
+{
+    "dropCollection": [
+        {
+            "fileName":"liquibase\/harness\/compatibility\/foundational\/changelogs\/nosql\/dropCollection.json",
+            "author":"as",
+            "description":"createCollection collectionName=towns_json; dropCollection collectionName=towns_json",
+            "id":"1",
+            "execType":"EXECUTED"
+        }
+    ]
+}

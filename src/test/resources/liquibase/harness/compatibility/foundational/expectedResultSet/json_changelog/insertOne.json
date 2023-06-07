@@ -1,0 +1,18 @@
+{
+    "insertOne": [
+        {
+            "fileName":"liquibase\/harness\/compatibility\/foundational\/changelogs\/nosql\/insertOne.json",
+            "author":"as",
+            "description":"createCollection collectionName=towns_json",
+            "id":"1",
+            "execType":"EXECUTED"
+        },
+        {
+            "fileName":"liquibase\/harness\/compatibility\/foundational\/changelogs\/nosql\/insertOne.json",
+            "author":"as",
+            "description":"insertOne collectionName=towns_json",
+            "id":"2",
+            "execType":"EXECUTED"
+        }
+    ]
+}

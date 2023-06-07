@@ -1,0 +1,25 @@
+{
+    "dropIndex": [
+        {
+            "fileName":"liquibase\/harness\/compatibility\/foundational\/changelogs\/nosql\/dropIndex.xml",
+            "author":"as",
+            "description":"createCollection collectionName=countries",
+            "id":"1",
+            "execType":"EXECUTED"
+        },
+        {
+            "fileName":"liquibase\/harness\/compatibility\/foundational\/changelogs\/nosql\/dropIndex.xml",
+            "author":"as",
+            "description":"insertMany collectionName=countries",
+            "id":"2",
+            "execType":"EXECUTED"
+        },
+        {
+            "fileName":"liquibase\/harness\/compatibility\/foundational\/changelogs\/nosql\/dropIndex.xml",
+            "author":"as",
+            "description":"createIndex collectionName=countries; dropIndex collectionName=countries",
+            "id":"3",
+            "execType":"EXECUTED"
+        }
+    ]
+}

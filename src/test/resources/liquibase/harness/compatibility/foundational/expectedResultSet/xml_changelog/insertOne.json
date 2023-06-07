@@ -1,0 +1,23 @@
+{
+    "insertOne": [
+        {
+            "fileName":"liquibase\/harness\/compatibility\/foundational\/changelogs\/nosql\/insertOne.xml",
+            "comments":"create_collection_comment",
+            "author":"as",
+            "description":"createCollection collectionName=towns",
+            "contexts":"createCollectionContext",
+            "labels":"createcollectionlabel",
+            "id":"1",
+            "execType":"EXECUTED"
+        },
+        {
+            "fileName":"liquibase\/harness\/compatibility\/foundational\/changelogs\/nosql\/insertOne.xml",
+            "author":"as",
+            "description":"insertOne collectionName=towns",
+            "contexts":"insertOneContext",
+            "labels":"insertonelabel",
+            "id":"2",
+            "execType":"EXECUTED"
+        }
+    ]
+}
