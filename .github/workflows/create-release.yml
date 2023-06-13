@@ -38,6 +38,10 @@ jobs:
           echo "Saw Liquibase version ${{ steps.collect-data.outputs.liquibaseVersion }}"
           echo "Saw Extension version ${{ steps.collect-data.outputs.extensionVersion }}"
 
+  update-version:
+    uses: liquibase/build-logic/.github/workflows/extension-update-version.yml@v0.3.2
+    secrets: inherit
+
   build:
     name: "Build and Test"
     runs-on: ubuntu-latest
@@ -62,11 +66,6 @@ jobs:
           java-version: '8'
           distribution: 'adopt'
 
-      - name: Configure git user
-        run: |
-          git config user.name "liquibot"
-          git config user.email "liquibot@liquibase.org"
-
       - name: Download and install liquibase-core.jar
         uses: dsaltares/fetch-gh-release-asset@master
         with:
@@ -78,24 +77,6 @@ jobs:
 
       - name: Install liquibase-core.jar
         run: mvn -B org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=liquibase-core.jar
-
-      - name: Update pom.xml with release versions and commit changes
-        run: |
-          mvn -B versions:set -DnewVersion=${{ needs.setup.outputs.extensionVersion }} -DallowSnapshots=false -DoldVersion="*"
-          mvn -B versions:use-dep-version -Dincludes=org.liquibase:liquibase-core -DdepVersion=${{ needs.setup.outputs.liquibaseVersion }} -DforceVersion=true
-
-          git add pom.xml
-          if git diff-index --cached --quiet HEAD --
-          then
-            echo "Nothing new to commit"
-          else
-            git commit -m "Version Bumped to ${{ needs.setup.outputs.extensionVersion }}"
-          fi
-          git tag -a -m "Version Bumped to ${{ needs.setup.outputs.extensionVersion }}" liquibase-mongodb-${{ needs.setup.outputs.extensionVersion }}
-          git push "https://liquibot:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git" HEAD:${{ github.ref }} --follow-tags --tags
-
-        env:
-          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
 
       - name: Get release SHA
         id: get-release-sha
