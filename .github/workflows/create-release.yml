@@ -101,7 +101,7 @@ jobs:
             target/*.jar
 
   draft-release:
-    needs: [ setup, build, integration-tests, release-prepare ]
+    needs: [ setup, build, release-prepare ]
     name: Draft Release
     runs-on: ubuntu-latest
     steps:
@@ -125,13 +125,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-perform:
-    needs: [ setup, release-prepare, build, integration-tests, draft-release ]
+    needs: [ setup, release-prepare, build, draft-release ]
     if: ${{ success() }}
     uses: liquibase/build-logic/.github/workflows/extension-release-perform.yml@v0.3.2
     secrets: inherit
 
   release-rollback:
-    needs: [ setup, release-prepare, build, integration-tests, draft-release ]
+    needs: [ setup, release-prepare, build, draft-release ]
     if: ${{ failure() }}
     uses: liquibase/build-logic/.github/workflows/extension-release-rollback.yml@v0.3.2
     secrets: inherit
