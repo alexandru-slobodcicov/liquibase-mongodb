@@ -39,10 +39,7 @@ jobs:
           echo "Saw Extension version ${{ steps.collect-data.outputs.extensionVersion }}"
 
   release-prepare:
-    uses: liquibase/build-logic/.github/workflows/extension-update-version.yml@v0.3.2
-    with:
-      perform-release: false
-      perform-rollback: false
+    uses: liquibase/build-logic/.github/workflows/extension-release-prepare.yml@v0.3.2
     secrets: inherit
 
   build:
@@ -154,17 +151,11 @@ jobs:
   release-perform:
     needs: [ setup, release-prepare, build, integration-tests, draft-release ]
     if: ${{ success() }}
-    uses: liquibase/build-logic/.github/workflows/extension-update-version.yml@v0.3.2
-    with:
-      perform-release: true
-      perform-rollback: false
+    uses: liquibase/build-logic/.github/workflows/extension-release-perform.yml@v0.3.2
     secrets: inherit
 
   release-rollback:
     needs: [ setup, release-prepare, build, integration-tests, draft-release ]
     if: ${{ failure() }}
-    uses: liquibase/build-logic/.github/workflows/extension-update-version.yml@v0.3.2
-    with:
-      perform-release: false
-      perform-rollback: true
+    uses: liquibase/build-logic/.github/workflows/extension-release-rollback.yml@v0.3.2
     secrets: inherit
