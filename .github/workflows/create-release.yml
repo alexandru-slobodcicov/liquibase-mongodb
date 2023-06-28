@@ -38,10 +38,14 @@ jobs:
           echo "Saw Liquibase version ${{ steps.collect-data.outputs.liquibaseVersion }}"
           echo "Saw Extension version ${{ steps.collect-data.outputs.extensionVersion }}"
 
+  release-prepare:
+    uses: liquibase/build-logic/.github/workflows/extension-release-prepare.yml@v0.3.2
+    secrets: inherit
+
   build:
     name: "Build and Test"
     runs-on: ubuntu-latest
-    needs: setup
+    needs: [ setup, release-prepare]
     outputs:
       releaseSha: ${{ steps.get-release-sha.outputs.releaseSha }}
     steps:
@@ -95,10 +99,6 @@ jobs:
           name: liquibase-mongodb
           path: |
             target/*.jar
-
-  release-prepare:
-    uses: liquibase/build-logic/.github/workflows/extension-release-prepare.yml@v0.3.2
-    secrets: inherit
 
   draft-release:
     needs: [ setup, build, release-prepare ]
