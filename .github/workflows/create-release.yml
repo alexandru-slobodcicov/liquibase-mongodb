@@ -106,7 +106,7 @@ jobs:
           path: |
             target/*.jar
             pom.xml
-            
+
   integration-tests:
     name: Java ${{ matrix.java }}
     runs-on: ubuntu-latest
@@ -132,7 +132,7 @@ jobs:
         run: mvn clean verify -Prun-its --file pom.xml
 
   draft-release:
-    needs: [ setup, build, release-prepare ]
+    needs: [ setup, build, integration-tests, release-prepare ]
     name: Draft Release
     runs-on: ubuntu-latest
     steps:
@@ -156,7 +156,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release-rollback:
-    needs: [ setup, release-prepare, build, draft-release ]
+    needs: [ setup, release-prepare, build, integration-tests, draft-release ]
     if: ${{ failure() }}
     uses: liquibase/build-logic/.github/workflows/extension-release-rollback.yml@v0.3.2
     secrets: inherit
