@@ -21,8 +21,20 @@ jobs:
             gpg-private-key: ${{ secrets.GPG_SECRET }}
             gpg-passphrase: GPG_PASSPHRASE
 
+        - name: Download artifact
+          id: download-artifact
+          uses: dawidd6/action-download-artifact@v2
+          with:
+            github_token: ${{secrets.BOT_TOKEN}}
+            workflow: create-release.yml
+            name: release-files
+            check_artifacts: true
+            skip_unpack: false
+            if_no_artifact_found: fail
+            workflow_conclusion: ""
+
         - name: Publish to the Maven Central Repository
-          run: mvn clean deploy -Dmaven.test.skip -P release
+          run: mvn clean deploy:deploy-file -Dfile=${{ github.event.release.tag_name}} -Dmaven.test.skip -DgeneratePom=false -DrepositoryId=sonatype-nexus-staging -Dulr=file:../local_repo/snapshot -P release
           env:
             MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
             MAVEN_PASSWORD: ${{ secrets.SONATYPE_TOKEN }}

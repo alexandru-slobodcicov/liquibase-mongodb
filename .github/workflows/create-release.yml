@@ -100,7 +100,6 @@ jobs:
     uses: liquibase/build-logic/.github/workflows/extension-release-prepare.yml@v0.3.2
     secrets: inherit
 
-    
   draft-release:
     needs: [ setup, build, release-prepare ]
     name: Draft Release

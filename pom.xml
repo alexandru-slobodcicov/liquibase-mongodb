@@ -350,12 +350,12 @@
         <repository>
             <id>sonatype-nexus-staging</id>
             <name>Nexus Release Repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+            <url>file:../local_repo/snapshot</url>
         </repository>
         <snapshotRepository>
             <id>sonatype-nexus-staging</id>
             <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>file:../local_repo/snapshot</url>
         </snapshotRepository>
     </distributionManagement>
 
