@@ -105,6 +105,7 @@ jobs:
           name: liquibase-mongodb
           path: |
             target/*.jar
+            pom.xml
 
   draft-release:
     needs: [ setup, build, release-prepare ]
