@@ -82,3 +82,5 @@ jobs:
                 sed -ie "s/<\/ul>/  <li><a href=\"\/xml\/ns\/mongodb\/${entry}\">${entry}<\/a><\/li>\n<\/ul>/" index-file/index.htm
               fi
             done
+            
+            aws s3 sync index-file s3://liquibaseorg-origin/xml/ns/mongodb/ --only-show-errors
