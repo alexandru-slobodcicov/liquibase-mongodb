@@ -21,6 +21,7 @@ package liquibase.ext.mongodb.changelog;
  */
 
 import liquibase.ChecksumVersion;
+import liquibase.Scope;
 import liquibase.change.CheckSum;
 import liquibase.changelog.ChangeLogHistoryServiceFactory;
 import liquibase.changelog.ChangeSet;
@@ -105,7 +106,7 @@ class MongoHistoryServiceIT extends AbstractMongoIntegrationTest {
     @BeforeEach
     protected void setUpEach() {
         super.setUpEach();
-        historyService = (MongoHistoryService) ChangeLogHistoryServiceFactory.getInstance().getChangeLogService(database);
+        historyService = (MongoHistoryService) Scope.getCurrentScope().getSingleton(ChangeLogHistoryServiceFactory.class).getChangeLogService(database);
         historyService.reset();
         historyService.resetDeploymentId();
     }

@@ -165,7 +165,7 @@ public class NoSqlExecutor extends AbstractExecutor {
         if(updateStatement.getNewColumnValues().containsKey("MD5SUM")
                 && updateStatement.getNewColumnValues().get("MD5SUM") == null) {
             try {
-                ChangeLogHistoryServiceFactory.getInstance()
+                Scope.getCurrentScope().getSingleton(ChangeLogHistoryServiceFactory.class)
                         .getChangeLogService(getDatabase()).clearAllCheckSums();
             } catch (final Exception e) {
                 throw new DatabaseException("Could not execute", e);

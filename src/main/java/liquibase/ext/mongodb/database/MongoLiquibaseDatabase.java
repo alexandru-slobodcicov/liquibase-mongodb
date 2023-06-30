@@ -24,7 +24,6 @@ import com.mongodb.client.MongoDatabase;
 import liquibase.CatalogAndSchema;
 import liquibase.Scope;
 import liquibase.changelog.ChangeLogHistoryServiceFactory;
-import liquibase.configuration.LiquibaseConfiguration;
 import liquibase.exception.LiquibaseException;
 import liquibase.executor.Executor;
 import liquibase.executor.ExecutorService;
@@ -54,7 +53,7 @@ public class MongoLiquibaseDatabase extends AbstractNoSqlDatabase {
         final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor(EXECUTOR_NAME, this);
         DropAllCollectionsStatement dropAllCollectionsStatement = new DropAllCollectionsStatement();
         executor.execute(dropAllCollectionsStatement);
-        ChangeLogHistoryServiceFactory.getInstance().getChangeLogService(this).destroy();
+        Scope.getCurrentScope().getSingleton(ChangeLogHistoryServiceFactory.class).getChangeLogService(this).destroy();
     }
 
     @Override
