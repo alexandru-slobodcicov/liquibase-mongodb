@@ -1,12 +1,7 @@
 package liquibase.ext.mongodb.changelog;
 
-import liquibase.ContextExpression;
-import liquibase.Contexts;
-import liquibase.LabelExpression;
-import liquibase.Labels;
 import liquibase.change.CheckSum;
 import liquibase.changelog.ChangeSet;
-import liquibase.ext.mongodb.statement.InsertOneStatement;
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +9,6 @@ import java.util.Arrays;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class MongoRanChangeSetToDocumentConverterTest {
 
@@ -36,7 +30,7 @@ class MongoRanChangeSetToDocumentConverterTest {
                 .append("dateExecuted", dateExecuted)
                 .append("orderExecuted", 100)
                 .append("execType", "EXECUTED")
-                .append("md5sum", "8:c3981fa8d26e95d911fe8eaeb6570f2f")
+                .append("md5sum", "9:c3981fa8d26e95d911fe8eaeb6570f2f")
                 .append("description", "The Description")
                 .append("comments", "The Comments")
                 .append("tag", "Tags")

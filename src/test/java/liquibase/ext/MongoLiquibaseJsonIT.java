@@ -68,7 +68,7 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
                 .filteredOn(c -> c.getId().equals("1")).hasSize(1).first()
                 .returns("liquibase/ext/json/generic-1-insert-people.json", RanChangeSet::getChangeLog)
                 .returns("Alex", RanChangeSet::getAuthor)
-                .returns(CheckSum.parse("8:6b06a10d8faf0a516c7f4a77f76041f2"), RanChangeSet::getLastCheckSum)
+                .returns(CheckSum.parse("9:6b06a10d8faf0a516c7f4a77f76041f2"), RanChangeSet::getLastCheckSum)
                 .returns(true, c -> nonNull(c.getDateExecuted()))
                 .returns(null, RanChangeSet::getTag)
                 .returns(ChangeSet.ExecType.EXECUTED, RanChangeSet::getExecType)
@@ -84,7 +84,7 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
                 .filteredOn(c -> c.getId().equals("2")).hasSize(1).first()
                 .returns("liquibase/ext/json/generic-1-insert-people.json", RanChangeSet::getChangeLog)
                 .returns("Nick", RanChangeSet::getAuthor)
-                .returns(CheckSum.parse("8:3da23c9b02c5297da06ca10d41c783aa"), RanChangeSet::getLastCheckSum)
+                .returns(CheckSum.parse("9:3da23c9b02c5297da06ca10d41c783aa"), RanChangeSet::getLastCheckSum)
                 .returns(true, c -> nonNull(c.getDateExecuted()))
                 .returns(null, RanChangeSet::getTag)
                 .returns(ChangeSet.ExecType.EXECUTED, RanChangeSet::getExecType)
@@ -108,7 +108,7 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
                 .filteredOn(c -> c.getId().equals("1")).hasSize(1).first()
                 .returns("liquibase/ext/json/generic-1-insert-people.json", RanChangeSet::getChangeLog)
                 .returns("Alex", RanChangeSet::getAuthor)
-                .returns(CheckSum.parse("8:6b06a10d8faf0a516c7f4a77f76041f2"), RanChangeSet::getLastCheckSum)
+                .returns(CheckSum.parse("9:6b06a10d8faf0a516c7f4a77f76041f2"), RanChangeSet::getLastCheckSum)
                 .returns(true, c -> nonNull(c.getDateExecuted()))
                 .returns(null, RanChangeSet::getTag)
                 .returns(ChangeSet.ExecType.EXECUTED, RanChangeSet::getExecType)
@@ -124,7 +124,7 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
                 .filteredOn(c -> c.getId().equals("2")).hasSize(1).first()
                 .returns("liquibase/ext/json/generic-1-insert-people.json", RanChangeSet::getChangeLog)
                 .returns("Nick", RanChangeSet::getAuthor)
-                .returns(CheckSum.parse("8:3da23c9b02c5297da06ca10d41c783aa"), RanChangeSet::getLastCheckSum)
+                .returns(CheckSum.parse("9:3da23c9b02c5297da06ca10d41c783aa"), RanChangeSet::getLastCheckSum)
                 .returns(true, c -> nonNull(c.getDateExecuted()))
                 .returns(null, RanChangeSet::getTag)
                 .returns(ChangeSet.ExecType.EXECUTED, RanChangeSet::getExecType)
@@ -147,8 +147,8 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
         assertThat(changeSets).hasSize(2)
                 .extracting(MongoRanChangeSet::getId, MongoRanChangeSet::getOrderExecuted, MongoRanChangeSet::getLastCheckSum)
                 .containsExactly(
-                        tuple("1", 1, CheckSum.parse("8:6b06a10d8faf0a516c7f4a77f76041f2")),
-                        tuple("2", 2, CheckSum.parse("8:3da23c9b02c5297da06ca10d41c783aa")));
+                        tuple("1", 1, CheckSum.parse("9:6b06a10d8faf0a516c7f4a77f76041f2")),
+                        tuple("2", 2, CheckSum.parse("9:3da23c9b02c5297da06ca10d41c783aa")));
 
         List<Document> documents = new FindAllStatement("person").queryForList(database);
         assertThat(documents).hasSize(3)
@@ -166,10 +166,10 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
         assertThat(changeSets).hasSize(4)
                 .extracting(MongoRanChangeSet::getId, MongoRanChangeSet::getOrderExecuted, MongoRanChangeSet::getLastCheckSum)
                 .containsExactly(
-                        tuple("1", 1, CheckSum.parse("8:6b06a10d8faf0a516c7f4a77f76041f2")),
-                        tuple("2", 2, CheckSum.parse("8:3da23c9b02c5297da06ca10d41c783aa")),
-                        tuple("1", 3, CheckSum.parse("8:0b178dc8f84a4e1464860edad456c290")),
-                        tuple("2", 4, CheckSum.parse("8:f7596d3e6bddd4dbbbe29439351bc640")));
+                        tuple("1", 1, CheckSum.parse("9:6b06a10d8faf0a516c7f4a77f76041f2")),
+                        tuple("2", 2, CheckSum.parse("9:3da23c9b02c5297da06ca10d41c783aa")),
+                        tuple("1", 3, CheckSum.parse("9:0b178dc8f84a4e1464860edad456c290")),
+                        tuple("2", 4, CheckSum.parse("9:f7596d3e6bddd4dbbbe29439351bc640")));
 
         documents = new FindAllStatement("person").queryForList(database);
         assertThat(documents).hasSize(2)

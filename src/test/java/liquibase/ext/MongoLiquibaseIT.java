@@ -78,9 +78,9 @@ class MongoLiquibaseIT extends AbstractMongoIntegrationTest {
         assertThat(changeSets).hasSize(3)
                 .extracting(MongoRanChangeSet::getId, MongoRanChangeSet::getOrderExecuted, MongoRanChangeSet::getLastCheckSum)
                 .containsExactly(
-                        tuple("1", 1, CheckSum.parse("8:4e072f0d1a237e4e98b5edac60c3f335")),
-                        tuple("2", 2, CheckSum.parse("8:e504f1757d0460c82b54b702794b8cf7")),
-                        tuple("3", 3, CheckSum.parse("8:4eff4f9e1b017ccce8da57f3c8125f13")));
+                        tuple("1", 1, CheckSum.parse("9:4e072f0d1a237e4e98b5edac60c3f335")),
+                        tuple("2", 2, CheckSum.parse("9:e504f1757d0460c82b54b702794b8cf7")),
+                        tuple("3", 3, CheckSum.parse("9:4eff4f9e1b017ccce8da57f3c8125f13")));
 
         // Clear checksums
         liquibase.clearCheckSums();
@@ -99,9 +99,9 @@ class MongoLiquibaseIT extends AbstractMongoIntegrationTest {
         assertThat(changeSets).hasSize(3)
                 .extracting(MongoRanChangeSet::getId, MongoRanChangeSet::getOrderExecuted, MongoRanChangeSet::getLastCheckSum)
                 .containsExactly(
-                        tuple("1", 1, CheckSum.parse("8:4e072f0d1a237e4e98b5edac60c3f335")),
-                        tuple("2", 2, CheckSum.parse("8:e504f1757d0460c82b54b702794b8cf7")),
-                        tuple("3", 3, CheckSum.parse("8:4eff4f9e1b017ccce8da57f3c8125f13")));
+                        tuple("1", 1, CheckSum.parse("9:4e072f0d1a237e4e98b5edac60c3f335")),
+                        tuple("2", 2, CheckSum.parse("9:e504f1757d0460c82b54b702794b8cf7")),
+                        tuple("3", 3, CheckSum.parse("9:4eff4f9e1b017ccce8da57f3c8125f13")));
     }
 
     @SneakyThrows
@@ -253,16 +253,16 @@ class MongoLiquibaseIT extends AbstractMongoIntegrationTest {
         assertThat(changeSets).hasSize(10)
                 .extracting(MongoRanChangeSet::getId, MongoRanChangeSet::getOrderExecuted, MongoRanChangeSet::getExecType, MongoRanChangeSet::getLastCheckSum)
                 .containsExactly(
-                        tuple("1", 1, SKIPPED, CheckSum.parse("8:025f868444aa99ff8238b3aeb8348fe0")),
-                        tuple("2", 2, EXECUTED, CheckSum.parse("8:517a149b6d344ba6859c016767c0b8d1")),
-                        tuple("3", 3, EXECUTED, CheckSum.parse("8:02aeacdd13ced7e88bd8a6373832e69c")),
-                        tuple("4", 4, SKIPPED, CheckSum.parse("8:54a251bbf203b3523eef2abf23a8f78d")),
-                        tuple("5", 5, EXECUTED, CheckSum.parse("8:d3c5dd6de42b559b7b1086012b5b38b9")),
-                        tuple("6", 6, EXECUTED, CheckSum.parse("8:5fe0e992687d479011653c2bc8d3d10f")),
-                        tuple("7", 7, SKIPPED, CheckSum.parse("8:c5876904ee5ebcc255f25d6ae100b3f5")),
-                        tuple("8", 8, EXECUTED, CheckSum.parse("8:253b4eb9514ddca767da8da818992fb1")),
-                        tuple("9", 9, EXECUTED, CheckSum.parse("8:7814f3ccf6a3132bd0473e1fe29394a3")),
-                        tuple("10", 10, SKIPPED, CheckSum.parse("8:6e91149e36cdaecf7e919312556e0e6b"))
+                        tuple("1", 1, SKIPPED, CheckSum.parse("9:025f868444aa99ff8238b3aeb8348fe0")),
+                        tuple("2", 2, EXECUTED, CheckSum.parse("9:517a149b6d344ba6859c016767c0b8d1")),
+                        tuple("3", 3, EXECUTED, CheckSum.parse("9:02aeacdd13ced7e88bd8a6373832e69c")),
+                        tuple("4", 4, SKIPPED, CheckSum.parse("9:54a251bbf203b3523eef2abf23a8f78d")),
+                        tuple("5", 5, EXECUTED, CheckSum.parse("9:d3c5dd6de42b559b7b1086012b5b38b9")),
+                        tuple("6", 6, EXECUTED, CheckSum.parse("9:5fe0e992687d479011653c2bc8d3d10f")),
+                        tuple("7", 7, SKIPPED, CheckSum.parse("9:c5876904ee5ebcc255f25d6ae100b3f5")),
+                        tuple("8", 8, EXECUTED, CheckSum.parse("9:253b4eb9514ddca767da8da818992fb1")),
+                        tuple("9", 9, EXECUTED, CheckSum.parse("9:7814f3ccf6a3132bd0473e1fe29394a3")),
+                        tuple("10", 10, SKIPPED, CheckSum.parse("9:6e91149e36cdaecf7e919312556e0e6b"))
                 );
 
         assertThat(getCollections(connection))
