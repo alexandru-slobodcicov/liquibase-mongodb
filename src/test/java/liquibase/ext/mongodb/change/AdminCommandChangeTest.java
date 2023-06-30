@@ -20,6 +20,7 @@ package liquibase.ext.mongodb.change;
  * #L%
  */
 
+import liquibase.ChecksumVersion;
 import liquibase.change.CheckSum;
 import liquibase.changelog.ChangeSet;
 import liquibase.ext.mongodb.statement.AdminCommandStatement;
@@ -41,15 +42,14 @@ class AdminCommandChangeTest extends AbstractMongoChangeTest {
         assertThat(new AdminCommandChange().getConfirmationMessage()).isEqualTo("Admin Command run");
     }
 
-//    @Test
+    @Test
     @SneakyThrows
     void generateStatements() {
         final List<ChangeSet> changeSets = getChangesets("liquibase/ext/changelog.admin-command.test.xml", database);
-
-        assertThat(changeSets).hasSize(2).extracting(ChangeSet::getAuthor, ChangeSet::getId, ChangeSet::generateCheckSum)
+        assertThat(changeSets).hasSize(2).extracting(ChangeSet::getAuthor, ChangeSet::getId, changeSet -> changeSet.generateCheckSum(ChecksumVersion.latest()))
                 .containsExactly(
-                        tuple("alex", "1", CheckSum.parse("8:e17342ecb217a7588eb1d33af4fadff4")),
-                        tuple("alex", "2", CheckSum.parse("8:b961faf376a802b74abeba3a54b34045"))
+                        tuple("alex", "1", CheckSum.parse("9:589527b47d13e0034c4860bbe0a742e6")),
+                        tuple("alex", "2", CheckSum.parse("9:1140b6605ecab8cf5cc6032bacc70f4b"))
                 );
 
         assertThat(changeSets.get(0).getChanges())

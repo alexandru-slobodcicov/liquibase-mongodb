@@ -20,6 +20,7 @@ package liquibase.ext.mongodb.change;
  * #L%
  */
 
+import liquibase.ChecksumVersion;
 import liquibase.changelog.ChangeSet;
 import liquibase.ext.mongodb.statement.CreateCollectionStatement;
 import liquibase.ext.mongodb.statement.DropCollectionStatement;
@@ -61,7 +62,7 @@ class CreateCollectionChangeTest extends AbstractMongoChangeTest {
                 .isNotNull()
                 .hasSize(1)
                 .first()
-                .returns("8:9613cffe7f07a1310ed2b6a47efb92c8", s -> s.generateCheckSum().toString());
+                .returns("9:ada06701e2890846393245c7b45d11b9", changeSet -> changeSet.generateCheckSum(ChecksumVersion.latest()).toString());
 
         assertThat(changeSets.get(0).getChanges())
                 .hasSize(3)
