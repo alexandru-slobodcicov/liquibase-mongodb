@@ -33,12 +33,13 @@ jobs:
         run: |
           PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^)
           echo "name=previous_tag::$PREVIOUS_TAG" >> GITHUB_OUTPUT
+          echo $GITHUB_OUTPUT
 
-      - name: Run Release Drafter
-        uses: release-drafter/release-drafter@v5
-        env:
-          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
-        with:
-          config-path: .github/release-drafter.yml
-          name-template: "v${{ steps.prev_tag.outputs.previous_tag }}"    
+      # - name: Run Release Drafter
+      #   uses: release-drafter/release-drafter@v5
+      #   env:
+      #     GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+      #   with:
+      #     config-path: .github/release-drafter.yml
+      #     name-template: "v${{ steps.prev_tag.outputs.previous_tag }}"    
     
