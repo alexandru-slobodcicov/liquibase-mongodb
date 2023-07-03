@@ -25,6 +25,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/checkout@v2
+      - run: git fetch --prune --unshallow
+      
       #  Get the $PREVIOUS_TAG for release-drafter job in .github/release-drafter.yml
       - name: Get previous tag
         id: prev_tag
