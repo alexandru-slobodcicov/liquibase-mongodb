@@ -50,6 +50,19 @@ jobs:
     outputs:
       releaseSha: ${{ steps.get-release-sha.outputs.releaseSha }}
     steps:
+      #  Get the $PREVIOUS_TAG for release-drafter job in .github/release-drafter.yml
+      - name: Get previous tag
+        id: prev_tag
+        run: |
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^)
+          echo "::set-output name=previous_tag::$PREVIOUS_TAG"
+
+      - name: Run Release Drafter
+        uses: release-drafter/release-drafter@v7
+        with:
+          config-path: .github/release-drafter.yml
+          name-template: "v${{ steps.prev_tag.outputs.previous_tag }}"    
+
       - uses: actions/checkout@v2
         with:
           persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
