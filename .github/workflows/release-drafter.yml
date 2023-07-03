@@ -32,8 +32,8 @@ jobs:
         id: prev_tag
         run: |
           PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^)
-          echo "name=previous_tag::$PREVIOUS_TAG" >> GITHUB_OUTPUT
-          echo $GITHUB_OUTPUT
+          echo "::set-output name=previous_tag::$PREVIOUS_TAG"
+          echo "Previous Tag: $PREVIOUS_TAG"
 
       # - name: Run Release Drafter
       #   uses: release-drafter/release-drafter@v5
