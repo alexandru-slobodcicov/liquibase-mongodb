@@ -34,6 +34,7 @@ import liquibase.nosql.statement.*;
 import liquibase.servicelocator.LiquibaseService;
 import liquibase.sql.visitor.SqlVisitor;
 import liquibase.statement.SqlStatement;
+import liquibase.statement.core.UpdateChangeSetChecksumStatement;
 import liquibase.statement.core.UpdateStatement;
 import lombok.NoArgsConstructor;
 
@@ -190,6 +191,8 @@ public class NoSqlExecutor extends AbstractExecutor {
             }
         } else if (sql instanceof UpdateStatement) {
             execute((UpdateStatement) sql);
+        } else if (sql instanceof UpdateChangeSetChecksumStatement) {
+            // TODO implement Update Checksum mechanism
         } else {
             throw new DatabaseException("liquibase-mongodb extension cannot execute changeset \n" +
                     "Unknown type: " + sql.getClass().getName() +
