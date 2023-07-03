@@ -33,7 +33,7 @@ jobs:
           echo "::set-output name=previous_tag::$PREVIOUS_TAG"
 
       - name: Run Release Drafter
-        uses: release-drafter/release-drafter@v7
+        uses: release-drafter/release-drafter@v5
         with:
           config-path: .github/release-drafter.yml
           name-template: "v${{ steps.prev_tag.outputs.previous_tag }}"    
