@@ -46,6 +46,8 @@ version-resolver:
   default: patch
 template: |
   ## Changes
+  
+  $CHANGES
+
   **Full Changelog**: https://github.com/liquibase/liquibase-mongodb/compare/liquibase-mongodb-$PREVIOUS_TAG...liquibase-mongodb-$RESOLVED_VERSION
 
-  $CHANGES
