@@ -48,5 +48,4 @@ template: |
   ## Changes
   **Full Changelog**: https://github.com/liquibase/liquibase-mongodb/compare/liquibase-mongodb-$PREVIOUS_TAG...liquibase-mongodb-$RESOLVED_VERSION
 
-  $PREVIOUS_TAG
   $CHANGES

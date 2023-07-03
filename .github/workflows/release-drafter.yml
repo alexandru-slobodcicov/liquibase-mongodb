@@ -23,14 +23,3 @@ jobs:
       - uses: release-drafter/release-drafter@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: actions/checkout@v2
-      - run: git fetch --prune --unshallow
-
-      # #  Get the $PREVIOUS_TAG for release-drafter job in .github/release-drafter.yml
-      # - name: Get previous tag
-      #   id: prev_tag
-      #   run: |
-      #     PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^)
-      #     echo "::set-output name=previous_tag::$PREVIOUS_TAG"
-      #     echo "Previous Tag: $PREVIOUS_TAG"
