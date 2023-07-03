@@ -1,5 +1,5 @@
 
-name-template: 'Support for Liquibase v$RESOLVED_VERSION \n **Full Changelog**: https://github.com/liquibase/liquibase-mongodb/compare/liquibase-mongodb-$PREVIOUS_TAG...liquibase-mongodb-$RESOLVED_VERSION'
+name-template: 'Support for Liquibase v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
 exclude-labels:
   - 'skipReleaseNotes'
@@ -46,5 +46,6 @@ version-resolver:
   default: patch
 template: |
   ## Changes
-
+  **Full Changelog**: https://github.com/liquibase/liquibase-mongodb/compare/liquibase-mongodb-$PREVIOUS_TAG...liquibase-mongodb-$RESOLVED_VERSION
+  
   $CHANGES
