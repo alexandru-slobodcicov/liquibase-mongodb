@@ -24,7 +24,7 @@ import liquibase.Liquibase;
 import liquibase.change.CheckSum;
 import liquibase.changelog.ChangeSet;
 import liquibase.changelog.RanChangeSet;
-import liquibase.exception.RollbackFailedException;
+import liquibase.exception.CommandExecutionException;
 import liquibase.ext.mongodb.changelog.MongoRanChangeSet;
 import liquibase.ext.mongodb.changelog.MongoRanChangeSetToDocumentConverter;
 import liquibase.ext.mongodb.statement.FindAllStatement;
@@ -68,7 +68,7 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
                 .filteredOn(c -> c.getId().equals("1")).hasSize(1).first()
                 .returns("liquibase/ext/json/generic-1-insert-people.json", RanChangeSet::getChangeLog)
                 .returns("Alex", RanChangeSet::getAuthor)
-                .returns(CheckSum.parse("9:6b06a10d8faf0a516c7f4a77f76041f2"), RanChangeSet::getLastCheckSum)
+                .returns(CheckSum.parse("9:26cdcf268d7947186164df2b3e5691d7"), RanChangeSet::getLastCheckSum)
                 .returns(true, c -> nonNull(c.getDateExecuted()))
                 .returns(null, RanChangeSet::getTag)
                 .returns(ChangeSet.ExecType.EXECUTED, RanChangeSet::getExecType)
@@ -84,7 +84,7 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
                 .filteredOn(c -> c.getId().equals("2")).hasSize(1).first()
                 .returns("liquibase/ext/json/generic-1-insert-people.json", RanChangeSet::getChangeLog)
                 .returns("Nick", RanChangeSet::getAuthor)
-                .returns(CheckSum.parse("9:3da23c9b02c5297da06ca10d41c783aa"), RanChangeSet::getLastCheckSum)
+                .returns(CheckSum.parse("9:3a5250595e3b5a2f373b0d05212894bb"), RanChangeSet::getLastCheckSum)
                 .returns(true, c -> nonNull(c.getDateExecuted()))
                 .returns(null, RanChangeSet::getTag)
                 .returns(ChangeSet.ExecType.EXECUTED, RanChangeSet::getExecType)
@@ -108,7 +108,7 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
                 .filteredOn(c -> c.getId().equals("1")).hasSize(1).first()
                 .returns("liquibase/ext/json/generic-1-insert-people.json", RanChangeSet::getChangeLog)
                 .returns("Alex", RanChangeSet::getAuthor)
-                .returns(CheckSum.parse("9:6b06a10d8faf0a516c7f4a77f76041f2"), RanChangeSet::getLastCheckSum)
+                .returns(CheckSum.parse("9:26cdcf268d7947186164df2b3e5691d7"), RanChangeSet::getLastCheckSum)
                 .returns(true, c -> nonNull(c.getDateExecuted()))
                 .returns(null, RanChangeSet::getTag)
                 .returns(ChangeSet.ExecType.EXECUTED, RanChangeSet::getExecType)
@@ -124,7 +124,7 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
                 .filteredOn(c -> c.getId().equals("2")).hasSize(1).first()
                 .returns("liquibase/ext/json/generic-1-insert-people.json", RanChangeSet::getChangeLog)
                 .returns("Nick", RanChangeSet::getAuthor)
-                .returns(CheckSum.parse("9:3da23c9b02c5297da06ca10d41c783aa"), RanChangeSet::getLastCheckSum)
+                .returns(CheckSum.parse("9:3a5250595e3b5a2f373b0d05212894bb"), RanChangeSet::getLastCheckSum)
                 .returns(true, c -> nonNull(c.getDateExecuted()))
                 .returns(null, RanChangeSet::getTag)
                 .returns(ChangeSet.ExecType.EXECUTED, RanChangeSet::getExecType)
@@ -147,8 +147,8 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
         assertThat(changeSets).hasSize(2)
                 .extracting(MongoRanChangeSet::getId, MongoRanChangeSet::getOrderExecuted, MongoRanChangeSet::getLastCheckSum)
                 .containsExactly(
-                        tuple("1", 1, CheckSum.parse("9:6b06a10d8faf0a516c7f4a77f76041f2")),
-                        tuple("2", 2, CheckSum.parse("9:3da23c9b02c5297da06ca10d41c783aa")));
+                        tuple("1", 1, CheckSum.parse("9:26cdcf268d7947186164df2b3e5691d7")),
+                        tuple("2", 2, CheckSum.parse("9:3a5250595e3b5a2f373b0d05212894bb")));
 
         List<Document> documents = new FindAllStatement("person").queryForList(database);
         assertThat(documents).hasSize(3)
@@ -166,10 +166,10 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
         assertThat(changeSets).hasSize(4)
                 .extracting(MongoRanChangeSet::getId, MongoRanChangeSet::getOrderExecuted, MongoRanChangeSet::getLastCheckSum)
                 .containsExactly(
-                        tuple("1", 1, CheckSum.parse("9:6b06a10d8faf0a516c7f4a77f76041f2")),
-                        tuple("2", 2, CheckSum.parse("9:3da23c9b02c5297da06ca10d41c783aa")),
-                        tuple("1", 3, CheckSum.parse("9:0b178dc8f84a4e1464860edad456c290")),
-                        tuple("2", 4, CheckSum.parse("9:f7596d3e6bddd4dbbbe29439351bc640")));
+                        tuple("1", 1, CheckSum.parse("9:26cdcf268d7947186164df2b3e5691d7")),
+                        tuple("2", 2, CheckSum.parse("9:3a5250595e3b5a2f373b0d05212894bb")),
+                        tuple("1", 3, CheckSum.parse("9:bfb744c23f97ee4bd9df050d189efa08")),
+                        tuple("2", 4, CheckSum.parse("9:ac7ea4fec237f17c4ae15a7a5ab1c7f0")));
 
         documents = new FindAllStatement("person").queryForList(database);
         assertThat(documents).hasSize(2)
@@ -302,7 +302,7 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
                 .containsExactlyInAnyOrder("DATABASECHANGELOG", "DATABASECHANGELOGLOCK", "results");
 
         // rollback to not existing
-        assertThatExceptionOfType(RollbackFailedException.class).isThrownBy(()-> liquibase.rollback("notExisting", ""))
+        assertThatExceptionOfType(CommandExecutionException.class).isThrownBy(()-> liquibase.rollback("notExisting", ""))
                 .withMessageContaining("Could not find tag 'notExisting' in the database");
 
         // rollback to tagged state. Tagged ChangeSet remains
