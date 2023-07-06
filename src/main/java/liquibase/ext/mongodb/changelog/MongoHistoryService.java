@@ -251,7 +251,7 @@ public class MongoHistoryService extends AbstractNoSqlHistoryService<MongoLiquib
     }
 
     @Override
-    protected void updateCheckSum(final ChangeSet changeSet) throws DatabaseException {
+    public void updateCheckSum(final ChangeSet changeSet) throws DatabaseException {
         final Bson filter = Filters.and(
                 Filters.eq(MongoRanChangeSet.Fields.fileName, changeSet.getFilePath()),
                 Filters.eq(MongoRanChangeSet.Fields.changeSetId, changeSet.getId()),

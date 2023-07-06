@@ -21,10 +21,12 @@ package liquibase.nosql.executor;
  */
 
 import liquibase.Scope;
+import liquibase.changelog.ChangeLogHistoryService;
 import liquibase.changelog.ChangeLogHistoryServiceFactory;
 import liquibase.database.Database;
 import liquibase.exception.DatabaseException;
 import liquibase.executor.AbstractExecutor;
+import liquibase.ext.mongodb.changelog.MongoHistoryService;
 import liquibase.ext.mongodb.database.MongoLiquibaseDatabase;
 import liquibase.logging.Logger;
 import liquibase.nosql.changelog.AbstractNoSqlHistoryService;
@@ -192,7 +194,13 @@ public class NoSqlExecutor extends AbstractExecutor {
         } else if (sql instanceof UpdateStatement) {
             execute((UpdateStatement) sql);
         } else if (sql instanceof UpdateChangeSetChecksumStatement) {
-            // TODO implement Update Checksum mechanism
+            ChangeLogHistoryService changeLogHistoryService = Scope.getCurrentScope().getSingleton(ChangeLogHistoryServiceFactory.class)
+                    .getChangeLogService(getDatabase());
+            if (changeLogHistoryService instanceof MongoHistoryService) {
+                ((MongoHistoryService)changeLogHistoryService).updateCheckSum(((UpdateChangeSetChecksumStatement) sql).getChangeSet());
+            } else {
+                throw new DatabaseException("Could not execute as we are not in a MongoDB");
+            }
         } else {
             throw new DatabaseException("liquibase-mongodb extension cannot execute changeset \n" +
                     "Unknown type: " + sql.getClass().getName() +
