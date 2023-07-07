@@ -62,7 +62,7 @@ class CreateCollectionChangeTest extends AbstractMongoChangeTest {
                 .isNotNull()
                 .hasSize(1)
                 .first()
-                .returns("9:ada06701e2890846393245c7b45d11b9", changeSet -> changeSet.generateCheckSum(ChecksumVersion.latest()).toString());
+                .returns("9:ea079a06e3fa4c4559b7a186382d9dde", changeSet -> changeSet.generateCheckSum(ChecksumVersion.latest()).toString());
 
         assertThat(changeSets.get(0).getChanges())
                 .hasSize(3)

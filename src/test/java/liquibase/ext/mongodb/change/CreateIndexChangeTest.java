@@ -51,7 +51,7 @@ class CreateIndexChangeTest extends AbstractMongoChangeTest {
                 .hasFieldOrPropertyWithValue("CollectionName", "collection1")
                 .hasFieldOrPropertyWithValue("keys", "{ clientId: 1, type: 1}")
                 .hasFieldOrPropertyWithValue("options", null)
-                .returns(CheckSum.parse("9:e6b1630ad2b20ef41a69eee853528099"), Change::generateCheckSum)
+                .returns(CheckSum.parse("9:d41d8cd98f00b204e9800998ecf8427e"), Change::generateCheckSum)
                 .returns("Index created for collection collection1", Change::getConfirmationMessage)
                 .returns(true, c -> c.supportsRollback(database));
 
@@ -80,7 +80,7 @@ class CreateIndexChangeTest extends AbstractMongoChangeTest {
         final List<ChangeSet> changeSets = getChangesets("liquibase/ext/changelog.create-index.test.xml", database);
 
         assertThat(changeSets).hasSize(1).first()
-                .returns("9:75e8da1118c4312c5987ecf9eb47a09e", changeSet -> changeSet.generateCheckSum(ChecksumVersion.latest()).toString());
+                .returns("9:c2dd6504fe11325573b8015c9057e907", changeSet -> changeSet.generateCheckSum(ChecksumVersion.latest()).toString());
 
         final List<Change> changes1 = changeSets.get(0).getChanges();
         assertThat(changes1).hasSize(2);

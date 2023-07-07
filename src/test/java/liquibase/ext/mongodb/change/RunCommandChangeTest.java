@@ -48,7 +48,7 @@ class RunCommandChangeTest extends AbstractMongoChangeTest {
 
         assertThat(changeSets).hasSize(2);
 
-        assertThat(changeSets.get(0)).returns("9:3115eba1af85f6636cf281fa54ec5c1d",  s -> s.generateCheckSum(ChecksumVersion.latest()).toString());
+        assertThat(changeSets.get(0)).returns("9:f01deb4f054d9620e0ddc9a1cfbdf6c9",  s -> s.generateCheckSum(ChecksumVersion.latest()).toString());
 
         assertThat(changeSets.get(0).getChanges()).hasSize(1);
         assertThat(changeSets.get(0).getChanges()).hasOnlyElementsOfTypes(RunCommandChange.class);
