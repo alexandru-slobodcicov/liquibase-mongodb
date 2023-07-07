@@ -48,8 +48,8 @@ class AdminCommandChangeTest extends AbstractMongoChangeTest {
         final List<ChangeSet> changeSets = getChangesets("liquibase/ext/changelog.admin-command.test.xml", database);
         assertThat(changeSets).hasSize(2).extracting(ChangeSet::getAuthor, ChangeSet::getId, changeSet -> changeSet.generateCheckSum(ChecksumVersion.latest()))
                 .containsExactly(
-                        tuple("alex", "1", CheckSum.parse("9:589527b47d13e0034c4860bbe0a742e6")),
-                        tuple("alex", "2", CheckSum.parse("9:1140b6605ecab8cf5cc6032bacc70f4b"))
+                        tuple("alex", "1", CheckSum.parse("9:f01deb4f054d9620e0ddc9a1cfbdf6c9")),
+                        tuple("alex", "2", CheckSum.parse("9:f01deb4f054d9620e0ddc9a1cfbdf6c9"))
                 );
 
         assertThat(changeSets.get(0).getChanges())
