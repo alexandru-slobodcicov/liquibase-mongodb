@@ -68,7 +68,7 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
                 .filteredOn(c -> c.getId().equals("1")).hasSize(1).first()
                 .returns("liquibase/ext/json/generic-1-insert-people.json", RanChangeSet::getChangeLog)
                 .returns("Alex", RanChangeSet::getAuthor)
-                .returns(CheckSum.parse("9:26cdcf268d7947186164df2b3e5691d7"), RanChangeSet::getLastCheckSum)
+                .returns(CheckSum.parse("9:95727cf24d16eda63ee7e0ca62f9e713"), RanChangeSet::getLastCheckSum)
                 .returns(true, c -> nonNull(c.getDateExecuted()))
                 .returns(null, RanChangeSet::getTag)
                 .returns(ChangeSet.ExecType.EXECUTED, RanChangeSet::getExecType)
@@ -84,7 +84,7 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
                 .filteredOn(c -> c.getId().equals("2")).hasSize(1).first()
                 .returns("liquibase/ext/json/generic-1-insert-people.json", RanChangeSet::getChangeLog)
                 .returns("Nick", RanChangeSet::getAuthor)
-                .returns(CheckSum.parse("9:3a5250595e3b5a2f373b0d05212894bb"), RanChangeSet::getLastCheckSum)
+                .returns(CheckSum.parse("9:9eb024092590f9c802032847573771af"), RanChangeSet::getLastCheckSum)
                 .returns(true, c -> nonNull(c.getDateExecuted()))
                 .returns(null, RanChangeSet::getTag)
                 .returns(ChangeSet.ExecType.EXECUTED, RanChangeSet::getExecType)
@@ -108,7 +108,7 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
                 .filteredOn(c -> c.getId().equals("1")).hasSize(1).first()
                 .returns("liquibase/ext/json/generic-1-insert-people.json", RanChangeSet::getChangeLog)
                 .returns("Alex", RanChangeSet::getAuthor)
-                .returns(CheckSum.parse("9:26cdcf268d7947186164df2b3e5691d7"), RanChangeSet::getLastCheckSum)
+                .returns(CheckSum.parse("9:95727cf24d16eda63ee7e0ca62f9e713"), RanChangeSet::getLastCheckSum)
                 .returns(true, c -> nonNull(c.getDateExecuted()))
                 .returns(null, RanChangeSet::getTag)
                 .returns(ChangeSet.ExecType.EXECUTED, RanChangeSet::getExecType)
@@ -124,7 +124,7 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
                 .filteredOn(c -> c.getId().equals("2")).hasSize(1).first()
                 .returns("liquibase/ext/json/generic-1-insert-people.json", RanChangeSet::getChangeLog)
                 .returns("Nick", RanChangeSet::getAuthor)
-                .returns(CheckSum.parse("9:3a5250595e3b5a2f373b0d05212894bb"), RanChangeSet::getLastCheckSum)
+                .returns(CheckSum.parse("9:9eb024092590f9c802032847573771af"), RanChangeSet::getLastCheckSum)
                 .returns(true, c -> nonNull(c.getDateExecuted()))
                 .returns(null, RanChangeSet::getTag)
                 .returns(ChangeSet.ExecType.EXECUTED, RanChangeSet::getExecType)
@@ -147,8 +147,8 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
         assertThat(changeSets).hasSize(2)
                 .extracting(MongoRanChangeSet::getId, MongoRanChangeSet::getOrderExecuted, MongoRanChangeSet::getLastCheckSum)
                 .containsExactly(
-                        tuple("1", 1, CheckSum.parse("9:26cdcf268d7947186164df2b3e5691d7")),
-                        tuple("2", 2, CheckSum.parse("9:3a5250595e3b5a2f373b0d05212894bb")));
+                        tuple("1", 1, CheckSum.parse("9:95727cf24d16eda63ee7e0ca62f9e713")),
+                        tuple("2", 2, CheckSum.parse("9:9eb024092590f9c802032847573771af")));
 
         List<Document> documents = new FindAllStatement("person").queryForList(database);
         assertThat(documents).hasSize(3)
@@ -166,8 +166,8 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
         assertThat(changeSets).hasSize(4)
                 .extracting(MongoRanChangeSet::getId, MongoRanChangeSet::getOrderExecuted, MongoRanChangeSet::getLastCheckSum)
                 .containsExactly(
-                        tuple("1", 1, CheckSum.parse("9:26cdcf268d7947186164df2b3e5691d7")),
-                        tuple("2", 2, CheckSum.parse("9:3a5250595e3b5a2f373b0d05212894bb")),
+                        tuple("1", 1, CheckSum.parse("9:95727cf24d16eda63ee7e0ca62f9e713")),
+                        tuple("2", 2, CheckSum.parse("9:9eb024092590f9c802032847573771af")),
                         tuple("1", 3, CheckSum.parse("9:bfb744c23f97ee4bd9df050d189efa08")),
                         tuple("2", 4, CheckSum.parse("9:ac7ea4fec237f17c4ae15a7a5ab1c7f0")));
 
