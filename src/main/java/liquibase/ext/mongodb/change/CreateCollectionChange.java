@@ -22,6 +22,7 @@ package liquibase.ext.mongodb.change;
 
 import liquibase.change.Change;
 import liquibase.change.ChangeMetaData;
+import liquibase.change.CheckSum;
 import liquibase.change.DatabaseChange;
 import liquibase.database.Database;
 import liquibase.ext.mongodb.statement.CreateCollectionStatement;
@@ -63,5 +64,10 @@ public class CreateCollectionChange extends AbstractMongoChange {
         return new Change[]{
                 inverse
         };
+    }
+
+    @Override
+    public CheckSum generateCheckSum() {
+        return super.generateCheckSum(collectionName, options);
     }
 }
