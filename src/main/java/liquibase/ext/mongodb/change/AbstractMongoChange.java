@@ -64,7 +64,7 @@ public abstract class AbstractMongoChange extends AbstractChange {
 
         String text = "";
         if (texts != null) {
-            StringUtil.join(texts, "");
+            text = StringUtil.join(texts, "");
         }
 
 
