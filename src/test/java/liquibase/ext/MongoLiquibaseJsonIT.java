@@ -168,8 +168,8 @@ class MongoLiquibaseJsonIT extends AbstractMongoIntegrationTest {
                 .containsExactly(
                         tuple("1", 1, CheckSum.parse("9:95727cf24d16eda63ee7e0ca62f9e713")),
                         tuple("2", 2, CheckSum.parse("9:9eb024092590f9c802032847573771af")),
-                        tuple("1", 3, CheckSum.parse("9:bfb744c23f97ee4bd9df050d189efa08")),
-                        tuple("2", 4, CheckSum.parse("9:ac7ea4fec237f17c4ae15a7a5ab1c7f0")));
+                        tuple("1", 3, CheckSum.parse("9:d9b8155bf8f6d6ddcb3e3887bfae7331")),
+                        tuple("2", 4, CheckSum.parse("9:4825273a230884cbcd35ff658f4b261d")));
 
         documents = new FindAllStatement("person").queryForList(database);
         assertThat(documents).hasSize(2)

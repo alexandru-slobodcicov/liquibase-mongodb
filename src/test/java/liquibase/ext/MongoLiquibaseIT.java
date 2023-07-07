@@ -78,9 +78,9 @@ class MongoLiquibaseIT extends AbstractMongoIntegrationTest {
         assertThat(changeSets).hasSize(3)
                 .extracting(MongoRanChangeSet::getId, MongoRanChangeSet::getOrderExecuted, MongoRanChangeSet::getLastCheckSum)
                 .containsExactly(
-                        tuple("1", 1, CheckSum.parse("9:66f74bbe4c1ae2aeec30a60885135611")),
-                        tuple("2", 2, CheckSum.parse("9:8da4d127bd90a85116dfd6109a527ab2")),
-                        tuple("3", 3, CheckSum.parse("9:ab691099a5db5a4ec05af5a310af1c40")));
+                        tuple("1", 1, CheckSum.parse("9:6123e9daaa6ae11900e17fb620e90bcb")),
+                        tuple("2", 2, CheckSum.parse("9:2c6879e9e003d28d5aecfcf68e5a841a")),
+                        tuple("3", 3, CheckSum.parse("9:ab7ee385b3e94d5d3050daba4c719f08")));
 
         // Clear checksums
         liquibase.clearCheckSums();
@@ -99,9 +99,9 @@ class MongoLiquibaseIT extends AbstractMongoIntegrationTest {
         assertThat(changeSets).hasSize(3)
                 .extracting(MongoRanChangeSet::getId, MongoRanChangeSet::getOrderExecuted, MongoRanChangeSet::getLastCheckSum)
                 .containsExactly(
-                        tuple("1", 1, CheckSum.parse("9:66f74bbe4c1ae2aeec30a60885135611")),
-                        tuple("2", 2, CheckSum.parse("9:8da4d127bd90a85116dfd6109a527ab2")),
-                        tuple("3", 3, CheckSum.parse("9:ab691099a5db5a4ec05af5a310af1c40")));
+                        tuple("1", 1, CheckSum.parse("9:6123e9daaa6ae11900e17fb620e90bcb")),
+                        tuple("2", 2, CheckSum.parse("9:2c6879e9e003d28d5aecfcf68e5a841a")),
+                        tuple("3", 3, CheckSum.parse("9:ab7ee385b3e94d5d3050daba4c719f08")));
     }
 
     @SneakyThrows
