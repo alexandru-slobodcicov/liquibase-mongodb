@@ -61,7 +61,7 @@ class RunCommandChangeTest extends AbstractMongoChangeTest {
         assertThat(sqlStatements).hasOnlyElementsOfType(RunCommandStatement.class);
         assertThat(((RunCommandStatement) sqlStatements[0]).getCommand()).containsEntry("buildInfo", 1);
 
-        assertThat(changeSets.get(1)).returns("9:f01deb4f054d9620e0ddc9a1cfbdf6c9",  s -> s.generateCheckSum(ChecksumVersion.latest()).toString());
+        assertThat(changeSets.get(1)).returns("9:2a659bf380005d42308e0616959f69c1",  s -> s.generateCheckSum(ChecksumVersion.latest()).toString());
         assertThat(changeSets.get(1).getChanges()).hasSize(1);
         assertThat(changeSets.get(1).getChanges()).hasOnlyElementsOfTypes(AdminCommandChange.class);
 

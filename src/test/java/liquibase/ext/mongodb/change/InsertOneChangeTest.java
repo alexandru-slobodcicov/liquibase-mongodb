@@ -61,7 +61,7 @@ class InsertOneChangeTest extends AbstractMongoChangeTest {
             .hasFieldOrPropertyWithValue("document", "{\n                id: 111\n                }")
             .hasFieldOrPropertyWithValue("options", null);
 
-        assertThat(changeSets.get(1)).returns("9:c2dd6504fe11325573b8015c9057e907",  s -> s.generateCheckSum(ChecksumVersion.latest()).toString());
+        assertThat(changeSets.get(1)).returns("9:2c6879e9e003d28d5aecfcf68e5a841a",  s -> s.generateCheckSum(ChecksumVersion.latest()).toString());
         assertThat(changeSets.get(1).getChanges().get(0))
             .hasFieldOrPropertyWithValue("collectionName", "insertOneTest2")
             .hasFieldOrPropertyWithValue("document", "{\n                id: 2\n                }")
