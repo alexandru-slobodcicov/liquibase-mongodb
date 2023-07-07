@@ -46,7 +46,7 @@ class InsertManyChangeTest extends AbstractMongoChangeTest {
 
         assertThat(changeSets)
                 .hasSize(1).first()
-                .returns("9:f01deb4f054d9620e0ddc9a1cfbdf6c9",  changeSet -> changeSet.generateCheckSum(ChecksumVersion.latest()).toString());
+                .returns("9:ff86bb7a77e760a728ad7c0df4e83137",  changeSet -> changeSet.generateCheckSum(ChecksumVersion.latest()).toString());
 
         assertThat(changeSets.get(0).getChanges())
                 .hasSize(1)

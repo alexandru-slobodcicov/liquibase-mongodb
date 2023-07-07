@@ -44,7 +44,7 @@ class DropIndexChangeTest extends AbstractMongoChangeTest {
         assertThat(dropIndexChange)
                 .hasFieldOrPropertyWithValue("CollectionName", "collection1")
                 .hasFieldOrPropertyWithValue("keys", "{ clientId: 1, type: 1}")
-                .returns(CheckSum.parse("9:d41d8cd98f00b204e9800998ecf8427e"), Change::generateCheckSum)
+                .returns(CheckSum.parse("9:bc13eacab67f94f078248d07af32838a"), Change::generateCheckSum)
                 .returns("Index dropped for collection collection1", Change::getConfirmationMessage)
                 .returns(false, c -> c.supportsRollback(database));
 
