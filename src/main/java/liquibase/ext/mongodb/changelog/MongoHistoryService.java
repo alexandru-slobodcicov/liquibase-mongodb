@@ -23,6 +23,7 @@ package liquibase.ext.mongodb.changelog;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
+import liquibase.ChecksumVersion;
 import liquibase.Scope;
 import liquibase.change.Change;
 import liquibase.change.core.TagDatabaseChange;
@@ -53,7 +54,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
-import static liquibase.plugin.Plugin.PRIORITY_SPECIALIZED;
 
 public class MongoHistoryService extends AbstractNoSqlHistoryService<MongoLiquibaseDatabase> {
 
@@ -80,6 +80,16 @@ public class MongoHistoryService extends AbstractNoSqlHistoryService<MongoLiquib
     @Override
     public boolean supports(final Database database) {
         return MongoLiquibaseDatabase.MONGODB_PRODUCT_NAME.equals(database.getDatabaseProductName());
+    }
+
+    @Override
+    public List<RanChangeSet> getRanChangeSets(boolean allowChecksumsUpgrade) throws DatabaseException {
+        return getRanChangeSets();
+    }
+
+    @Override
+    public boolean isDatabaseChecksumsCompatible() {
+        return false;
     }
 
     @Override
@@ -141,6 +151,8 @@ public class MongoHistoryService extends AbstractNoSqlHistoryService<MongoLiquib
         final String tag = extractTag(changeSet);
         final Date dateExecuted = new Date(getClock().instant().toEpochMilli());
 
+        ChecksumVersion currentChecksumVersion = changeSet.getStoredCheckSum() != null ?
+                ChecksumVersion.enumFromChecksumVersion(changeSet.getStoredCheckSum().getVersion()) : ChecksumVersion.latest();
         if (execType.ranBefore) {
             final Bson filter = Filters.and(
                     Filters.eq(MongoRanChangeSet.Fields.fileName, changeSet.getFilePath()),
@@ -151,7 +163,7 @@ public class MongoHistoryService extends AbstractNoSqlHistoryService<MongoLiquib
             final List<Bson> updates = new ArrayList<>();
             updates.add(Updates.set(MongoRanChangeSet.Fields.dateExecuted, dateExecuted));
             updates.add(Updates.set(MongoRanChangeSet.Fields.orderExecuted, nextSequenceValue));
-            updates.add(Updates.set(MongoRanChangeSet.Fields.md5sum, changeSet.generateCheckSum().toString()));
+            updates.add(Updates.set(MongoRanChangeSet.Fields.md5sum, changeSet.generateCheckSum(currentChecksumVersion).toString()));
             updates.add(Updates.set(MongoRanChangeSet.Fields.execType, execType.value));
             updates.add(Updates.set(MongoRanChangeSet.Fields.deploymentId, getDeploymentId()));
             if (nonNull(tag)) {
@@ -167,7 +179,7 @@ public class MongoHistoryService extends AbstractNoSqlHistoryService<MongoLiquib
                     changeSet.getFilePath()
                     , changeSet.getId()
                     , changeSet.getAuthor()
-                    , changeSet.generateCheckSum()
+                    , changeSet.generateCheckSum(currentChecksumVersion)
                     , dateExecuted
                     , tag
                     , execType
@@ -239,14 +251,16 @@ public class MongoHistoryService extends AbstractNoSqlHistoryService<MongoLiquib
     }
 
     @Override
-    protected void updateCheckSum(final ChangeSet changeSet) throws DatabaseException {
+    public void updateCheckSum(final ChangeSet changeSet) throws DatabaseException {
         final Bson filter = Filters.and(
                 Filters.eq(MongoRanChangeSet.Fields.fileName, changeSet.getFilePath()),
                 Filters.eq(MongoRanChangeSet.Fields.changeSetId, changeSet.getId()),
                 Filters.eq(MongoRanChangeSet.Fields.author, changeSet.getAuthor())
         );
+        ChecksumVersion currentChecksumVersion = changeSet.getStoredCheckSum() != null ?
+                ChecksumVersion.enumFromChecksumVersion(changeSet.getStoredCheckSum().getVersion()) : ChecksumVersion.latest();
 
-        final Bson update = Updates.set(MongoRanChangeSet.Fields.md5sum, changeSet.generateCheckSum().toString());
+        final Bson update = Updates.set(MongoRanChangeSet.Fields.md5sum, changeSet.generateCheckSum(currentChecksumVersion).toString());
 
         getExecutor().update(new UpdateManyStatement(getDatabaseChangeLogTableName(), filter, update));
     }

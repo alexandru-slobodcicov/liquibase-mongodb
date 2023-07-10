@@ -302,6 +302,6 @@ public abstract class AbstractNoSqlHistoryService<D extends AbstractNoSqlDatabas
 
     protected abstract long countRanChangeSets() throws DatabaseException;
 
-    protected abstract void updateCheckSum(ChangeSet changeSet) throws DatabaseException;
+    public abstract void updateCheckSum(ChangeSet changeSet) throws DatabaseException;
 
 }

@@ -20,6 +20,7 @@ package liquibase.ext.mongodb.change;
  * #L%
  */
 
+import liquibase.ChecksumVersion;
 import liquibase.changelog.ChangeSet;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
@@ -54,13 +55,13 @@ class InsertOneChangeTest extends AbstractMongoChangeTest {
             .hasSize(2)
             .hasOnlyElementsOfType(InsertOneChange.class);
 
-        assertThat(changeSets.get(0)).returns("8:4e072f0d1a237e4e98b5edac60c3f335", s -> s.generateCheckSum().toString());
+        assertThat(changeSets.get(0)).returns("9:66f74bbe4c1ae2aeec30a60885135611", s -> s.generateCheckSum(ChecksumVersion.latest()).toString());
         assertThat(changeSets.get(0).getChanges().get(0))
             .hasFieldOrPropertyWithValue("collectionName", "insertOneTest1")
             .hasFieldOrPropertyWithValue("document", "{\n                id: 111\n                }")
             .hasFieldOrPropertyWithValue("options", null);
 
-        assertThat(changeSets.get(1)).returns("8:e504f1757d0460c82b54b702794b8cf7",  s -> s.generateCheckSum().toString());
+        assertThat(changeSets.get(1)).returns("9:8da4d127bd90a85116dfd6109a527ab2",  s -> s.generateCheckSum(ChecksumVersion.latest()).toString());
         assertThat(changeSets.get(1).getChanges().get(0))
             .hasFieldOrPropertyWithValue("collectionName", "insertOneTest2")
             .hasFieldOrPropertyWithValue("document", "{\n                id: 2\n                }")
@@ -71,7 +72,7 @@ class InsertOneChangeTest extends AbstractMongoChangeTest {
             .hasFieldOrPropertyWithValue("document", "{\n                id: 3\n                }")
             .hasFieldOrPropertyWithValue("options", null);
 
-        assertThat(changeSets.get(2)).returns("8:4eff4f9e1b017ccce8da57f3c8125f13",  s -> s.generateCheckSum().toString());
+        assertThat(changeSets.get(2)).returns("9:ab691099a5db5a4ec05af5a310af1c40",  s -> s.generateCheckSum(ChecksumVersion.latest()).toString());
         assertThat(changeSets.get(2).getChanges().get(0))
             .hasFieldOrPropertyWithValue("collectionName", "insertOneTest2")
             .hasFieldOrPropertyWithValue("document", "{\n                id: 21323123\n                }")

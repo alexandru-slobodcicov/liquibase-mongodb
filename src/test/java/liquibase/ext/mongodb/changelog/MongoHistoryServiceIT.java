@@ -20,6 +20,8 @@ package liquibase.ext.mongodb.changelog;
  * #L%
  */
 
+import liquibase.ChecksumVersion;
+import liquibase.Scope;
 import liquibase.change.CheckSum;
 import liquibase.changelog.ChangeLogHistoryServiceFactory;
 import liquibase.changelog.ChangeSet;
@@ -104,7 +106,7 @@ class MongoHistoryServiceIT extends AbstractMongoIntegrationTest {
     @BeforeEach
     protected void setUpEach() {
         super.setUpEach();
-        historyService = (MongoHistoryService) ChangeLogHistoryServiceFactory.getInstance().getChangeLogService(database);
+        historyService = (MongoHistoryService) Scope.getCurrentScope().getSingleton(ChangeLogHistoryServiceFactory.class).getChangeLogService(database);
         historyService.reset();
         historyService.resetDeploymentId();
     }
@@ -172,7 +174,7 @@ class MongoHistoryServiceIT extends AbstractMongoIntegrationTest {
         assertThat(historyService.queryRanChangeSets()).filteredOn("id", "2").first()
                 .returns("2", RanChangeSet::getId)
                 .returns(CheckSum.compute("md5sum2"), RanChangeSet::getLastCheckSum)
-                .returns(CheckSum.parse("8:7e17a06f723599d381d405666d4afbe5"), RanChangeSet::getLastCheckSum);
+                .returns(CheckSum.parse("9:7e17a06f723599d381d405666d4afbe5"), RanChangeSet::getLastCheckSum);
 
         final CreateCollectionChange createCollectionChange1 = new CreateCollectionChange();
         createCollectionChange1.setCollectionName("collection1");
@@ -180,8 +182,8 @@ class MongoHistoryServiceIT extends AbstractMongoIntegrationTest {
         createCollectionChange2.setCollectionName("collection2");
         changeSet2.addChange(createCollectionChange1);
         changeSet2.addChange(createCollectionChange2);
-        assertThat(changeSet2.generateCheckSum().toString())
-                .isEqualTo("8:108b893cced1429ea3d32ac4967bac7d");
+        assertThat(changeSet2.generateCheckSum(ChecksumVersion.latest()))
+                .hasToString("9:e23be10b8382f379139f7f07617aa6ff");
 
         historyService.replaceChecksum(changeSet2);
 
@@ -189,12 +191,12 @@ class MongoHistoryServiceIT extends AbstractMongoIntegrationTest {
         assertThat(ranChangeSets).hasSize(2).filteredOn("id", "1").first()
                 .returns("1", RanChangeSet::getId)
                 .returns(CheckSum.compute("md5sum1"), RanChangeSet::getLastCheckSum)
-                .returns(CheckSum.parse("8:f21d0d5e516d13bf3048dbcdafbc82c7"), RanChangeSet::getLastCheckSum);
+                .returns(CheckSum.parse("9:f21d0d5e516d13bf3048dbcdafbc82c7"), RanChangeSet::getLastCheckSum);
 
         assertThat(ranChangeSets).hasSize(2).filteredOn("id", "2").first()
                 .returns("2", RanChangeSet::getId)
-                .returns(CheckSum.parse("8:108b893cced1429ea3d32ac4967bac7d"), RanChangeSet::getLastCheckSum)
-                .returns(changeSet2.generateCheckSum(), RanChangeSet::getLastCheckSum);
+                .returns(CheckSum.parse("9:e23be10b8382f379139f7f07617aa6ff"), RanChangeSet::getLastCheckSum)
+                .returns(changeSet2.generateCheckSum(ChecksumVersion.V9), RanChangeSet::getLastCheckSum);
 
         assertThat(historyService.isServiceInitialized()).isFalse();
     }

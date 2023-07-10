@@ -23,13 +23,15 @@ package liquibase.ext.mongodb.database;
 import com.mongodb.client.MongoDatabase;
 import liquibase.CatalogAndSchema;
 import liquibase.Scope;
+import liquibase.changelog.ChangeLogHistoryService;
 import liquibase.changelog.ChangeLogHistoryServiceFactory;
-import liquibase.configuration.LiquibaseConfiguration;
 import liquibase.exception.LiquibaseException;
 import liquibase.executor.Executor;
 import liquibase.executor.ExecutorService;
 import liquibase.ext.mongodb.configuration.MongoConfiguration;
 import liquibase.ext.mongodb.statement.DropAllCollectionsStatement;
+import liquibase.lockservice.LockService;
+import liquibase.lockservice.LockServiceFactory;
 import liquibase.nosql.database.AbstractNoSqlDatabase;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -54,7 +56,17 @@ public class MongoLiquibaseDatabase extends AbstractNoSqlDatabase {
         final Executor executor = Scope.getCurrentScope().getSingleton(ExecutorService.class).getExecutor(EXECUTOR_NAME, this);
         DropAllCollectionsStatement dropAllCollectionsStatement = new DropAllCollectionsStatement();
         executor.execute(dropAllCollectionsStatement);
-        ChangeLogHistoryServiceFactory.getInstance().getChangeLogService(this).destroy();
+
+        // TODO Revert this changes in the scope of DAT-15327
+        LockService lockService = LockServiceFactory.getInstance().getLockService(this);
+        lockService.releaseLock();
+        lockService.destroy();
+        LockServiceFactory.getInstance().resetAll();
+        ChangeLogHistoryService changeLogService = Scope.getCurrentScope().getSingleton(ChangeLogHistoryServiceFactory.class).getChangeLogService(this);
+        Scope.getCurrentScope().getSingleton(ChangeLogHistoryServiceFactory.class).unregister(changeLogService);
+        Scope.getCurrentScope().getSingleton(ChangeLogHistoryServiceFactory.class).resetAll();
+        Scope.getCurrentScope().getSingleton(ExecutorService.class).reset();
+        Scope.getCurrentScope().getSingleton(ChangeLogHistoryServiceFactory.class).getChangeLogService(this).destroy();
     }
 
     @Override

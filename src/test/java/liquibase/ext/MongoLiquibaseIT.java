@@ -22,8 +22,8 @@ package liquibase.ext;
 
 import liquibase.Liquibase;
 import liquibase.change.CheckSum;
+import liquibase.exception.CommandExecutionException;
 import liquibase.exception.LiquibaseException;
-import liquibase.exception.RollbackFailedException;
 import liquibase.ext.mongodb.changelog.MongoRanChangeSet;
 import liquibase.ext.mongodb.changelog.MongoRanChangeSetToDocumentConverter;
 import liquibase.ext.mongodb.statement.FindAllStatement;
@@ -78,9 +78,9 @@ class MongoLiquibaseIT extends AbstractMongoIntegrationTest {
         assertThat(changeSets).hasSize(3)
                 .extracting(MongoRanChangeSet::getId, MongoRanChangeSet::getOrderExecuted, MongoRanChangeSet::getLastCheckSum)
                 .containsExactly(
-                        tuple("1", 1, CheckSum.parse("8:4e072f0d1a237e4e98b5edac60c3f335")),
-                        tuple("2", 2, CheckSum.parse("8:e504f1757d0460c82b54b702794b8cf7")),
-                        tuple("3", 3, CheckSum.parse("8:4eff4f9e1b017ccce8da57f3c8125f13")));
+                        tuple("1", 1, CheckSum.parse("9:66f74bbe4c1ae2aeec30a60885135611")),
+                        tuple("2", 2, CheckSum.parse("9:8da4d127bd90a85116dfd6109a527ab2")),
+                        tuple("3", 3, CheckSum.parse("9:ab691099a5db5a4ec05af5a310af1c40")));
 
         // Clear checksums
         liquibase.clearCheckSums();
@@ -99,9 +99,9 @@ class MongoLiquibaseIT extends AbstractMongoIntegrationTest {
         assertThat(changeSets).hasSize(3)
                 .extracting(MongoRanChangeSet::getId, MongoRanChangeSet::getOrderExecuted, MongoRanChangeSet::getLastCheckSum)
                 .containsExactly(
-                        tuple("1", 1, CheckSum.parse("8:4e072f0d1a237e4e98b5edac60c3f335")),
-                        tuple("2", 2, CheckSum.parse("8:e504f1757d0460c82b54b702794b8cf7")),
-                        tuple("3", 3, CheckSum.parse("8:4eff4f9e1b017ccce8da57f3c8125f13")));
+                        tuple("1", 1, CheckSum.parse("9:66f74bbe4c1ae2aeec30a60885135611")),
+                        tuple("2", 2, CheckSum.parse("9:8da4d127bd90a85116dfd6109a527ab2")),
+                        tuple("3", 3, CheckSum.parse("9:ab691099a5db5a4ec05af5a310af1c40")));
     }
 
     @SneakyThrows
@@ -253,16 +253,16 @@ class MongoLiquibaseIT extends AbstractMongoIntegrationTest {
         assertThat(changeSets).hasSize(10)
                 .extracting(MongoRanChangeSet::getId, MongoRanChangeSet::getOrderExecuted, MongoRanChangeSet::getExecType, MongoRanChangeSet::getLastCheckSum)
                 .containsExactly(
-                        tuple("1", 1, SKIPPED, CheckSum.parse("8:025f868444aa99ff8238b3aeb8348fe0")),
-                        tuple("2", 2, EXECUTED, CheckSum.parse("8:517a149b6d344ba6859c016767c0b8d1")),
-                        tuple("3", 3, EXECUTED, CheckSum.parse("8:02aeacdd13ced7e88bd8a6373832e69c")),
-                        tuple("4", 4, SKIPPED, CheckSum.parse("8:54a251bbf203b3523eef2abf23a8f78d")),
-                        tuple("5", 5, EXECUTED, CheckSum.parse("8:d3c5dd6de42b559b7b1086012b5b38b9")),
-                        tuple("6", 6, EXECUTED, CheckSum.parse("8:5fe0e992687d479011653c2bc8d3d10f")),
-                        tuple("7", 7, SKIPPED, CheckSum.parse("8:c5876904ee5ebcc255f25d6ae100b3f5")),
-                        tuple("8", 8, EXECUTED, CheckSum.parse("8:253b4eb9514ddca767da8da818992fb1")),
-                        tuple("9", 9, EXECUTED, CheckSum.parse("8:7814f3ccf6a3132bd0473e1fe29394a3")),
-                        tuple("10", 10, SKIPPED, CheckSum.parse("8:6e91149e36cdaecf7e919312556e0e6b"))
+                        tuple("1", 1, SKIPPED, CheckSum.parse("9:dad21c5e3cce72d50076657128081c0c")),
+                        tuple("2", 2, EXECUTED, CheckSum.parse("9:67e9ce155c04ef70eb553ff6cab13f58")),
+                        tuple("3", 3, EXECUTED, CheckSum.parse("9:9bf4925aac3718c3eb1929e95b5332c9")),
+                        tuple("4", 4, SKIPPED, CheckSum.parse("9:d37e34334465cfae484bbe8e3e6f1482")),
+                        tuple("5", 5, EXECUTED, CheckSum.parse("9:b8ef52e2f9d7b96664577c026bc079e4")),
+                        tuple("6", 6, EXECUTED, CheckSum.parse("9:2e1e5f512aaab73117ca23108ec8076f")),
+                        tuple("7", 7, SKIPPED, CheckSum.parse("9:5e1fca21679293232bbade890e057bca")),
+                        tuple("8", 8, EXECUTED, CheckSum.parse("9:b95cec9546c91ae40c4ce63f7901ad24")),
+                        tuple("9", 9, EXECUTED, CheckSum.parse("9:ae8941a239134f17455b01f0d92ff53b")),
+                        tuple("10", 10, SKIPPED, CheckSum.parse("9:89b8c6b5f63ad239e2993c84d24ad342"))
                 );
 
         assertThat(getCollections(connection))
@@ -374,7 +374,7 @@ class MongoLiquibaseIT extends AbstractMongoIntegrationTest {
                 .containsExactlyInAnyOrder("DATABASECHANGELOG", "DATABASECHANGELOGLOCK", "results");
 
         // rollback to not existing
-        assertThatExceptionOfType(RollbackFailedException.class).isThrownBy(() -> liquibase.rollback("notExisting", ""))
+        assertThatExceptionOfType(CommandExecutionException.class).isThrownBy(() -> liquibase.rollback("notExisting", ""))
                 .withMessageContaining("Could not find tag 'notExisting' in the database");
 
         // rollback to tagged state. Tagged ChangeSet remains

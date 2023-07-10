@@ -38,6 +38,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 class MongoHistoryServiceTest {
 
+    ChangeLogHistoryServiceFactory changeLogHistoryServiceFactory = Scope.getCurrentScope().getSingleton(ChangeLogHistoryServiceFactory.class);
+
     @Mock
     protected NoSqlExecutor executorMock;
 
@@ -55,16 +57,18 @@ class MongoHistoryServiceTest {
         database = new MongoLiquibaseDatabase();
         database.setConnection(connectionMock);
         historyService.setDatabase(database);
+        changeLogHistoryServiceFactory.register(historyService);
         resetServices();
     }
 
     @AfterEach
     void tearDown() {
+        changeLogHistoryServiceFactory.unregister(historyService);
         resetServices();
     }
 
     protected void resetServices() {
-        ChangeLogHistoryServiceFactory.reset();
+        Scope.getCurrentScope().getSingleton(ChangeLogHistoryServiceFactory.class).resetAll();
         Scope.getCurrentScope().getSingleton(ExecutorService.class).reset();
     }
 

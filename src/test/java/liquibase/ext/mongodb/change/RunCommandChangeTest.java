@@ -20,6 +20,7 @@ package liquibase.ext.mongodb.change;
  * #L%
  */
 
+import liquibase.ChecksumVersion;
 import liquibase.changelog.ChangeSet;
 import liquibase.ext.mongodb.statement.AdminCommandStatement;
 import liquibase.ext.mongodb.statement.RunCommandStatement;
@@ -47,7 +48,7 @@ class RunCommandChangeTest extends AbstractMongoChangeTest {
 
         assertThat(changeSets).hasSize(2);
 
-        assertThat(changeSets.get(0)).returns("8:a9f789a8482003bb149da01cdab92707",  s -> s.generateCheckSum().toString());
+        assertThat(changeSets.get(0)).returns("9:3115eba1af85f6636cf281fa54ec5c1d",  s -> s.generateCheckSum(ChecksumVersion.latest()).toString());
 
         assertThat(changeSets.get(0).getChanges()).hasSize(1);
         assertThat(changeSets.get(0).getChanges()).hasOnlyElementsOfTypes(RunCommandChange.class);
@@ -60,7 +61,7 @@ class RunCommandChangeTest extends AbstractMongoChangeTest {
         assertThat(sqlStatements).hasOnlyElementsOfType(RunCommandStatement.class);
         assertThat(((RunCommandStatement) sqlStatements[0]).getCommand()).containsEntry("buildInfo", 1);
 
-        assertThat(changeSets.get(1)).returns("8:e17342ecb217a7588eb1d33af4fadff4",  s -> s.generateCheckSum().toString());
+        assertThat(changeSets.get(1)).returns("9:589527b47d13e0034c4860bbe0a742e6",  s -> s.generateCheckSum(ChecksumVersion.latest()).toString());
         assertThat(changeSets.get(1).getChanges()).hasSize(1);
         assertThat(changeSets.get(1).getChanges()).hasOnlyElementsOfTypes(AdminCommandChange.class);
 
