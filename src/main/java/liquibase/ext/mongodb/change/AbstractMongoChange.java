@@ -20,9 +20,20 @@ package liquibase.ext.mongodb.change;
  * #L%
  */
 
+import liquibase.ChecksumVersion;
+import liquibase.GlobalConfiguration;
+import liquibase.Scope;
 import liquibase.change.AbstractChange;
+import liquibase.change.AbstractSQLChange;
+import liquibase.change.CheckSum;
 import liquibase.database.Database;
+import liquibase.exception.UnexpectedLiquibaseException;
 import liquibase.ext.mongodb.database.MongoLiquibaseDatabase;
+import liquibase.util.StringUtil;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public abstract class AbstractMongoChange extends AbstractChange {
 
@@ -39,5 +50,28 @@ public abstract class AbstractMongoChange extends AbstractChange {
     @Override
     public boolean generateRollbackStatementsVolatile(final Database database) {
         return false;
+    }
+
+    /**
+     * Generate checksum normalizing texts so changes as adding white spaces and new lines
+     * won't break the checksum
+     */
+    CheckSum generateCheckSum(String... texts) {
+        ChecksumVersion version = Scope.getCurrentScope().getChecksumVersion();
+        if (version.lowerOrEqualThan(ChecksumVersion.V8)) {
+            return super.generateCheckSum();
+        }
+
+        String text = "";
+        if (texts != null) {
+            text = StringUtil.join(texts, "");
+        }
+
+
+        try (InputStream stream = new ByteArrayInputStream(text.getBytes(GlobalConfiguration.FILE_ENCODING.getCurrentValue()))) {
+            return CheckSum.compute(new AbstractSQLChange.NormalizingStream(stream), false);
+        } catch (IOException e) {
+            throw new UnexpectedLiquibaseException(e);
+        }
     }
 }

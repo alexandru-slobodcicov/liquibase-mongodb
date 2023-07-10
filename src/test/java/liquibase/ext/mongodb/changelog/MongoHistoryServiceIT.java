@@ -183,7 +183,7 @@ class MongoHistoryServiceIT extends AbstractMongoIntegrationTest {
         changeSet2.addChange(createCollectionChange1);
         changeSet2.addChange(createCollectionChange2);
         assertThat(changeSet2.generateCheckSum(ChecksumVersion.latest()))
-                .hasToString("9:e23be10b8382f379139f7f07617aa6ff");
+                .hasToString("9:c6b62cb517b0bc6cde17be8f75b2c1e2");
 
         historyService.replaceChecksum(changeSet2);
 
@@ -195,7 +195,7 @@ class MongoHistoryServiceIT extends AbstractMongoIntegrationTest {
 
         assertThat(ranChangeSets).hasSize(2).filteredOn("id", "2").first()
                 .returns("2", RanChangeSet::getId)
-                .returns(CheckSum.parse("9:e23be10b8382f379139f7f07617aa6ff"), RanChangeSet::getLastCheckSum)
+                .returns(CheckSum.parse("9:c6b62cb517b0bc6cde17be8f75b2c1e2"), RanChangeSet::getLastCheckSum)
                 .returns(changeSet2.generateCheckSum(ChecksumVersion.V9), RanChangeSet::getLastCheckSum);
 
         assertThat(historyService.isServiceInitialized()).isFalse();

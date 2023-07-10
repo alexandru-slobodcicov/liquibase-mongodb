@@ -51,7 +51,7 @@ class CreateIndexChangeTest extends AbstractMongoChangeTest {
                 .hasFieldOrPropertyWithValue("CollectionName", "collection1")
                 .hasFieldOrPropertyWithValue("keys", "{ clientId: 1, type: 1}")
                 .hasFieldOrPropertyWithValue("options", null)
-                .returns(CheckSum.parse("9:e6b1630ad2b20ef41a69eee853528099"), Change::generateCheckSum)
+                .returns(CheckSum.parse("9:39414d63d912421a93152b03017c2d49"), Change::generateCheckSum)
                 .returns("Index created for collection collection1", Change::getConfirmationMessage)
                 .returns(true, c -> c.supportsRollback(database));
 
@@ -80,7 +80,7 @@ class CreateIndexChangeTest extends AbstractMongoChangeTest {
         final List<ChangeSet> changeSets = getChangesets("liquibase/ext/changelog.create-index.test.xml", database);
 
         assertThat(changeSets).hasSize(1).first()
-                .returns("9:75e8da1118c4312c5987ecf9eb47a09e", changeSet -> changeSet.generateCheckSum(ChecksumVersion.latest()).toString());
+                .returns("9:73c08fccf08f1802915156fe638b7d53", changeSet -> changeSet.generateCheckSum(ChecksumVersion.latest()).toString());
 
         final List<Change> changes1 = changeSets.get(0).getChanges();
         assertThat(changes1).hasSize(2);
@@ -90,7 +90,7 @@ class CreateIndexChangeTest extends AbstractMongoChangeTest {
                 .hasFieldOrPropertyWithValue("CollectionName", "createIndexTest")
                 .hasFieldOrPropertyWithValue("keys", "{ clientId: 1, type: 1}")
                 .hasFieldOrPropertyWithValue("options", "{unique: true, name: \"ui_tppClientId\"}")
-                .returns(CheckSum.parse("9:2ea778164e5507ea6678158bee3f8959"), Change::generateCheckSum)
+                .returns(CheckSum.parse("9:540ed5fb8583e2e9b9b58c72cd923647"), Change::generateCheckSum)
                 .returns(true, c -> c.supportsRollback(database));
 
         assertThat(Arrays.asList(changes1.get(0).generateStatements(database))).hasSize(1)
@@ -115,7 +115,7 @@ class CreateIndexChangeTest extends AbstractMongoChangeTest {
                 .hasFieldOrPropertyWithValue("CollectionName", "createIndexNoOptionsTest")
                 .hasFieldOrPropertyWithValue("keys", "{ clientId: 1, type: 1}")
                 .hasFieldOrPropertyWithValue("options", null)
-                .returns(CheckSum.parse("9:4499e67ade10db858b5eafa32665623f"), Change::generateCheckSum)
+                .returns(CheckSum.parse("9:1f9cabae6442a9aa4ab0e9cdf4181a66"), Change::generateCheckSum)
                 .returns(true, c -> c.supportsRollback(database));
 
         assertThat(Arrays.asList(changes1.get(1).generateStatements(database))).hasSize(1)

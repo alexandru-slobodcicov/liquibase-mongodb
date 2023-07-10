@@ -21,6 +21,7 @@ package liquibase.ext.mongodb.change;
  */
 
 import liquibase.change.ChangeMetaData;
+import liquibase.change.CheckSum;
 import liquibase.change.DatabaseChange;
 import liquibase.database.Database;
 import liquibase.ext.mongodb.statement.InsertOneStatement;
@@ -52,5 +53,10 @@ public class InsertOneChange extends AbstractMongoChange {
         return new SqlStatement[]{
                 new InsertOneStatement(collectionName, document, options)
         };
+    }
+
+    @Override
+    public CheckSum generateCheckSum() {
+        return super.generateCheckSum(collectionName, document, options);
     }
 }

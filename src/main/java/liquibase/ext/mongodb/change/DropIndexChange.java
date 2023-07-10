@@ -21,6 +21,7 @@ package liquibase.ext.mongodb.change;
  */
 
 import liquibase.change.ChangeMetaData;
+import liquibase.change.CheckSum;
 import liquibase.change.DatabaseChange;
 import liquibase.database.Database;
 import liquibase.ext.mongodb.statement.DropIndexStatement;
@@ -51,6 +52,11 @@ public class DropIndexChange extends AbstractMongoChange {
         return new SqlStatement[]{
                 new DropIndexStatement(collectionName, keys)
         };
+    }
+
+    @Override
+    public CheckSum generateCheckSum() {
+        return super.generateCheckSum(collectionName, keys);
     }
 
 }

@@ -21,6 +21,7 @@ package liquibase.ext.mongodb.change;
  */
 
 import liquibase.change.ChangeMetaData;
+import liquibase.change.CheckSum;
 import liquibase.change.DatabaseChange;
 import liquibase.database.Database;
 import liquibase.ext.mongodb.statement.AdminCommandStatement;
@@ -51,5 +52,10 @@ public class AdminCommandChange extends AbstractMongoChange {
         return new SqlStatement[]{
             new AdminCommandStatement(command)
         };
+    }
+
+    @Override
+    public CheckSum generateCheckSum() {
+        return super.generateCheckSum(command);
     }
 }
