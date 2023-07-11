@@ -1,52 +1,20 @@
 name: Release Extension to Sonatype
 
 on:
+  workflow_dispatch:
   release:
     types: [published]
 
 jobs:
     release:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v2
+      uses: liquibase/build-logic/.github/workflows/extension-release-published.yml@v0.3.2
+      secrets: inherit
 
-        - name: Set up Java for publishing to Maven Central Repository
-          uses: actions/setup-java@v2
-          with:
-            java-version: '11'
-            distribution: 'adopt'
-            server-id: sonatype-nexus-staging
-            server-username: MAVEN_USERNAME
-            server-password: MAVEN_PASSWORD
-            gpg-private-key: ${{ secrets.GPG_SECRET }}
-            gpg-passphrase: GPG_PASSPHRASE
-
-        - name: Download artifact
-          id: download-artifact
-          uses: dawidd6/action-download-artifact@v2
-          with:
-            github_token: ${{secrets.BOT_TOKEN}}
-            workflow: create-release.yml
-            name: liquibase-mongodb
-            check_artifacts: true
-            skip_unpack: false
-            if_no_artifact_found: fail
-            workflow_conclusion: ""
-
-        - name: Publish to the Maven Central Repository
-          run: mvn deploy:deploy-file -Dfile=./target/${{ github.event.release.tag_name}}.jar -Dmaven.test.skip -DrepositoryId=sonatype-nexus-staging -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DpomFile=pom.xml -P release
-          env:
-            MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-            MAVEN_PASSWORD: ${{ secrets.SONATYPE_TOKEN }}
-            GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
 
     deploy_xsd:
       name: Upload xsds
       runs-on: ubuntu-20.04
-      outputs:
-        tag: ${{ steps.collect-data.outputs.tag }}
-        version: ${{ needs.setup.outputs.version }}
       steps:
         - name: Download liquibase mongodb xsd
           uses: actions/checkout@v3
