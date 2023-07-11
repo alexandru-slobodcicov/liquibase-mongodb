@@ -7,10 +7,6 @@ on:
 
 jobs:
 
-  release-prepare:
-    uses: liquibase/build-logic/.github/workflows/extension-release-prepare.yml@v0.3.2
-    secrets: inherit
-
   attach-artifact-to-release:
     uses: liquibase/build-logic/.github/workflows/extension-attach-artifact-release.yml@v0.3.2
     secrets: inherit
