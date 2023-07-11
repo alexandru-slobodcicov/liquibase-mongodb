@@ -10,8 +10,6 @@ jobs:
       uses: liquibase/build-logic/.github/workflows/extension-release-published.yml@v0.3.2
       secrets: inherit
 
-
-
     deploy_xsd:
       name: Upload xsds
       runs-on: ubuntu-20.04
