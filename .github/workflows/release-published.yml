@@ -34,7 +34,7 @@ jobs:
             workflow_conclusion: ""
 
         - name: Publish to the Maven Central Repository
-          run: mvn deploy:deploy-file -Dfile=./target/${{ github.event.release.tag_name}}.jar -Dmaven.test.skip -DrepositoryId=sonatype-nexus-staging -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2-fail -DpomFile=pom.xml -P release
+          run: mvn deploy:deploy-file -Dfile=./target/${{ github.event.release.tag_name}}.jar -Dmaven.test.skip -DrepositoryId=sonatype-nexus-staging -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DpomFile=pom.xml -P release
           env:
             MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
             MAVEN_PASSWORD: ${{ secrets.SONATYPE_TOKEN }}
