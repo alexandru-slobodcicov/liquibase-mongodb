@@ -42,6 +42,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
@@ -180,6 +181,7 @@ public class NoSqlExecutor extends AbstractExecutor {
 
     @Override
     public void execute(final SqlStatement sql) throws DatabaseException {
+        disableRowAffectedMessage();
         this.execute(sql, emptyList());
     }
 
@@ -227,6 +229,13 @@ public class NoSqlExecutor extends AbstractExecutor {
             }
         } else {
             throw new IllegalArgumentException();
+        }
+    }
+
+    private void disableRowAffectedMessage() {
+        AtomicInteger rowsAffected = Scope.getCurrentScope().get("rowsAffected", AtomicInteger.class);
+        if (rowsAffected != null) {
+            rowsAffected.set(-1);
         }
     }
 
