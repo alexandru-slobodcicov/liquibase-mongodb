@@ -21,12 +21,11 @@ jobs:
           java-version: 17
           distribution: 'temurin'
           cache: 'maven'
-
       # look for dependencies in maven
       - name: maven-settings-xml-action
-        uses: whelk-io/maven-settings-xml-action@v21
+        uses: whelk-io/maven-settings-xml-action@v20
         with:
-          repositories: >
+          repositories: |
             [
               {
                 "id": "liquibase",
@@ -51,7 +50,7 @@ jobs:
                 }
               }
             ]
-          servers: >
+          servers: |
             [
               {
                 "id": "liquibase-pro",
