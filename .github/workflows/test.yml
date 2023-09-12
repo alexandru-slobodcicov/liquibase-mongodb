@@ -47,7 +47,8 @@ jobs:
                 "snapshots": {
                   "enabled": "true",
                   "updatePolicy": "always"
-                },
+                }
+              },
                 {
                   "id": "liquibase-super-pom",
                   "url": "https://maven.pkg.github.com/liquibase/liquibase-super-pom",
@@ -59,7 +60,6 @@ jobs:
                     "updatePolicy": "always"
                   }
                 }
-              }
             ]
           servers: |
             [
@@ -148,7 +148,8 @@ jobs:
                 "snapshots": {
                   "enabled": "true",
                   "updatePolicy": "always"
-                },
+                }
+              },
                 {
                   "id": "liquibase-super-pom",
                   "url": "https://maven.pkg.github.com/liquibase/liquibase-super-pom",
@@ -160,7 +161,6 @@ jobs:
                     "updatePolicy": "always"
                   }
                 }
-              }
             ]
           servers: |
             [
@@ -248,7 +248,8 @@ jobs:
                 "snapshots": {
                   "enabled": "true",
                   "updatePolicy": "always"
-                },
+                }
+              },
                 {
                   "id": "liquibase-super-pom",
                   "url": "https://maven.pkg.github.com/liquibase/liquibase-super-pom",
@@ -260,7 +261,6 @@ jobs:
                     "updatePolicy": "always"
                   }
                 }
-              }
             ]
           servers: |
             [
@@ -327,7 +327,8 @@ jobs:
                 "snapshots": {
                   "enabled": "true",
                   "updatePolicy": "always"
-                },
+                }
+              },
                 {
                   "id": "liquibase-super-pom",
                   "url": "https://maven.pkg.github.com/liquibase/liquibase-super-pom",
@@ -339,7 +340,6 @@ jobs:
                     "updatePolicy": "always"
                   }
                 }
-              }
             ]
           servers: |
             [
@@ -359,7 +359,7 @@ jobs:
                 "password": "${{ secrets.LIQUIBOT_PAT }}"
               }
             ]
-            
+
       - name: Build Cache
         uses: actions/cache@v3.3.2
         with:
