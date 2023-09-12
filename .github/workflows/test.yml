@@ -53,7 +53,7 @@ jobs:
                   "id": "liquibase-super-pom",
                   "url": "https://maven.pkg.github.com/liquibase/liquibase-super-pom",
                   "releases": {
-                    "enabled": "false"
+                    "enabled": "true"
                   },
                   "snapshots": {
                     "enabled": "true",
@@ -154,7 +154,7 @@ jobs:
                   "id": "liquibase-super-pom",
                   "url": "https://maven.pkg.github.com/liquibase/liquibase-super-pom",
                   "releases": {
-                    "enabled": "false"
+                    "enabled": "true"
                   },
                   "snapshots": {
                     "enabled": "true",
@@ -254,7 +254,7 @@ jobs:
                   "id": "liquibase-super-pom",
                   "url": "https://maven.pkg.github.com/liquibase/liquibase-super-pom",
                   "releases": {
-                    "enabled": "false"
+                    "enabled": "true"
                   },
                   "snapshots": {
                     "enabled": "true",
@@ -333,7 +333,7 @@ jobs:
                   "id": "liquibase-super-pom",
                   "url": "https://maven.pkg.github.com/liquibase/liquibase-super-pom",
                   "releases": {
-                    "enabled": "false"
+                    "enabled": "true"
                   },
                   "snapshots": {
                     "enabled": "true",
