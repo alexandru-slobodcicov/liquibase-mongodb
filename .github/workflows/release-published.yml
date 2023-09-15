@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    uses: liquibase/build-logic/.github/workflows/extension-release-published.yml@v0.4.0
+    uses: liquibase/build-logic/.github/workflows/extension-release-published.yml@v0.4.2
     secrets: inherit
 
   deploy_xsd:
@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Download liquibase mongodb xsd
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # Relative path under $GITHUB_WORKSPACE to place the repository
           path: liquibase-mongodb
