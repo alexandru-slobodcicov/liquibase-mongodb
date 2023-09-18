@@ -12,6 +12,11 @@ jobs:
   build:
     name: Build & Package
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      LIQUIBOT_TOKEN: ${{ secrets.LIQUIBOT_PAT }}
+      GPM_USERNAME: "liquibot"
+      GPM_PASSWORD: ${{ secrets.PUBLIC_REPO_ACCESS_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
@@ -95,6 +100,9 @@ jobs:
         os: [ ubuntu-latest, windows-latest ]
     name: Test Java ${{ matrix.java }} - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    env:
+      LIQUIBOT_TOKEN: ${{ secrets.LIQUIBOT_PAT }}
+      GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
     needs: build
     steps:
       - uses: actions/checkout@v4
@@ -169,6 +177,9 @@ jobs:
   integration-tests:
     name: Integration Test - Java ${{ matrix.java }}
     runs-on: ubuntu-latest
+    env:
+      LIQUIBOT_TOKEN: ${{ secrets.LIQUIBOT_PAT }}
+      GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
     needs: unit-test
     strategy:
       matrix:
@@ -239,6 +250,9 @@ jobs:
   harness-tests:
     name: Harness Tests - Java ${{ matrix.java }}
     runs-on: ubuntu-latest
+    env:
+      LIQUIBOT_TOKEN: ${{ secrets.LIQUIBOT_PAT }}
+      GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
     strategy:
       matrix:
         java: [ 11, 17 ]
@@ -322,4 +336,3 @@ jobs:
         with:
           name: mongodb-test-results
           path: build/spock-reports
-          
