@@ -28,6 +28,7 @@
         <license.inceptionYear>2019</license.inceptionYear>
         <license.organizationName>Mastercard</license.organizationName>
         <license.trimHeaderLine>true</license.trimHeaderLine>
+        <mockito-junit-jupiter.version>4.8.0</mockito-junit-jupiter.version>
     </properties>
 
     <dependencies>
@@ -36,6 +37,24 @@
             <artifactId>mongodb-driver-sync</artifactId>
             <version>${mongodb-driver.version}</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${jupiter.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
