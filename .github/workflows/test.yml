@@ -101,6 +101,7 @@ jobs:
   harness-tests:
     name: Harness Tests - Java ${{ matrix.java }}
     runs-on: ubuntu-latest
+    needs: build
     env:
       LIQUIBOT_TOKEN: ${{ secrets.LIQUIBOT_PAT }}
       GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
