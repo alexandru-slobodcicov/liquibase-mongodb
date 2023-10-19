@@ -12,9 +12,12 @@ permissions:
   contents: write
   pull-requests: write
 
+env:
+  MAVEN_VERSION: '3.9.5'
+
 jobs:
   build:
-    uses: liquibase/build-logic/.github/workflows/os-extension-test.yml@v0.5.0
+    uses: liquibase/build-logic/.github/workflows/os-extension-test.yml@upgrade-maven
     secrets: inherit
 
   integration-tests:
@@ -43,6 +46,11 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
           cache: 'maven'
+
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4.5
+        with:
+          maven-version: ${{ env.MAVEN_VERSION }}
 
       # look for dependencies in maven
       - name: maven-settings-xml-action
@@ -109,6 +117,11 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
           cache: 'maven'
+
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4.5
+        with:
+          maven-version: ${{ env.MAVEN_VERSION }}
 
       # look for dependencies in maven
       - name: maven-settings-xml-action
