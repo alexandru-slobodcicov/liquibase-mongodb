@@ -85,7 +85,7 @@ jobs:
 
 
       - name: Integration Test - Java ${{ matrix.java }}
-        run: mvn -B clean test verify -Prun-its --file pom.xml
+        run: mvn -B clean test verify
 
   harness-tests:
     name: Harness Tests - Java ${{ matrix.java }}
