@@ -52,49 +52,6 @@ jobs:
         with:
           maven-version: ${{ env.MAVEN_VERSION }}
 
-      # look for dependencies in maven
-      - name: maven-settings-xml-action
-        uses: whelk-io/maven-settings-xml-action@v21
-        with:
-          repositories: |
-            [
-              {
-                "id": "liquibase",
-                "url": "https://maven.pkg.github.com/liquibase/liquibase",
-                "releases": {
-                  "enabled": "true"
-                },
-                "snapshots": {
-                  "enabled": "true",
-                  "updatePolicy": "always"
-                }
-              },
-              {
-                "id": "liquibase-pro",
-                "url": "https://maven.pkg.github.com/liquibase/liquibase-pro",
-                "releases": {
-                  "enabled": "true"
-                },
-                "snapshots": {
-                  "enabled": "true",
-                  "updatePolicy": "always"
-                }
-              }
-            ]
-          servers: |
-            [
-              {
-                "id": "liquibase-pro",
-                "username": "liquibot",
-                "password": "${{ secrets.LIQUIBOT_PAT }}"
-              },
-              {
-                "id": "liquibase",
-                "username": "liquibot",
-                "password": "${{ secrets.LIQUIBOT_PAT }}"
-              }
-            ]
-
       - name: Integration Test - Java ${{ matrix.java }}
         run: mvn -B clean test verify -Prun-its --file pom.xml
 
@@ -123,57 +80,6 @@ jobs:
         uses: stCarolas/setup-maven@v4.5
         with:
           maven-version: ${{ env.MAVEN_VERSION }}
-
-      # look for dependencies in maven
-      - name: maven-settings-xml-action
-        uses: whelk-io/maven-settings-xml-action@v21
-        with:
-          repositories: |
-            [
-              {
-                "id": "liquibase",
-                "url": "https://maven.pkg.github.com/liquibase/liquibase",
-                "releases": {
-                  "enabled": "true"
-                },
-                "snapshots": {
-                  "enabled": "true",
-                  "updatePolicy": "always"
-                }
-              },
-              {
-                "id": "liquibase-pro",
-                "url": "https://maven.pkg.github.com/liquibase/liquibase-pro",
-                "releases": {
-                  "enabled": "true"
-                },
-                "snapshots": {
-                  "enabled": "true",
-                  "updatePolicy": "always"
-                }
-              }
-            ]
-          servers: |
-            [
-              {
-                "id": "liquibase-pro",
-                "username": "liquibot",
-                "password": "${{ secrets.LIQUIBOT_PAT }}"
-              },
-              {
-                "id": "liquibase",
-                "username": "liquibot",
-                "password": "${{ secrets.LIQUIBOT_PAT }}"
-              }
-            ]
-
-      - name: Build Cache
-        uses: actions/cache@v3.3.2
-        with:
-          key: build-${{ github.run_number }}-${{ github.run_attempt }}
-          path: |
-            **/target/**
-            ~/.m2/repository/org/liquibase/
 
       - name: Start Database
         run: |
