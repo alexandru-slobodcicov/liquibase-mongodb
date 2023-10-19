@@ -34,6 +34,7 @@
         <license.trimHeaderLine>true</license.trimHeaderLine>
         <license-maven-plugin.version>2.0.0</license-maven-plugin.version>
         <jackson-core.version>2.15.3</jackson-core.version>
+        <db.connection.uri>mongodb://localhost:27017/test_db?socketTimeoutMS=100&amp;connectTimeoutMS=100&amp;serverSelectionTimeoutMS=100</db.connection.uri>
     </properties>
 
     <dependencies>
