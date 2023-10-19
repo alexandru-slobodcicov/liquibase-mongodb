@@ -13,95 +13,13 @@ jobs:
     uses: liquibase/build-logic/.github/workflows/os-extension-test.yml@v0.5.0
     secrets: inherit
 
-  unit-test:
-    strategy:
-      fail-fast: false
-      matrix:
-        java: [ 8, 11, 17, 18 ]
-        os: [ ubuntu-latest, windows-latest ]
-    name: Test Java ${{ matrix.java }} - ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    env:
-      LIQUIBOT_TOKEN: ${{ secrets.LIQUIBOT_PAT }}
-      GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v3
-        with:
-          java-version: ${{ matrix.java }}
-          distribution: 'temurin'
-          cache: 'maven'
-
-      # look for dependencies in maven
-      - name: maven-settings-xml-action
-        uses: whelk-io/maven-settings-xml-action@v21
-        with:
-          repositories: |
-            [
-              {
-                "id": "liquibase",
-                "url": "https://maven.pkg.github.com/liquibase/liquibase",
-                "releases": {
-                  "enabled": "false"
-                },
-                "snapshots": {
-                  "enabled": "true",
-                  "updatePolicy": "always"
-                }
-              },
-              {
-                "id": "liquibase-pro",
-                "url": "https://maven.pkg.github.com/liquibase/liquibase-pro",
-                "releases": {
-                  "enabled": "false"
-                },
-                "snapshots": {
-                  "enabled": "true",
-                  "updatePolicy": "always"
-                }
-              }
-            ]
-          servers: |
-            [
-              {
-                "id": "liquibase-pro",
-                "username": "liquibot",
-                "password": "${{ secrets.LIQUIBOT_PAT }}"
-              },
-              {
-                "id": "liquibase",
-                "username": "liquibot",
-                "password": "${{ secrets.LIQUIBOT_PAT }}"
-              }
-            ]      
-
-      - uses: actions/download-artifact@v3
-        with:
-          name: ${{needs.build.outputs.artifact_id}}-artifacts
-          path: ./target
-
-      - name: Run Tests
-        run: mvn -B jacoco:prepare-agent surefire:test
-
-      - name: Archive Test Results - ${{ matrix.os }}
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-reports-jdk-${{ matrix.java }}-${{ matrix.os }}
-          path: |
-            **/target/surefire-reports
-            **/target/jacoco.exec
-
   integration-tests:
     name: Integration Test - Java ${{ matrix.java }}
     runs-on: ubuntu-latest
     env:
       LIQUIBOT_TOKEN: ${{ secrets.LIQUIBOT_PAT }}
       GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
-    needs: unit-test
+    needs: build
     strategy:
       matrix:
         java: [8, 11, 17]
