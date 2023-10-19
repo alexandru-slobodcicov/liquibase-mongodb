@@ -84,7 +84,7 @@ jobs:
 
 
       - name: Integration Test - Java ${{ matrix.java }}
-        run: mvn -B clean test verify
+        run: mvn -B clean test verify -Ddb.connection.uri="mongodb://localhost:27017/test_db?socketTimeoutMS=100&amp;connectTimeoutMS=100&amp;serverSelectionTimeoutMS=100"
 
   harness-tests:
     name: Harness Tests - Java ${{ matrix.java }}
