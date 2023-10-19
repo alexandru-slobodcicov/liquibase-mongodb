@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.liquibase</groupId>
         <artifactId>liquibase-parent-pom</artifactId>
-        <version>0.2.6</version> <!-- Replace with the desired version -->
+        <version>0.2.6</version>
     </parent>
 
     <groupId>org.liquibase.ext</groupId>
@@ -56,7 +56,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
         <!-- // if you don't already have slf4j-api and an implementation of it in the classpath, add this! -->
         <dependency>
             <groupId>org.slf4j</groupId>
