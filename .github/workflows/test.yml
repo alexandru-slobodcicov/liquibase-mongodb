@@ -19,7 +19,6 @@ jobs:
     env:
       LIQUIBOT_TOKEN: ${{ secrets.LIQUIBOT_PAT }}
       GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
-    needs: build
     strategy:
       matrix:
         java: [8, 11, 17]
