@@ -45,7 +45,6 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-          cache: 'maven'
 
       - name: Set up Maven
         uses: stCarolas/setup-maven@v4.5
@@ -116,7 +115,6 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-          cache: 'maven'
 
       - name: Set up Maven
         uses: stCarolas/setup-maven@v4.5
