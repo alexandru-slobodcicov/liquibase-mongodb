@@ -37,6 +37,13 @@
         <db.connection.uri>mongodb://localhost:27017/test_db?socketTimeoutMS=100&amp;connectTimeoutMS=100&amp;serverSelectionTimeoutMS=100</db.connection.uri>
     </properties>
 
+    <scm>
+        <connection>scm:git:${project.scm.url}</connection>
+        <developerConnection>scm:git:${project.scm.url}</developerConnection>
+		<url>https://github.com/liquibase/liquibase-mongodb.git</url>
+		<tag>HEAD</tag>
+	</scm>
+
     <dependencies>
         <dependency>
             <groupId>org.mongodb</groupId>
